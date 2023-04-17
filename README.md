@@ -1,2 +1,4 @@
 # SSUNOVEL
 Backend Repository
+
+*cfgd
