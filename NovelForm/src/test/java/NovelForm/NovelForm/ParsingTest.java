@@ -34,14 +34,20 @@ public class ParsingTest {
 
 
     @Test
-    // @Rollback(false) DB에 삽입되는 거 확인하고 싶다면 주석 해제
+    @Rollback(false) //DB에 삽입되는 거 확인하고 싶다면 주석 해제
     void 파싱후저장(){
         //일단 파싱해오기
         List<List<String>> read = NovelCSVParser.read("series1.csv");//테스트
         List<Novel> newNovelList = new ArrayList<>();
         List<Author> newAuthorList = new ArrayList<>();
+        List<Author> currentAuthor = authorRepository.findAll(); // DB안에 있는 작가 리스트 가져옴
         for (List<String> info : read) {
-            Author isPresent = authorRepository.findByAuthorName(info.get(3)); //1.해당 작가명이 DB상에 이미 존재하는지
+            //1.해당 작가명이 DB상에 이미 존재하는지
+            Optional<Author> inDBAuthor = currentAuthor.parallelStream().filter(author -> author.getName().equals(info.get(3))).findAny();
+            Author isPresent = null;
+            if(inDBAuthor.isPresent()){
+                isPresent = inDBAuthor.get();
+            }
             Novel newNovel = null;
             if(isPresent == null){ //DB에 현재 작가 이름에 속하는 Author 튜플이 없으면.
                 Author newAuthor = null;
