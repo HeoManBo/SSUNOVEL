@@ -25,5 +25,9 @@ public interface NovelRepository extends JpaRepository<Novel, Long> {
     @Query("select n from Novel n join fetch n.author au where au.name like %:search%")
     List<Novel> findByAuthorName(@Param("search") String search);
 
+    //장르명으로 조회
+    @Query("select n from Novel n join fetch n.author where n.category = :category")
+    List<Novel> findByCategory(@Param("category")String category);
+
 
 }

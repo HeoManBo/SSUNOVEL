@@ -1,4 +1,4 @@
-package NovelForm.NovelForm.domain.novel;
+/*package NovelForm.NovelForm.domain.novel;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -50,4 +50,4 @@ public class Week {
         this.saturday = saturday;
         this.sunday = sunday;
     }
-}
+}*/
