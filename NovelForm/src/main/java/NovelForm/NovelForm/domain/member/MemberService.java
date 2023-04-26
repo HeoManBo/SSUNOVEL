@@ -1,7 +1,9 @@
 package NovelForm.NovelForm.domain.member;
 
 import NovelForm.NovelForm.domain.member.dto.CreateMemberRequest;
+import NovelForm.NovelForm.domain.member.dto.LoginMemberRequest;
 import NovelForm.NovelForm.domain.member.exception.MemberDuplicateException;
+import NovelForm.NovelForm.domain.member.exception.WrongLoginException;
 import NovelForm.NovelForm.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,5 +55,31 @@ public class MemberService {
         memberRepository.save(member);
         //log.info("save member id = {}", member.getId());
         return member.getId();
+    }
+
+    /**
+     *  로그인 서비스 로직
+     *  
+     *  해당 이메일로 회원 가입이 되어있는지 체크
+     *  비밀번호가 일치하는지 체크
+     */
+    public Long loginMember(LoginMemberRequest loginMemberRequest) throws WrongLoginException {
+
+
+        Member findMember = memberRepository.findByEmail(loginMemberRequest.getEmail());
+        log.info("member={}", findMember);
+
+        // 이미 같은 이메일로 회원 가입이 되어 있지 않다면, 에러
+        if(findMember == null){
+            throw new WrongLoginException("해당 이메일로 회원 가입이 되어 있지 않습니다.");
+        }
+
+        // 비밀번호가 다르다면, 에러
+        if(!encoder.matches(loginMemberRequest.getPassword(), findMember.getPassword())){
+            throw new WrongLoginException("비밀번호가 다릅니다.");
+        }
+        
+
+        return findMember.getId();
     }
 }

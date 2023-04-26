@@ -35,7 +35,7 @@ public class MemberControllerAdvice {
     @ExceptionHandler(UnexpectedTypeException.class)
     public BaseResponse unexpectExHandler(UnexpectedTypeException e){
         log.error("[member exception handler] ex", e);
-        return new BaseResponse(BAD_REQUEST, "Type으로 기대되지 않은 값이 왔습니다.");
+        return new BaseResponse(BAD_REQUEST, null,"Type으로 기대되지 않은 값이 왔습니다.");
     }
 
 
@@ -46,7 +46,7 @@ public class MemberControllerAdvice {
     @ExceptionHandler
     public BaseResponse exHandler(Exception e){
         log.error("[member exception handler] ex", e);
-        return new BaseResponse(INTERNAL_SERVER_ERROR, "서버 내부 오류");
+        return new BaseResponse(INTERNAL_SERVER_ERROR, null,"서버 내부 오류");
     }
 
 
@@ -57,7 +57,7 @@ public class MemberControllerAdvice {
     @ExceptionHandler(LoginInterceptorException.class)
     public BaseResponse loginInterceptorExHandler(Exception e){
         log.error("[member exception handler] ex ", e);
-        return new BaseResponse(BAD_REQUEST, e.getMessage());
+        return new BaseResponse(BAD_REQUEST, null, e.getMessage());
     }
 
 
@@ -68,7 +68,17 @@ public class MemberControllerAdvice {
     @ExceptionHandler(MemberDuplicateException.class)
     public BaseResponse memberDuplicateExHandler(Exception e){
         log.error("[member exception handler] ex", e);
-        return new BaseResponse(BAD_REQUEST, e.getMessage());
+        return new BaseResponse(BAD_REQUEST, null, e.getMessage());
     }
 
+
+    /**
+     *  회원 가입이 안 되어있는 상태에서 로그인시 호출 될 핸들러
+     */
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(WrongLoginException.class)
+    public BaseResponse wrongLoginExHandler(Exception e){
+        log.error("[member exception handler] ex", e);
+        return new BaseResponse(BAD_REQUEST, e.getMessage(), "회원 가입이 안 되어 있습니다.");
+    }
 }

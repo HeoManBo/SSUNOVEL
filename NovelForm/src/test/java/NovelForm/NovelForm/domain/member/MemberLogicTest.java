@@ -2,10 +2,12 @@ package NovelForm.NovelForm.domain.member;
 
 import NovelForm.NovelForm.domain.member.dto.CreateMemberRequest;
 
+import NovelForm.NovelForm.domain.member.dto.LoginMemberRequest;
 import NovelForm.NovelForm.domain.member.exception.MemberDuplicateException;
 import NovelForm.NovelForm.global.BaseResponse;
 import NovelForm.NovelForm.repository.MemberRepository;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.sun.jdi.request.DuplicateRequestException;
@@ -133,4 +135,102 @@ public class MemberLogicTest {
 
     }
 
+
+
+    @Test
+    @DisplayName("[통합] 로그인로직")
+    public void loginMember() throws JsonProcessingException {
+
+        // given
+        // request에 들어갈 body 부분 정의
+        String email = "test888@naver.com";
+        String password = "12345678";
+
+
+
+        // 정상 적인 회원...
+        CreateMemberRequest createMemberRequest = new CreateMemberRequest(
+                email,
+                password,
+                "testn",
+                Gender.stringToGender("MALE")
+        );
+        LoginMemberRequest testDto = new LoginMemberRequest(email, password);
+
+        // DB에 없는 회원...
+        LoginMemberRequest emptyTestDto = new LoginMemberRequest("test@ggg.com", "87654321");
+
+        // 비밀번호가 잘못 된 회원...
+        LoginMemberRequest wrongPwDto = new LoginMemberRequest(email, "12312312");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        String url = "http://localhost:8080";
+
+        // json 타입이 body에 들어가기에 헤더에 content-type 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json");
+
+        // 헤더를 포함해 HttpEntity 생성
+        // 회원 생성 엔티티
+        HttpEntity<String> createEntity = new HttpEntity<>(objectMapper.writeValueAsString(createMemberRequest), headers);
+
+        // 로그인 헤더 엔티티
+        HttpEntity<String> loginEntity = new HttpEntity<>(objectMapper.writeValueAsString(testDto), headers);
+
+        // emptyTestDto 헤더 엔티티
+        HttpEntity<String> emptyTestEntity = new HttpEntity<>(objectMapper.writeValueAsString(emptyTestDto), headers);
+
+        // wrongPwDto 헤더 엔티티
+        HttpEntity<String> wrongTestEntity = new HttpEntity<>(objectMapper.writeValueAsString(wrongPwDto), headers);
+
+
+
+
+        // when
+        // post 요청 보내기
+        // 먼저 회원을 하나 생성
+        restTemplate.postForEntity(
+                url + "/member/create",
+                createEntity,
+                BaseResponse.class);
+
+
+        // 로그인 post 요청 보내기
+        // wrongTestRes : 잘못된 비밀번호
+        ResponseEntity<BaseResponse> wrongTestRes = restTemplate.postForEntity(
+                url + "/member/login",
+                wrongTestEntity,
+                BaseResponse.class);
+
+        // emptyTestRes : 비어있는 유저
+        ResponseEntity<BaseResponse> emptyTestRes = restTemplate.postForEntity(
+                url + "/member/login",
+                emptyTestEntity,
+                BaseResponse.class
+        );
+
+        // baseRes : 정상 수행 로그인
+        ResponseEntity<BaseResponse> baseRes = restTemplate.postForEntity(
+                url + "/member/login",
+                loginEntity,
+                BaseResponse.class
+        );
+
+
+        // then
+
+        // 비밀번호가 일치하지 않을 때 거를 수 있는가?
+        Assertions.assertThat(wrongTestRes.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        // DB에 없는 이메일을 거를 수 있는가?
+        Assertions.assertThat(emptyTestRes.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        // 정상 요청이 받아지는가?
+        Assertions.assertThat(baseRes.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        // 세션이 생성 되는가?
+        Assertions.assertThat(baseRes.getHeaders().get("Set-Cookie")).isNotNull();
+
+    }
 }

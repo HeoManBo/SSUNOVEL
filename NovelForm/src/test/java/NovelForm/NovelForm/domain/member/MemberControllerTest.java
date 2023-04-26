@@ -1,6 +1,7 @@
 package NovelForm.NovelForm.domain.member;
 
 import NovelForm.NovelForm.domain.member.dto.CreateMemberRequest;
+import NovelForm.NovelForm.domain.member.dto.LoginMemberRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
@@ -118,6 +119,62 @@ class MemberControllerTest {
                 )
         // then
                 .andExpect(status().isOk());
+
+    }
+
+
+
+
+
+    @Test
+    @DisplayName("[단위] 로그인 / 요청이 잘 들어오는가?")
+    @WithMockUser(username = "테스트관리자", roles = "USER")
+    void loginMember() throws Exception {
+
+        // given
+        // body에 들어갈 값들 정의
+        ArrayList<LoginMemberRequest> testList = new ArrayList<>();
+
+        // null 체크
+        testList.add(new LoginMemberRequest("test@naver.com", null));
+
+        // 길이 체크
+        testList.add(new LoginMemberRequest("test@naver.com", "12345"));
+
+        // 이메일 형식 체크
+        testList.add(new LoginMemberRequest("testnaver.com", "1234567"));
+
+        // 정상 통과 체크
+        LoginMemberRequest successTest =
+                new LoginMemberRequest("test@naver.com", "123456789");
+
+
+        // when
+        // mockMvc로 post 요청을 보내기
+        // 실패 테스트
+        for (LoginMemberRequest loginMemberRequest : testList) {
+            mockMvc.perform(post("/member/login")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(loginMemberRequest))
+                            .accept(MediaType.APPLICATION_JSON)
+                            .with(csrf())
+                    )
+        // then
+                    .andExpect(status().isBadRequest());
+        }
+
+
+        // when
+        // 성공 테스트
+        mockMvc.perform(post("/member/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(successTest))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                )
+        // then
+                .andExpect(status().isOk());
+
 
     }
 
