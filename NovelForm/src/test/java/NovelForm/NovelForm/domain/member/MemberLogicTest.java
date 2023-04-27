@@ -50,7 +50,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 @SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Transactional
 public class MemberLogicTest {
 
     @Autowired
@@ -74,6 +73,7 @@ public class MemberLogicTest {
 
     @Test
     @DisplayName("[통합] 회원가입로직")
+    @Transactional
     public void createMember() throws Exception {
         // given
         // request에 들어갈 body 부분 정의
@@ -139,6 +139,7 @@ public class MemberLogicTest {
 
     @Test
     @DisplayName("[통합] 로그인로직")
+    @Transactional
     public void loginMember() throws JsonProcessingException {
 
         // given

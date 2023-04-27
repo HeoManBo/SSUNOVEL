@@ -34,14 +34,6 @@ import java.util.List;
 
 
 @Tag(name = "회원", description = "회원 관련 api입니다.")
-@ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "성공",
-                content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-        @ApiResponse(responseCode = "400", description = "잘못 된 요청",
-                content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-        @ApiResponse(responseCode = "500", description = "서버 에러",
-                content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-})
 @Slf4j
 @RestController
 @RequestMapping("/member")

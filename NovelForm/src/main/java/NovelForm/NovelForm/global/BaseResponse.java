@@ -2,7 +2,8 @@ package NovelForm.NovelForm.global;
 
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,11 @@ import static org.springframework.http.HttpStatus.*;
  *
  * @Getter가 있어야 핸들러가 가져다 JSON파싱이 가능하다?
  */
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공"),
+        @ApiResponse(responseCode = "400", description = "잘못 된 요청"),
+        @ApiResponse(responseCode = "500", description = "서버 에러")
+})
 @Slf4j
 @Getter
 @NoArgsConstructor
