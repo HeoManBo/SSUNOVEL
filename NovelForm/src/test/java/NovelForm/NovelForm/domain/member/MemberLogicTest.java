@@ -3,6 +3,7 @@ package NovelForm.NovelForm.domain.member;
 import NovelForm.NovelForm.domain.member.dto.CreateMemberRequest;
 
 import NovelForm.NovelForm.domain.member.dto.LoginMemberRequest;
+import NovelForm.NovelForm.domain.member.exception.LoginInterceptorException;
 import NovelForm.NovelForm.domain.member.exception.MemberDuplicateException;
 import NovelForm.NovelForm.global.BaseResponse;
 import NovelForm.NovelForm.repository.MemberRepository;
@@ -11,6 +12,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.sun.jdi.request.DuplicateRequestException;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 
@@ -23,12 +25,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,8 +47,10 @@ import static org.junit.jupiter.api.Assertions.*;
  * 그래서 spring.main.allow-bean-definition-overriding=true를 properties에 추가했다.
  *
  * 통합 테스트에서는 TemplateRestTest를 사용했다.
+ *
+ * test에 profile 적용... applicaiton-test.properties를 우선시 해서 받게 처리했다.
  */
-
+@ActiveProfiles("test")
 @Slf4j
 @SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class MemberLogicTest {
@@ -70,10 +73,13 @@ public class MemberLogicTest {
     private TestRestTemplate restTemplate;
 
 
-
+    /**
+     *  회원가입 서비스 통합 테스트
+     */
     @Test
     @DisplayName("[통합] 회원가입로직")
     @Transactional
+    @Rollback(true)
     public void createMember() throws Exception {
         // given
         // request에 들어갈 body 부분 정의
@@ -104,7 +110,6 @@ public class MemberLogicTest {
                 httpEntity,
                 BaseResponse.class);
 
-        //log.info("result = {}", response);
 
         // then
         // 요청이 성공했는지 먼저 확인
@@ -133,13 +138,17 @@ public class MemberLogicTest {
         // 중복 체크에 걸리는가?
         Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 
+
     }
 
 
-
+    /**
+     *  로그인 로그아웃 로직 확인
+     */
     @Test
-    @DisplayName("[통합] 로그인로직")
+    @DisplayName("[통합] 로그인/로그아웃 로직")
     @Transactional
+    @Rollback(true)
     public void loginMember() throws JsonProcessingException {
 
         // given
@@ -233,5 +242,32 @@ public class MemberLogicTest {
         // 세션이 생성 되는가?
         Assertions.assertThat(baseRes.getHeaders().get("Set-Cookie")).isNotNull();
 
+
+
+        // 로그아웃 요청 전달
+        // 위에서 만든 쿠키 정보를 같이 전달
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(HttpHeaders.COOKIE, baseRes.getHeaders().get("Set-Cookie").get(0));
+
+        ResponseEntity<BaseResponse> logoutResponse =
+                restTemplate.exchange(url + "/member/logout",
+                        HttpMethod.GET,
+                        new HttpEntity<String>(httpHeaders),
+                        BaseResponse.class);
+
+
+        // 요청이 성공했는가?
+        Assertions.assertThat(logoutResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        // 세션이 사라졌는가?
+        Assertions.assertThat(logoutResponse.getHeaders().get("set-Cookie")).isNull();
+
+        // 로그아웃이 된 상황에서 로그아웃을 다시 호출했을 때, BAD_REQUEST를 내보내는가?
+        logoutResponse = restTemplate.exchange(url + "/member/logout",
+                        HttpMethod.GET,
+                        new HttpEntity<String>(httpHeaders),
+                        BaseResponse.class);
+
+        Assertions.assertThat(logoutResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 }

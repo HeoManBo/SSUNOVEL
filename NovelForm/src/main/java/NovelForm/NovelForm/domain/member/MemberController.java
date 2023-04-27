@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -51,7 +52,7 @@ public class MemberController {
      *  request body에 대한 type체크는 아직이다.
      *  다른 에러에 대한 다른 메시지가 나오게 해야 한다 (미 구현)
      */
-    @Operation(summary = "회원 가입 메서드", description = "회원 가입 메서드입니다.")
+    @Operation(summary = "회원 가입", description = "회원 가입 메서드입니다.")
     @PostMapping("/create")
     public BaseResponse<Long> createMember(
             @Validated @RequestBody CreateMemberRequest createMemberRequest,
@@ -79,7 +80,7 @@ public class MemberController {
     /**
      *  로그인 메소드
      */
-    @Operation(summary = "로그인 메서드", description = "로그인 메서드입니다.")
+    @Operation(summary = "로그인", description = "로그인 메서드입니다.")
     @PostMapping("/login")
     public BaseResponse loginMember(
             @Validated @RequestBody LoginMemberRequest loginMemberRequest,
@@ -95,10 +96,39 @@ public class MemberController {
 
         Long id = memberService.loginMember(loginMemberRequest);
 
-        HttpSession session = request.getSession();
-        session.setAttribute(SessionConst.LOGIN_MEMBER_ID, id);
+
+        HttpSession session = request.getSession(false);
+        if(session == null){
+            session = request.getSession();
+            session.setAttribute(SessionConst.LOGIN_MEMBER_ID, id);
+        }
 
         return new BaseResponse<Long>(HttpStatus.OK, id, "생성 성공");
     }
+
+
+    /**
+     *  로그 아웃 메서드
+     *
+     *  세션 해제시키는게 주요 기능
+     *  인터셉터에서 이미 세션 체크를 하기 때문에 세션이 없으면 걸러져서 여기까지 오지 않음
+     */
+    @Operation(summary = "로그 아웃", description = "로그아웃 기능입니다.")
+
+    @GetMapping("/logout")
+    public BaseResponse logoutMember(HttpServletRequest request) throws WrongLoginException {
+
+        HttpSession httpSession = request.getSession(false);
+
+        // 세션 삭제
+        if(httpSession != null){
+
+            // 세션 무효화
+            httpSession.invalidate();
+        }
+
+        return new BaseResponse(HttpStatus.OK, null, "로그아웃에 성공했습니다.");
+    }
+
 
 }

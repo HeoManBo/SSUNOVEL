@@ -19,6 +19,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -42,7 +43,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * build.gradle에 security-test를 추가하고 perform에
  * .with(csrf()) 를 추가했다.
  *
+ * test에 profile 적용... applicaiton-test.properties를 우선시 해서 받게 처리했다.
  */
+@ActiveProfiles("test")
 @WebMvcTest(controllers = MemberController.class)
 @MockBean(JpaMetamodelMappingContext.class)
 class MemberControllerTest {
@@ -177,5 +180,4 @@ class MemberControllerTest {
 
 
     }
-
 }
