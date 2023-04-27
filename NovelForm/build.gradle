@@ -26,7 +26,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'	// @Validated 사용을 위해
 	implementation 'org.springframework.boot:spring-boot-starter-security'		// 스프링 시큐리티
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'	// swagger-ui 와 spring-boot 통합
-    implementation 'mysql:mysql-connector-java'
 	testImplementation 'org.projectlombok:lombok:1.18.26'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'

@@ -104,7 +104,7 @@ public class MemberLogicTest {
                 httpEntity,
                 BaseResponse.class);
 
-        log.info("result = {}", response);
+        //log.info("result = {}", response);
 
         // then
         // 요청이 성공했는지 먼저 확인

@@ -2,11 +2,14 @@ package NovelForm.NovelForm.domain.member;
 
 
 import NovelForm.NovelForm.domain.member.dto.CreateMemberRequest;
+import NovelForm.NovelForm.domain.member.dto.LoginMemberRequest;
 import NovelForm.NovelForm.domain.member.exception.MemberDuplicateException;
+import NovelForm.NovelForm.domain.member.exception.WrongLoginException;
 import NovelForm.NovelForm.global.BaseResponse;
 import NovelForm.NovelForm.global.ErrorResponse;
 import NovelForm.NovelForm.global.ErrorResultCreater;
 import NovelForm.NovelForm.global.SessionConst;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -73,6 +76,32 @@ public class MemberController {
 
         Long id = memberService.createMember(createMemberRequest);
 
+
+        HttpSession session = request.getSession();
+        session.setAttribute(SessionConst.LOGIN_MEMBER_ID, id);
+
+        return new BaseResponse<Long>(HttpStatus.OK, id, "생성 성공");
+    }
+
+
+    /**
+     *  로그인 메소드
+     */
+    @Operation(summary = "로그인 메서드", description = "로그인 메서드입니다.")
+    @PostMapping("/login")
+    public BaseResponse loginMember(
+            @Validated @RequestBody LoginMemberRequest loginMemberRequest,
+            BindingResult bindingResult,
+            HttpServletRequest request
+    ) throws JsonProcessingException, WrongLoginException {
+
+        // field 에러 체크
+        if(bindingResult.hasFieldErrors()){
+            String message = ErrorResultCreater.objectErrorToJson(bindingResult.getFieldErrors());
+            throw new IllegalArgumentException(message);
+        }
+
+        Long id = memberService.loginMember(loginMemberRequest);
 
         HttpSession session = request.getSession();
         session.setAttribute(SessionConst.LOGIN_MEMBER_ID, id);

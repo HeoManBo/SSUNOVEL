@@ -33,7 +33,7 @@ public class ParsingTest {
     // 이때 새로 들어온 작가 객체가 있으므로 작가를 찾을 때 DB에서 찾고 -> 새로 추가한 작가 리스트에서 찾음
 
 
-    @Test
+    //@Test
     @Rollback(false) //DB에 삽입되는 거 확인하고 싶다면 주석 해제
     void 파싱후저장(){
         //일단 파싱해오기

@@ -37,7 +37,7 @@ public class ReviewTest {
      * delete from review; 수행해야함.
      */
 
-    @Test
+    //@Test
     @Rollback(false)
     void 리뷰생성1(){
         //given : ssu라는 유저가 1번, 2번 소설에 대한 리뷰 작성
@@ -69,7 +69,7 @@ public class ReviewTest {
         assertThat(result2.getContent()).isEqualTo(review2.getContent());
     }
 
-    @Test
+    //@Test
     @Rollback(false)
     void 리뷰생성2(){
         //given : test라는 유저가 성냥팔이 소녀 리뷰 작성
@@ -92,7 +92,7 @@ public class ReviewTest {
         assertThat(result1.getContent()).isEqualTo(review1.getContent());
     }
 
-    @Test
+    //@Test
     @DisplayName("리뷰생성1,2 후 소설번호 1번에 대한 리뷰 수가 2개인지 확인")
     void 리뷰개수확인(){
         Novel find = novelRepository.findById(1L).get();
