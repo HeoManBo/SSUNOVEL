@@ -1,7 +1,7 @@
 package NovelForm.NovelForm.repository;
 
 
-import NovelForm.NovelForm.domain.member.Review;
+import NovelForm.NovelForm.domain.member.domain.Review;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

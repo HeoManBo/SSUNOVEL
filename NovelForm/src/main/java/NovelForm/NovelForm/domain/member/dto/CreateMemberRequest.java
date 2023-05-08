@@ -1,7 +1,7 @@
 package NovelForm.NovelForm.domain.member.dto;
 
 
-import NovelForm.NovelForm.domain.member.Gender;
+import NovelForm.NovelForm.domain.member.domain.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -38,4 +38,8 @@ public class CreateMemberRequest {
     @Schema(description = "성별", defaultValue = "MALE")
     @NotNull
     private Gender gender;
+
+    @Schema(description = "나이", defaultValue = "10")
+    @NotNull
+    private Integer age;
 }

@@ -25,6 +25,8 @@ public class ErrorResultCreater {
             map.put(error.getField(), error.getDefaultMessage());
         }
 
+        System.out.println("objectMapper.writeValueAsString(map) = " + objectMapper.writeValueAsString(map));
+        
         return objectMapper.writeValueAsString(map);
     }
 

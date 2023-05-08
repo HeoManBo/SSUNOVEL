@@ -1,7 +1,7 @@
 package NovelForm.NovelForm.domain.novel;
 
 
-import NovelForm.NovelForm.domain.member.Review;
+import NovelForm.NovelForm.domain.member.domain.Review;
 import NovelForm.NovelForm.global.BaseEntityTime;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,8 +17,8 @@ import java.util.List;
 public class Novel extends BaseEntityTime {
 
     @Id
-    @GeneratedValue
-    @Column(name = "novel_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "novel_idx")
     private Long id;
 
     @Column
@@ -46,9 +46,21 @@ public class Novel extends BaseEntityTime {
     @Column
     private int review_cnt;
 
+
+    // 플랫폼 추가
+    @Column
+    private int is_naver;
+    @Column
+    private int is_kakao;
+    @Column
+    private int is_ridi;
+    @Column
+    private int is_munpia;
+
+
     //작품 관점에서 여러 작품은 하나의 작가에 속하므로 N:1
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "author_id")
+    @JoinColumn(name = "author_idx")
     private Author author;
 
     // 수정 해야함..
@@ -77,7 +89,8 @@ public class Novel extends BaseEntityTime {
 
     @Builder
     public Novel(String title, String summary, int episode, int price, int download_cnt, String is_finished,
-                 String cover_image, double rating, int review_cnt, String category, Author author, Platform platform) {
+                 String cover_image, double rating, int review_cnt, String category, Author author,
+                 int is_naver, int is_kakao, int is_ridi, int is_munpia) {
         this.title = title;
         this.summary = summary;
         this.episode = episode;
@@ -88,6 +101,11 @@ public class Novel extends BaseEntityTime {
         this.cover_image = cover_image;
         this.review_cnt = review_cnt;
         this.is_finished = is_finished;
+        this.author = author;
+        this.is_naver = is_naver;
+        this.is_kakao = is_kakao;
+        this.is_ridi = is_ridi;
+        this.is_munpia = is_munpia;
     }
 
     public void addAuthor(Author author){

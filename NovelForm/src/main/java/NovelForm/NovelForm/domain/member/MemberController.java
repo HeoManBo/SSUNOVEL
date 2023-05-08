@@ -3,35 +3,21 @@ package NovelForm.NovelForm.domain.member;
 
 import NovelForm.NovelForm.domain.member.dto.CreateMemberRequest;
 import NovelForm.NovelForm.domain.member.dto.LoginMemberRequest;
-import NovelForm.NovelForm.domain.member.exception.MemberDuplicateException;
 import NovelForm.NovelForm.domain.member.exception.WrongLoginException;
 import NovelForm.NovelForm.global.BaseResponse;
-import NovelForm.NovelForm.global.ErrorResponse;
 import NovelForm.NovelForm.global.ErrorResultCreater;
 import NovelForm.NovelForm.global.SessionConst;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.List;
 
 
 @Tag(name = "회원", description = "회원 관련 api입니다.")

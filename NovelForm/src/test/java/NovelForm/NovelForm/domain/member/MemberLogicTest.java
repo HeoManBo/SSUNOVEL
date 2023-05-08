@@ -1,23 +1,18 @@
 package NovelForm.NovelForm.domain.member;
 
+import NovelForm.NovelForm.domain.member.domain.Gender;
 import NovelForm.NovelForm.domain.member.dto.CreateMemberRequest;
 
 import NovelForm.NovelForm.domain.member.dto.LoginMemberRequest;
-import NovelForm.NovelForm.domain.member.exception.LoginInterceptorException;
-import NovelForm.NovelForm.domain.member.exception.MemberDuplicateException;
 import NovelForm.NovelForm.global.BaseResponse;
 import NovelForm.NovelForm.repository.MemberRepository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.sun.jdi.request.DuplicateRequestException;
-import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +26,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -50,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * test에 profile 적용... applicaiton-test.properties를 우선시 해서 받게 처리했다.
  */
-@ActiveProfiles("test")
+
 @Slf4j
 @SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class MemberLogicTest {
@@ -90,7 +83,8 @@ public class MemberLogicTest {
                 email,
                 password,
                 "testNickname",
-                Gender.MALE);
+                Gender.MALE,
+                10);
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -163,7 +157,8 @@ public class MemberLogicTest {
                 email,
                 password,
                 "testn",
-                Gender.stringToGender("MALE")
+                Gender.stringToGender("MALE"),
+                10
         );
         LoginMemberRequest testDto = new LoginMemberRequest(email, password);
 

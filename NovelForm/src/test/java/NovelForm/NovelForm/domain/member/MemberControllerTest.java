@@ -1,31 +1,22 @@
 package NovelForm.NovelForm.domain.member;
 
+import NovelForm.NovelForm.domain.member.domain.Gender;
 import NovelForm.NovelForm.domain.member.dto.CreateMemberRequest;
 import NovelForm.NovelForm.domain.member.dto.LoginMemberRequest;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.EntityManager;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -80,17 +71,17 @@ class MemberControllerTest {
         ArrayList<CreateMemberRequest> testList = new ArrayList<>();
 
         // null 체크
-        testList.add(new CreateMemberRequest("test@naver.com", null, "testNickname", null));
+        testList.add(new CreateMemberRequest("test@naver.com", null, "testNickname", null, 1));
 
         // 길이 체크
-        testList.add(new CreateMemberRequest("test@naver.com", "12345", "testNickname", Gender.MALE));
+        testList.add(new CreateMemberRequest("test@naver.com", "12345", "testNickname", Gender.MALE, 1));
 
         // 이메일 형식 체크
-        testList.add(new CreateMemberRequest("testnaver.com", "1234567", "testNickname", Gender.MALE));
+        testList.add(new CreateMemberRequest("testnaver.com", "1234567", "testNickname", Gender.MALE, 10));
 
         // 정상 통과 체크
         CreateMemberRequest successTest =
-                new CreateMemberRequest("test@naver.com", "123456789", "testNickname", Gender.MALE);
+                new CreateMemberRequest("test@naver.com", "123456789", "testNickname", Gender.MALE,1);
 
 
 

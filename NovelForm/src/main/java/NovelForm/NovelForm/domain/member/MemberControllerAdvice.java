@@ -1,11 +1,11 @@
-package NovelForm.NovelForm.domain.member.exception;
+package NovelForm.NovelForm.domain.member;
 
+import NovelForm.NovelForm.domain.member.exception.LoginInterceptorException;
+import NovelForm.NovelForm.domain.member.exception.MemberDuplicateException;
+import NovelForm.NovelForm.domain.member.exception.WrongLoginException;
 import NovelForm.NovelForm.global.BaseResponse;
-import NovelForm.NovelForm.global.ErrorResponse;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.UnexpectedTypeException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
