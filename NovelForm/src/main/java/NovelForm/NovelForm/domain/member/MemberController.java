@@ -57,7 +57,7 @@ public class MemberController {
 
 
         HttpSession session = request.getSession();
-        session.setAttribute(SessionConst.LOGIN_member_id, id);
+        session.setAttribute(SessionConst.LOGIN_MEMBER_ID, id);
 
         return new BaseResponse<Long>(HttpStatus.OK, id, "생성 성공");
     }
@@ -86,7 +86,7 @@ public class MemberController {
         HttpSession session = request.getSession(false);
         if(session == null){
             session = request.getSession();
-            session.setAttribute(SessionConst.LOGIN_member_id, id);
+            session.setAttribute(SessionConst.LOGIN_MEMBER_ID, id);
         }
 
         return new BaseResponse<Long>(HttpStatus.OK, id, "생성 성공");

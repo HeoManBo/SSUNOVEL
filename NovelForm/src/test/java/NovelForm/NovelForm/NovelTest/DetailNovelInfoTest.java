@@ -1,10 +1,10 @@
 package NovelForm.NovelForm.NovelTest;
 
 
-import NovelForm.NovelForm.domain.member.Gender;
-import NovelForm.NovelForm.domain.member.LoginType;
-import NovelForm.NovelForm.domain.member.Member;
-import NovelForm.NovelForm.domain.member.Review;
+import NovelForm.NovelForm.domain.member.domain.Gender;
+import NovelForm.NovelForm.domain.member.domain.LoginType;
+import NovelForm.NovelForm.domain.member.domain.Member;
+import NovelForm.NovelForm.domain.member.domain.Review;
 import NovelForm.NovelForm.domain.novel.Author;
 import NovelForm.NovelForm.domain.novel.Novel;
 import NovelForm.NovelForm.repository.AuthorRepository;
@@ -12,9 +12,7 @@ import NovelForm.NovelForm.repository.MemberRepository;
 import NovelForm.NovelForm.repository.NovelRepository;
 import NovelForm.NovelForm.repository.ReviewRepository;
 import jakarta.persistence.EntityManager;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,8 +72,8 @@ public class DetailNovelInfoTest {
         authorRepository.save(author);
         novelRepository.save(novel);
         // 2명의 member 생성
-        Member member1 = new Member("aaa", "aaaa", "A", Gender.MALE, LoginType.USER);
-        Member member2 = new Member("bbb", "aaaa", "B", Gender.MALE, LoginType.USER);
+        Member member1 = new Member("aaa", "aaaa", "A", Gender.MALE, LoginType.USER, 5);
+        Member member2 = new Member("bbb", "aaaa", "B", Gender.MALE, LoginType.USER, 5);
         memberRepository.save(member1);
         memberRepository.save(member2);
         for(int i=0; i<20; i++){

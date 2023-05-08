@@ -21,6 +21,7 @@ import java.util.List;
 @Slf4j
 @Tag(name = "소설 검색", description = "소설 검색 컨트롤러입니다")
 @RequiredArgsConstructor
+@RequestMapping("/novel")
 public class NovelSearchController {
     private final NovelService novelService;
 

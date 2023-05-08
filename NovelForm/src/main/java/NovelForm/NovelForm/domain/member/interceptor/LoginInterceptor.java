@@ -25,7 +25,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 
         HttpSession session = request.getSession(false);    // 생성 X, 가져오기
 
-        if(session == null || session.getAttribute(SessionConst.LOGIN_member_id) == null){
+        if(session == null || session.getAttribute(SessionConst.LOGIN_MEMBER_ID) == null){
             log.info("미인증 사용자 = {}", request.getSession(false));
 
 

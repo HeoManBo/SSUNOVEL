@@ -1,7 +1,7 @@
 package NovelForm.NovelForm.repository;
 
 
-import NovelForm.NovelForm.domain.member.Review;
+import NovelForm.NovelForm.domain.member.domain.Review;
 import NovelForm.NovelForm.domain.novel.Novel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
