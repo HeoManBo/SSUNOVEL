@@ -1,4 +1,4 @@
-package NovelForm.NovelForm.domain.member;
+package NovelForm.NovelForm.domain.member.domain;
 
 
 import NovelForm.NovelForm.global.BaseEntityTime;

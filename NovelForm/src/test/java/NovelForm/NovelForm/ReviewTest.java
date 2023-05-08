@@ -1,10 +1,10 @@
 package NovelForm.NovelForm;
 
 
-import NovelForm.NovelForm.domain.member.Gender;
-import NovelForm.NovelForm.domain.member.LoginType;
-import NovelForm.NovelForm.domain.member.Member;
-import NovelForm.NovelForm.domain.member.Review;
+import NovelForm.NovelForm.domain.member.domain.Gender;
+import NovelForm.NovelForm.domain.member.domain.LoginType;
+import NovelForm.NovelForm.domain.member.domain.Member;
+import NovelForm.NovelForm.domain.member.domain.Review;
 import NovelForm.NovelForm.domain.novel.Author;
 import NovelForm.NovelForm.domain.novel.Novel;
 import NovelForm.NovelForm.repository.AuthorRepository;
@@ -12,15 +12,11 @@ import NovelForm.NovelForm.repository.MemberRepository;
 import NovelForm.NovelForm.repository.NovelRepository;
 import NovelForm.NovelForm.repository.ReviewRepository;
 import jakarta.transaction.Transactional;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;

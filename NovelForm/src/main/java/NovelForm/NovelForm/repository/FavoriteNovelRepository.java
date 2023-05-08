@@ -2,8 +2,7 @@ package NovelForm.NovelForm.repository;
 
 
 import NovelForm.NovelForm.domain.favorite.FavoriteNovel;
-import NovelForm.NovelForm.domain.member.Member;
-import NovelForm.NovelForm.domain.novel.Novel;
+import NovelForm.NovelForm.domain.member.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

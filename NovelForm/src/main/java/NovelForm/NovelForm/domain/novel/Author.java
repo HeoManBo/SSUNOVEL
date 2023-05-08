@@ -15,8 +15,8 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Author extends BaseEntityTime {
     @Id
-    @GeneratedValue
-    @Column(name = "author_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "author_idx")
     private Long id;
 
     @Column
@@ -34,6 +34,7 @@ public class Author extends BaseEntityTime {
     @Builder
     public Author(String name) {
         this.name = name;
+        this.status = "activated";
     }
 
 

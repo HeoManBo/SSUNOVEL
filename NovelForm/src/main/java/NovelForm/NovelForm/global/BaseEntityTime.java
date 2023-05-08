@@ -1,6 +1,7 @@
 package NovelForm.NovelForm.global;
 
 
+import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
@@ -20,9 +21,12 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntityTime {
+
+    @Column(name = "created_at")
     @CreatedDate
     private LocalDateTime create_at;
 
+    @Column(name = "updated_at")
     @LastModifiedDate
     private LocalDateTime update_at;
 }

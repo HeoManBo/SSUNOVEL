@@ -1,4 +1,4 @@
-package NovelForm.NovelForm.domain.member;
+package NovelForm.NovelForm.domain.member.domain;
 
 
 import NovelForm.NovelForm.domain.community.Comment;
@@ -18,11 +18,11 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(exclude = {"alerts", "favorite_novels" , "communityPosts", "favoriteBoxes"})
+//@ToString(exclude = {"alerts", "favorite_novels" , "communityPosts", "favoriteBoxes"})
 public class Member extends BaseEntityTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_id")
+    @Column(name = "member_idx")
     private Long id;
 
     @Column(unique = true)
@@ -30,6 +30,10 @@ public class Member extends BaseEntityTime {
 
     @Column
     private String password;
+
+
+    @Column
+    private Integer age;
 
     @Column
     private String nickname;
@@ -78,12 +82,13 @@ public class Member extends BaseEntityTime {
 
 
     @Builder
-    public Member(String email, String password, String nickname, Gender gender, LoginType loginType) {
+    public Member(String email, String password, String nickname, Gender gender, LoginType loginType, Integer age) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.gender = gender;
         this.loginType = loginType;
+        this.age = age;
     }
 
     //연관관계 메소드 --> 파라미터로 넘어온 객체에서 해당 함수 호출

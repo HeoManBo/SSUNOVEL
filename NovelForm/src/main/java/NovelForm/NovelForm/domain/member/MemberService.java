@@ -1,5 +1,7 @@
 package NovelForm.NovelForm.domain.member;
 
+import NovelForm.NovelForm.domain.member.domain.LoginType;
+import NovelForm.NovelForm.domain.member.domain.Member;
 import NovelForm.NovelForm.domain.member.dto.CreateMemberRequest;
 import NovelForm.NovelForm.domain.member.dto.LoginMemberRequest;
 import NovelForm.NovelForm.domain.member.exception.MemberDuplicateException;
@@ -7,7 +9,6 @@ import NovelForm.NovelForm.domain.member.exception.WrongLoginException;
 import NovelForm.NovelForm.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +48,7 @@ public class MemberService {
                 .nickname(createMemberRequest.getNickname())
                 .gender(createMemberRequest.getGender())
                 .loginType(LoginType.USER)
+                .age(createMemberRequest.getAge())
                 .build();
 
         log.info("member = {}", member);

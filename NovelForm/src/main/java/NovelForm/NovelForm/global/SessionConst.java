@@ -1,5 +1,5 @@
 package NovelForm.NovelForm.global;
 
 public class SessionConst {
-    public static String LOGIN_member_id = "loginMemberId";
+    public static final String LOGIN_MEMBER_ID = "loginMemberId";
 }

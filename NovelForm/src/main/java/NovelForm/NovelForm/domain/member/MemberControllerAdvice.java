@@ -1,5 +1,8 @@
-package NovelForm.NovelForm.domain.member.exception;
+package NovelForm.NovelForm.domain.member;
 
+import NovelForm.NovelForm.domain.member.exception.LoginInterceptorException;
+import NovelForm.NovelForm.domain.member.exception.MemberDuplicateException;
+import NovelForm.NovelForm.domain.member.exception.WrongLoginException;
 import NovelForm.NovelForm.global.BaseResponse;
 import jakarta.validation.UnexpectedTypeException;
 import lombok.extern.slf4j.Slf4j;
