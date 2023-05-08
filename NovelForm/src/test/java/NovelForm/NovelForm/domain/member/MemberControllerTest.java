@@ -55,6 +55,7 @@ class MemberControllerTest {
 
     @MockBean
     private MemberService memberService;
+
     @Autowired
     MockMvc mockMvc;
 

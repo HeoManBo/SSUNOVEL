@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "novel")
-//@ToString(exclude = {"author","platform", "reviews", "week" })
+@ToString(exclude = {"author", "reviews"})
 public class Novel extends BaseEntityTime {
 
     @Id
@@ -51,15 +51,6 @@ public class Novel extends BaseEntityTime {
     @JoinColumn(name = "author_id")
     private Author author;
 
-    // 수정 해야함..
-    /**
-     * @OneToOne 은 주인이 아닌쪽에 lazy를 걸어도 즉시 로딩 됨. --> 바꿔야 함
-     *
-     */
-    @OneToMany(mappedBy = "novel", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<Platform> platforms = new ArrayList<>();
-
-
     @Column
     private String is_finished;
 
@@ -67,17 +58,25 @@ public class Novel extends BaseEntityTime {
     // @Convert(converter = CategoryConverter.class)
     private String category;
 
-//    @OneToOne(mappedBy = "novel", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-//    private Week week;
-//
-//    @OneToOne(mappedBy = "novel", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-//    private Platform platforms;
+    @Column
+    private int is_naver;
+
+    @Column
+    private int is_kakao;
+
+    @Column
+    private int is_munpia;
+
+    @Column
+    private int is_ridi;
+
     @OneToMany(mappedBy = "novel",fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
 
     @Builder
     public Novel(String title, String summary, int episode, int price, int download_cnt, String is_finished,
-                 String cover_image, double rating, int review_cnt, String category, Author author, Platform platform) {
+                 String cover_image, double rating, int review_cnt, String category, Author author,
+                 int is_kakao, int is_munpia, int is_naver, int is_ridi) {
         this.title = title;
         this.summary = summary;
         this.episode = episode;
@@ -88,16 +87,15 @@ public class Novel extends BaseEntityTime {
         this.cover_image = cover_image;
         this.review_cnt = review_cnt;
         this.is_finished = is_finished;
+        this.is_kakao = is_kakao;
+        this.is_munpia = is_munpia;
+        this.is_ridi = is_ridi;
+        this.is_naver = is_naver;
     }
 
     public void addAuthor(Author author){
         this.author = author;
         author.addNovel(this);
-    }
-
-
-    public void addPlatform(Platform platform){
-        this.platforms.add(platform);
     }
 
     public void addReview(Review review){

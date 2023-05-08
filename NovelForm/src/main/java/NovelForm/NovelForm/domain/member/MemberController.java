@@ -3,35 +3,21 @@ package NovelForm.NovelForm.domain.member;
 
 import NovelForm.NovelForm.domain.member.dto.CreateMemberRequest;
 import NovelForm.NovelForm.domain.member.dto.LoginMemberRequest;
-import NovelForm.NovelForm.domain.member.exception.MemberDuplicateException;
 import NovelForm.NovelForm.domain.member.exception.WrongLoginException;
 import NovelForm.NovelForm.global.BaseResponse;
-import NovelForm.NovelForm.global.ErrorResponse;
 import NovelForm.NovelForm.global.ErrorResultCreater;
 import NovelForm.NovelForm.global.SessionConst;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.List;
 
 
 @Tag(name = "회원", description = "회원 관련 api입니다.")
@@ -71,7 +57,7 @@ public class MemberController {
 
 
         HttpSession session = request.getSession();
-        session.setAttribute(SessionConst.LOGIN_MEMBER_ID, id);
+        session.setAttribute(SessionConst.LOGIN_member_id, id);
 
         return new BaseResponse<Long>(HttpStatus.OK, id, "생성 성공");
     }
@@ -100,7 +86,7 @@ public class MemberController {
         HttpSession session = request.getSession(false);
         if(session == null){
             session = request.getSession();
-            session.setAttribute(SessionConst.LOGIN_MEMBER_ID, id);
+            session.setAttribute(SessionConst.LOGIN_member_id, id);
         }
 
         return new BaseResponse<Long>(HttpStatus.OK, id, "생성 성공");
@@ -114,7 +100,6 @@ public class MemberController {
      *  인터셉터에서 이미 세션 체크를 하기 때문에 세션이 없으면 걸러져서 여기까지 오지 않음
      */
     @Operation(summary = "로그 아웃", description = "로그아웃 기능입니다.")
-
     @GetMapping("/logout")
     public BaseResponse logoutMember(HttpServletRequest request) throws WrongLoginException {
 

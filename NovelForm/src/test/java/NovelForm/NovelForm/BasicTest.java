@@ -343,7 +343,6 @@ public class BasicTest {
                 .summary("테스트 입력")
                 .build();
 
-        novel.addPlatform(registerPlatform(list));
         novel.addAuthor(author);
 
         return novel;
