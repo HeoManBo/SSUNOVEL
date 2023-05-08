@@ -18,7 +18,7 @@ import java.util.Optional;
 
 @Transactional
 @SpringBootTest
-public class ParsingTest {
+public class    ParsingTest {
 
     @Autowired
     private NovelRepository novelRepository;
@@ -33,11 +33,11 @@ public class ParsingTest {
     // 이때 새로 들어온 작가 객체가 있으므로 작가를 찾을 때 DB에서 찾고 -> 새로 추가한 작가 리스트에서 찾음
 
 
-    //@Test
+    @Test
     @Rollback(false) //DB에 삽입되는 거 확인하고 싶다면 주석 해제
     void 파싱후저장(){
         //일단 파싱해오기
-        List<List<String>> read = NovelCSVParser.read("series1.csv");//테스트
+        List<List<String>> read = NovelCSVParser.read("seriesinfo1.csv");//테스트
         List<Novel> newNovelList = new ArrayList<>();
         List<Author> newAuthorList = new ArrayList<>();
         List<Author> currentAuthor = authorRepository.findAll(); // DB안에 있는 작가 리스트 가져옴

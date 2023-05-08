@@ -100,7 +100,6 @@ public class MemberController {
      *  인터셉터에서 이미 세션 체크를 하기 때문에 세션이 없으면 걸러져서 여기까지 오지 않음
      */
     @Operation(summary = "로그 아웃", description = "로그아웃 기능입니다.")
-
     @GetMapping("/logout")
     public BaseResponse logoutMember(HttpServletRequest request) throws WrongLoginException {
 
