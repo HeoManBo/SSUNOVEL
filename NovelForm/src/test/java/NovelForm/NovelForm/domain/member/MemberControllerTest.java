@@ -36,7 +36,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  * test에 profile 적용... applicaiton-test.properties를 우선시 해서 받게 처리했다.
  */
-@ActiveProfiles("test")
 @WebMvcTest(controllers = MemberController.class)
 @MockBean(JpaMetamodelMappingContext.class)
 class MemberControllerTest {
