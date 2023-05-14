@@ -6,6 +6,8 @@ import NovelForm.NovelForm.domain.member.exception.WrongLoginException;
 import NovelForm.NovelForm.global.BaseResponse;
 import jakarta.validation.UnexpectedTypeException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -14,6 +16,7 @@ import static org.springframework.http.HttpStatus.*;
 
 @Slf4j
 @RestControllerAdvice("NovelForm.NovelForm.domain.member")
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class MemberControllerAdvice {
 
     /**

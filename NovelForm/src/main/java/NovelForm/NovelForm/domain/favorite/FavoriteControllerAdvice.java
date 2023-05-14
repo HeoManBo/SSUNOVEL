@@ -5,6 +5,8 @@ package NovelForm.NovelForm.domain.favorite;
 import NovelForm.NovelForm.domain.favorite.exception.*;
 import NovelForm.NovelForm.global.BaseResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -14,6 +16,8 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @Slf4j
 @RestControllerAdvice("NovelForm.NovelForm.domain.favorite")
+@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class FavoriteControllerAdvice {
 
     @ResponseStatus(BAD_REQUEST)

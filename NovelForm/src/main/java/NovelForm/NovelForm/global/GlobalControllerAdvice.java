@@ -4,6 +4,8 @@ package NovelForm.NovelForm.global;
 
 import NovelForm.NovelForm.global.exception.LoginInterceptorException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -19,13 +21,13 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(LoginInterceptorException.class)
     public BaseResponse loginInterceptorExHandler(Exception e){
         log.error("[global exception handler] ex ", e);
-        return new BaseResponse(BAD_REQUEST, null, e.getMessage());
+        return new BaseResponse(BAD_REQUEST, e.getMessage(), "로그인 필요");
     }
 
     @ResponseStatus(INTERNAL_SERVER_ERROR)
     @ExceptionHandler
     public BaseResponse exHandler(Exception e){
         log.error("[global exception handler] ex", e);
-        return new BaseResponse(INTERNAL_SERVER_ERROR, null,"서버 내부 오류");
+        return new BaseResponse(INTERNAL_SERVER_ERROR, e.getMessage(),"서버 내부 오류");
     }
 }
