@@ -26,7 +26,7 @@ public class MemberService {
      *  비밀번호 암호화 수행 (BCryptPasswordEncoder 사용)
      */
     private final PasswordEncoder encoder;
-    public Long createMember(CreateMemberRequest createMemberRequest) throws MemberDuplicateException {
+    public Long createMember(CreateMemberRequest createMemberRequest) throws Exception {
         
         // 이미 같은 이메일로 회원 가입이 되어 있다면, 에러
         if(memberRepository.findByEmail(createMemberRequest.getEmail()) != null){

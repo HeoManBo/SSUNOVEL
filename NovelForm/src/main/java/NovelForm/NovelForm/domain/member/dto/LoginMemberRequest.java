@@ -19,7 +19,7 @@ public class LoginMemberRequest {
     @Email
     private String email;
 
-    @Schema(description = "비밀번호", defaultValue = "password123")
+    @Schema(description = "비밀번호", defaultValue = "12345678")
     @NotEmpty
     @Size(max = 20, min = 6)
     private String password;

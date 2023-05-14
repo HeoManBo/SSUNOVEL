@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import static org.springframework.http.HttpStatus.*;
 
 @Slf4j
-@RestControllerAdvice(basePackages = {"NovelForm.NovelForm.domain.member"})
+@RestControllerAdvice("NovelForm.NovelForm.domain.member")
 public class MemberControllerAdvice {
 
     /**
