@@ -17,7 +17,6 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 @Slf4j
 @RestControllerAdvice("NovelForm.NovelForm.domain.favorite")
 @Order(Ordered.HIGHEST_PRECEDENCE)
-@Order(Ordered.HIGHEST_PRECEDENCE)
 public class FavoriteControllerAdvice {
 
     @ResponseStatus(BAD_REQUEST)
