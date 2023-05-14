@@ -1,7 +1,7 @@
 package NovelForm.NovelForm;
 
 
-import NovelForm.NovelForm.domain.favorite.FavoriteNovel;
+import NovelForm.NovelForm.domain.favorite.domain.FavoriteNovel;
 import NovelForm.NovelForm.domain.member.domain.Gender;
 import NovelForm.NovelForm.domain.member.domain.LoginType;
 import NovelForm.NovelForm.domain.member.domain.Member;
@@ -16,6 +16,7 @@ import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,17 +114,18 @@ public class BasicTest {
         /**
          * 즐겨 찾기 생성
          */
-        FavoriteNovel favoriteNovel1 = new FavoriteNovel();
+        FavoriteNovel favoriteNovel1 = new FavoriteNovel(novel1);
         favoriteNovel1.addMember(member1);
         favoriteNovel1.addNovel(novel1);
         favoriteNovelRepository.save(favoriteNovel1);
 
-        FavoriteNovel favoriteNovel2 = new FavoriteNovel();
+        FavoriteNovel favoriteNovel2 = new FavoriteNovel(novel2);
         favoriteNovel2.addMember(member1);
         favoriteNovel2.addNovel(novel2);
         favoriteNovelRepository.save(favoriteNovel2);
 
-        List<FavoriteNovel> findNovels = favoriteNovelRepository.findByMember(member1);
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        List<FavoriteNovel> findNovels = favoriteNovelRepository.findByMember(member1, pageRequest);
         List<Novel> result = new ArrayList<>();
         for (FavoriteNovel findNovel : findNovels) {
             System.out.print("member nickname = " + findNovel.getMember().getNickname());

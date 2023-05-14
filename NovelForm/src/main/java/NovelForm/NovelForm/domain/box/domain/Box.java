@@ -1,9 +1,11 @@
 package NovelForm.NovelForm.domain.box.domain;
 
 
+import NovelForm.NovelForm.domain.like.domain.Like;
 import NovelForm.NovelForm.domain.member.domain.Member;
 import NovelForm.NovelForm.global.BaseEntityTime;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -11,6 +13,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@AllArgsConstructor
 public class Box extends BaseEntityTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,6 +38,9 @@ public class Box extends BaseEntityTime {
     @JoinColumn(name = "member_idx")
     private Member member;
 
+
+    @OneToMany(mappedBy = "box", cascade = CascadeType.REMOVE)
+    private List<Like> likes = new ArrayList<>();
 
     @OneToMany(mappedBy = "box", cascade = CascadeType.ALL)
     private List<BoxItem> boxItems = new ArrayList<>();

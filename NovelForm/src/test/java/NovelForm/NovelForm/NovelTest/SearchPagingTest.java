@@ -86,10 +86,10 @@ public class SearchPagingTest {
         //then : 1번째라는 이름을 가진 소설은 총 10개이고 페이징 단위가 5이므로 총 2개의 페이지가 나온다.
         //또한 전체 소설 개수는 10개가 된다.
         List<Novel> result = novels.stream().toList();
-        log.info("총 소설 개수는 {}개", novelCnt);
+        //log.info("총 소설 개수는 {}개", novelCnt);
         //각 소설의 정보를 찍어보자
         for (Novel novel : result) {
-            log.info("작가 이름 : {}, 소설 이름 : {} ", novel.getAuthor().getName(), novel.getTitle());
+            //log.info("작가 이름 : {}, 소설 이름 : {} ", novel.getAuthor().getName(), novel.getTitle());
         }
         assertThat(novelCnt).isEqualTo(10); //총 개수는 10개임.
         assertThat(novels.getTotalPages()).isEqualTo(2); // '1번째'라는 소설이름은 10개이므로 페이징을 5단위로 했으므로 전체 페이진 2개여야 함.
@@ -110,10 +110,10 @@ public class SearchPagingTest {
 
         //then : 5번째 작가가 쓴 소설은 총 10개이므로 개수는 10개가 된다.
         List<Novel> result = novels.stream().toList();
-        log.info("5번째 작가의 총 작품 수는 {}개", countWithMatchingAuthorName);
+        //log.info("5번째 작가의 총 작품 수는 {}개", countWithMatchingAuthorName);
         //각 소설의 정보를 찍어보자
         for (Novel novel : result) {
-            log.info("작가 이름 : {}, 소설 이름 : {} ", novel.getAuthor().getName(), novel.getTitle());
+            //log.info("작가 이름 : {}, 소설 이름 : {} ", novel.getAuthor().getName(), novel.getTitle());
         }
         assertThat(countWithMatchingAuthorName).isEqualTo(10); //각 작가는 10개의 소설을 가지고 있음
         assertThat(novels.getTotalPages()).isEqualTo(2); //  5번째작가는 전체 10개의 소설을 가지므로 1:5, 2:5 개를 갖는 페이지를 2개 갖는다.

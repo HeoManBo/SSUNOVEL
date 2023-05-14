@@ -20,4 +20,10 @@ public class BoxSearchInfo {
 
     @Schema(description = "보관함 대표 작품 이미지 링크", defaultValue = "https://img.xxx.net/cover")
     private String imgSrc;      // 대표 이미지 링크
+
+    @Schema(description = "보관함 내 작품 개수", defaultValue = "3")
+    private Long itemCnt;
+
+    @Schema(description = "해당 보관함에 좋아요 개수", defaultValue = "3")
+    private Long likeCnt;
 }

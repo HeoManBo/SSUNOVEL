@@ -17,7 +17,7 @@ public class BoxItem extends BaseEntityTime {
     private String status;
 
     @Column
-    private Long is_lead_item;
+    private Integer is_lead_item;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "box_idx")
@@ -29,7 +29,7 @@ public class BoxItem extends BaseEntityTime {
     private Novel novel;
 
 
-    public BoxItem(Long is_lead_item, Novel novel) {
+    public BoxItem(Integer is_lead_item, Novel novel) {
         this.is_lead_item = is_lead_item;
         this.novel = novel;
         this.status = "activated";

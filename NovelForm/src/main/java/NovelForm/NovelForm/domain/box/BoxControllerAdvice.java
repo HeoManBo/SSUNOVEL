@@ -25,7 +25,7 @@ public class BoxControllerAdvice {
     @ResponseStatus(BAD_REQUEST)
     @ExceptionHandler(IllegalArgumentException.class)
     public BaseResponse illegalExHandler(IllegalArgumentException e){
-        log.error("[member exception handler] ex ", e);
+        log.error("[box exception handler] ex ", e);
         return new BaseResponse(BAD_REQUEST, e.getMessage(), "필드 에러");
     }
 
@@ -36,7 +36,7 @@ public class BoxControllerAdvice {
     @ResponseStatus(BAD_REQUEST)
     @ExceptionHandler(UnexpectedTypeException.class)
     public BaseResponse unexpectExHandler(UnexpectedTypeException e){
-        log.error("[member exception handler] ex", e);
+        log.error("[box exception handler] ex", e);
         return new BaseResponse(BAD_REQUEST, null,"Type으로 기대되지 않은 값이 왔습니다.");
     }
 
@@ -44,23 +44,23 @@ public class BoxControllerAdvice {
     /**
      * Login Interceptor에서 에러가 생긴 경우 호출 된다.
      */
-    @ResponseStatus(BAD_REQUEST)
-    @ExceptionHandler(LoginInterceptorException.class)
-    public BaseResponse loginInterceptorExHandler(Exception e){
-        log.error("[box exception handler] ex ", e);
-        return new BaseResponse(BAD_REQUEST, null, e.getMessage());
-    }
+//    @ResponseStatus(BAD_REQUEST)
+//    @ExceptionHandler(LoginInterceptorException.class)
+//    public BaseResponse loginInterceptorExHandler(Exception e){
+//        log.error("[box exception handler] ex ", e);
+//        return new BaseResponse(BAD_REQUEST, null, e.getMessage());
+//    }
 
 
     /**
      * 서버의 로직에서 문제가 생긴 경우 밑의 핸들러가 호출된다.
      */
-    @ResponseStatus(INTERNAL_SERVER_ERROR)
-    @ExceptionHandler
-    public BaseResponse exHandler(Exception e){
-        log.error("[member exception handler] ex", e);
-        return new BaseResponse(INTERNAL_SERVER_ERROR, null,"서버 내부 오류");
-    }
+//    @ResponseStatus(INTERNAL_SERVER_ERROR)
+//    @ExceptionHandler
+//    public BaseResponse exHandler(Exception e){
+//        log.error("[box exception handler] ex", e);
+//        return new BaseResponse(INTERNAL_SERVER_ERROR, null,"서버 내부 오류");
+//    }
 
 
     /**

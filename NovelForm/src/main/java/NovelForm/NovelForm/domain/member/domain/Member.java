@@ -3,8 +3,9 @@ package NovelForm.NovelForm.domain.member.domain;
 
 import NovelForm.NovelForm.domain.community.Comment;
 import NovelForm.NovelForm.domain.community.CommunityPost;
-import NovelForm.NovelForm.domain.favorite.FavoriteBox;
-import NovelForm.NovelForm.domain.favorite.FavoriteNovel;
+import NovelForm.NovelForm.domain.favorite.domain.FavoriteAuthor;
+import NovelForm.NovelForm.domain.favorite.domain.FavoriteBox;
+import NovelForm.NovelForm.domain.favorite.domain.FavoriteNovel;
 import NovelForm.NovelForm.global.BaseEntityTime;
 import jakarta.persistence.*;
 import lombok.*;
@@ -79,6 +80,8 @@ public class Member extends BaseEntityTime {
     @OneToMany(mappedBy = "member")
     private List<Review> reviews = new ArrayList<>();
 
+    @OneToMany(mappedBy = "member")
+    private List<FavoriteAuthor> favoriteAuthors = new ArrayList<>();
 
 
     @Builder

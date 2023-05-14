@@ -28,8 +28,11 @@ public class BoxItemInfo {
     private Double rating;          // 소설의 별점 (평균)
 
     @Schema(description = "리뷰 수", defaultValue = "38")
-    private Integer review_cnt;     // 리뷰를 남긴 사람의 수
+    private Integer reviewCnt;     // 리뷰를 남긴 사람의 수
 
+
+    @Schema(description = "대표 작품 여부", defaultValue = "0")
+    private Integer isLeadItem;
 
 
 }

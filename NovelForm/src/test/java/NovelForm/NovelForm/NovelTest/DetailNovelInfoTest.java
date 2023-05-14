@@ -102,14 +102,14 @@ public class DetailNovelInfoTest {
         List<Novel> novels = novelRepository.findByTitleName("콩쥐 팥쥐");
         System.out.println(novels.size());
         Novel kp = novels.get(0);
-        log.info("kp review size = {}", kp.getReview_cnt());
+        //log.info("kp review size = {}", kp.getReview_cnt());
 
         Pageable pageable = PageRequest.of(1, 10); //처음 10개를 가져옴
         Page<Review> result = reviewRepository.findByReview(kp, pageable);
         List<Review> reviews = result.getContent();
-        log.info("리뷰 사이즈 : {}", result.getTotalElements());
+        //log.info("리뷰 사이즈 : {}", result.getTotalElements());
         for (Review reivew : reviews) {
-            log.info("리뷰 작성자 : {}, 부여 평점 : {}, 리뷰 내용 : {}", reivew.getMember().getNickname(), reivew.getRating(), reivew.getContent());
+            //log.info("리뷰 작성자 : {}, 부여 평점 : {}, 리뷰 내용 : {}", reivew.getMember().getNickname(), reivew.getRating(), reivew.getContent());
         }
 
         assertThat(kp.getTitle()).isEqualTo("콩쥐 팥쥐");

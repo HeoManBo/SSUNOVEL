@@ -1,10 +1,7 @@
 package NovelForm.NovelForm.domain.box;
 
 
-import NovelForm.NovelForm.domain.box.dto.AllBoxResponse;
-import NovelForm.NovelForm.domain.box.dto.BoxInfoResponse;
-import NovelForm.NovelForm.domain.box.dto.BoxSearchResponse;
-import NovelForm.NovelForm.domain.box.dto.CreateBoxRequest;
+import NovelForm.NovelForm.domain.box.dto.*;
 import NovelForm.NovelForm.global.BaseResponse;
 import NovelForm.NovelForm.global.ErrorResultCreater;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,6 +16,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -106,7 +104,7 @@ public class BoxController {
     @PostMapping("/{boxId}")
     public BaseResponse<Long> updateBox(
             @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId,
-            @Valid @RequestBody CreateBoxRequest createBoxRequest,
+            @Validated @RequestBody CreateBoxRequest createBoxRequest,
             BindingResult bindingResult,
             @Parameter(description = "보관함 번호(id)", in = ParameterIn.PATH) @PathVariable Long boxId) throws Exception {
 
@@ -133,11 +131,16 @@ public class BoxController {
      * @return
      */
     @Operation(summary = "보관함 전체 목록 가져오기", description = "공유로 설정해 놓은 보관함들을 다 가져오는 메서드입니다.")
-    @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = AllBoxResponse.class))))
     @GetMapping("/all")
-    public BaseResponse<List<AllBoxResponse>> getAllBox(){
+    public BaseResponse<List<AllBoxResponse>> getAllBox(
+            @Parameter(description = "페이지 번호", in = ParameterIn.QUERY)
+            @Validated @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+            @Parameter(description = "정렬 조건", in = ParameterIn.QUERY)
+            @Validated @RequestParam(value = "filtering", required = false, defaultValue = "TIME_DESC") FilteringType filtering){
 
-        List<AllBoxResponse> allBoxResponses = boxService.getAllBox();
+
+
+        List<AllBoxResponse> allBoxResponses = boxService.getAllBox(page, filtering);
 
         return new BaseResponse<>(allBoxResponses);
     }
@@ -151,9 +154,11 @@ public class BoxController {
     @Operation(summary = "보관함 상세 정보 가져오기", description = "보관함 내부의 작품 목록및 보관함에 대한 정보를 가져오는 메서드입니다.")
     @GetMapping("/info/{boxId}")
     public BaseResponse<BoxInfoResponse> getBoxInfo(
-            @Parameter(name = "보관함 번호(id)", in = ParameterIn.PATH) @PathVariable Long boxId){
+            @Parameter(name = "보관함 번호(id)", in = ParameterIn.PATH) @PathVariable Long boxId,
+            @Parameter(description = "페이지 번호", in = ParameterIn.QUERY)
+            @Validated @RequestParam(value = "page", required = false, defaultValue = "1") Integer page){
 
-        BoxInfoResponse boxInfo = boxService.getBoxInfo(boxId);
+        BoxInfoResponse boxInfo = boxService.getBoxInfo(boxId, page);
 
         return new BaseResponse<>(boxInfo);
     }
@@ -162,16 +167,57 @@ public class BoxController {
     /**
      * 보관함 검색 기능
      *
-     * 검색어에 따른 보관함 목록이 나온다.
+     * 검색어에 따른 보관함 목록이 나온다. (보관함 생성자 및 보관함 이름)
+     * 두 가지에 대해 각각 10개의 결과를 가져온다.
      */
     @Operation(summary = "보관함 검색", description = "공유로 설정되어 있는 보관함들을 검색하는 메서드입니다.")
     @GetMapping("/search")
     public BaseResponse<BoxSearchResponse> getSearchBox(
-            @Parameter(name = "검색어", required = true, example = "test") @RequestParam String item){
+            @Parameter(name = "검색어", required = true, example = "test") @RequestParam String item,
+            @Parameter(description = "페이지 번호", in = ParameterIn.QUERY)
+            @Validated @RequestParam(value = "page", required = false, defaultValue = "1") Integer page){
 
-        BoxSearchResponse boxSearchResponse = boxService.searchBox(item);
+        BoxSearchResponse boxSearchResponse = boxService.searchBox(item, page);
 
         return new BaseResponse<>(boxSearchResponse);
     }
+
+
+    /**
+     * 보관함 검색
+     *
+     * 보관함 이름으로 검색
+     */
+    @Operation(summary = "보관함 이름 검색", description = "공유로 설정되어 있는 보관함들을 이름을 기반으로 검색하는 메서드입니다.")
+    @GetMapping("/search/title")
+    public BaseResponse<BoxSearchByTitleResponse> getSearchBoxByTitle(
+            @Parameter(name = "검색어", required = true, example = "title") @RequestParam String item,
+            @Parameter(description = "페이지 번호", in = ParameterIn.QUERY)
+            @Validated @RequestParam(value = "page", required = false, defaultValue = "1") Integer page){
+
+        BoxSearchByTitleResponse boxSearchResponse = boxService.searchBoxByTitle(item, page);
+
+        return new BaseResponse<>(boxSearchResponse);
+    }
+
+
+
+    /**
+     * 보관함 검색
+     *
+     * 보관함 생성자 이름으로 검색
+     */
+    @Operation(summary = "보관함 생성자 검색", description = "공유로 설정되어 있는 보관함들을 생성자를 기반으로 검색하는 메서드입니다.")
+    @GetMapping("/search/creator")
+    public BaseResponse<BoxSearchByCreatorResponse> getSearchBoxByCreator(
+            @Parameter(name = "검색어", required = true, example = "creator") @RequestParam String item,
+            @Parameter(description = "페이지 번호", in = ParameterIn.QUERY)
+            @Validated @RequestParam(value = "page", required = false, defaultValue = "1") Integer page){
+
+        BoxSearchByCreatorResponse boxSearchResponse = boxService.searchBoxByCreator(item, page);
+
+        return new BaseResponse<>(boxSearchResponse);
+    }
+
 
 }

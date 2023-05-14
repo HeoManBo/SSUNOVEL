@@ -42,23 +42,23 @@ public class MemberControllerAdvice {
     /**
      * 서버의 로직에서 문제가 생긴 경우 밑의 핸들러가 호출된다.
      */
-    @ResponseStatus(INTERNAL_SERVER_ERROR)
-    @ExceptionHandler
-    public BaseResponse exHandler(Exception e){
-        log.error("[member exception handler] ex", e);
-        return new BaseResponse(INTERNAL_SERVER_ERROR, null,"서버 내부 오류");
-    }
+//    @ResponseStatus(INTERNAL_SERVER_ERROR)
+//    @ExceptionHandler
+//    public BaseResponse exHandler(Exception e){
+//        log.error("[member exception handler] ex", e);
+//        return new BaseResponse(INTERNAL_SERVER_ERROR, null,"서버 내부 오류");
+//    }
 
 
     /**
      * Login Interceptor에서 에러가 생긴 경우 호출 된다.
      */
-    @ResponseStatus(BAD_REQUEST)
-    @ExceptionHandler(LoginInterceptorException.class)
-    public BaseResponse loginInterceptorExHandler(Exception e){
-        log.error("[member exception handler] ex ", e);
-        return new BaseResponse(BAD_REQUEST, null, e.getMessage());
-    }
+//    @ResponseStatus(BAD_REQUEST)
+//    @ExceptionHandler(LoginInterceptorException.class)
+//    public BaseResponse loginInterceptorExHandler(Exception e){
+//        log.error("[member exception handler] ex ", e);
+//        return new BaseResponse(BAD_REQUEST, null, e.getMessage());
+//    }
 
 
     /**

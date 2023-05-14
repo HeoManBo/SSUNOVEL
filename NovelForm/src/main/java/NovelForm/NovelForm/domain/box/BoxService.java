@@ -9,12 +9,11 @@ import NovelForm.NovelForm.domain.box.exception.WrongBoxException;
 import NovelForm.NovelForm.domain.box.exception.WrongMemberException;
 import NovelForm.NovelForm.domain.member.domain.Member;
 import NovelForm.NovelForm.domain.novel.Novel;
-import NovelForm.NovelForm.repository.AuthorRepository;
-import NovelForm.NovelForm.repository.BoxRepository;
-import NovelForm.NovelForm.repository.MemberRepository;
-import NovelForm.NovelForm.repository.NovelRepository;
+import NovelForm.NovelForm.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +33,8 @@ public class BoxService {
     private final MemberRepository memberRepository;
 
     private final NovelRepository novelRepository;
-    private final AuthorRepository authorRepository;
+    
+    private final LikeRepository likeRepository;
 
 
     /**
@@ -63,22 +63,26 @@ public class BoxService {
             Optional<Novel> optionalNovel = novelRepository.findById(boxItemId);
             Novel novel;
 
+            log.info("==================================================");
+            log.info("id={}",boxItemId);
+            log.info("create request 속 novels: {}",optionalNovel);
+
             // 없는 작품을 보관함에 넣으려고 하면, 실패
             if(optionalNovel.isPresent()){
                 novel = novelRepository.findById(boxItemId).get();
             }
             else{
-                throw new NoSuchBoxItemException("소설번호: " + boxItemId);
+                throw new NoSuchBoxItemException("없는소설번호: " + boxItemId);
             }
 
 
             BoxItem boxItem;
 
             if (boxItemId == createBoxRequest.getLeadItemId()){
-                boxItem = new BoxItem(1L, novel);
+                boxItem = new BoxItem(1, novel);
             }
             else{
-                boxItem = new BoxItem(0L, novel);
+                boxItem = new BoxItem(0, novel);
             }
 
 
@@ -152,9 +156,33 @@ public class BoxService {
      *
      * @return
      */
-    public List<AllBoxResponse> getAllBox() {
+    public List<AllBoxResponse> getAllBox(Integer page, FilteringType filtering) {
 
-        List<AllBoxResponse> allBoxByPublic = boxRepository.findAllBoxByPublic();
+        List<AllBoxResponse> allBoxByPublic = null;
+
+        PageRequest pageRequest = PageRequest.of(page - 1, 10);
+
+        // 필터링 조건에 따른 정렬 순서 조정
+        switch (filtering) {
+            case TIME_DESC -> {
+                PageRequest pageRequestBySort = pageRequest.withSort(Sort.by(Sort.Order.desc("update_at")));
+                allBoxByPublic = boxRepository.findAllBoxByPublic(pageRequestBySort).getContent();
+            }
+            case TIME_ASC -> {
+                PageRequest pageRequestBySort = pageRequest.withSort(Sort.by("update_at"));
+                allBoxByPublic = boxRepository.findAllBoxByPublic(pageRequestBySort).getContent();
+            }
+            case LIKE_ASC -> {
+                allBoxByPublic = likeRepository.findAllBoxByPublicWithLike(pageRequest).getContent();
+            }
+            case LIKE_DESC -> {
+                allBoxByPublic = likeRepository.findAllBoxByPublicWithLikeDesc(pageRequest).getContent();
+            }
+
+        }
+
+
+
 
         return allBoxByPublic;
     }
@@ -165,9 +193,17 @@ public class BoxService {
      * @param boxId
      * @return
      */
-    public BoxInfoResponse getBoxInfo(Long boxId) {
+    public BoxInfoResponse getBoxInfo(Long boxId, Integer page) {
 
-        Box findBox = boxRepository.findBoxWithBoxItems(boxId);
+        PageRequest pageRequest = PageRequest.of(page - 1, 10);
+
+        Box findBox = boxRepository.findBoxWithBoxItems(boxId, pageRequest);
+
+
+        if(findBox == null){
+            throw new NoSuchBoxItemException("보관함: " + boxId);
+        }
+
 
         List<BoxItemInfo> boxItemInfos = new ArrayList<>();
 
@@ -179,7 +215,8 @@ public class BoxService {
                     boxItem.getNovel().getAuthor().getName(),
                     boxItem.getNovel().getTitle(),
                     boxItem.getNovel().getRating(),
-                    boxItem.getNovel().getReview_cnt()));
+                    boxItem.getNovel().getReview_cnt(),
+                    boxItem.getIs_lead_item()));
         }
 
 
@@ -196,19 +233,43 @@ public class BoxService {
 
     /**
      *  보관함 검색 (보관함 이름, 보관함 생성자 이름)
+     *
+     *  둘 다 10개씩 검색하기
      */
-    public BoxSearchResponse searchBox(String item) {
+    public BoxSearchResponse searchBox(String search, Integer page) {
 
-        String search = "%" + item + "%";
+        PageRequest pageRequest = PageRequest.of(page - 1, 10);
 
-        List<BoxSearchInfo> boxByTitle = boxRepository.findBoxByTitle(search);
-        List<BoxSearchInfo> boxByMember = boxRepository.findBoxByMember(search);
+        List<BoxSearchInfo> boxByTitle = boxRepository.findBoxByTitle(search, pageRequest);
+        List<BoxSearchInfo> boxByMember = boxRepository.findBoxByMember(search, pageRequest);
 
         return new BoxSearchResponse(boxByTitle, boxByMember);
     }
 
 
+    /**
+     *  보관함 검색 (보관함 이름)
+     *
+     *  10개씩 검색하기
+     */
+    public BoxSearchByTitleResponse searchBoxByTitle(String search, Integer page) {
+
+        PageRequest pageRequest = PageRequest.of(page - 1, 10);
+
+        List<BoxSearchInfo> boxByTitle = boxRepository.findBoxByTitle(search, pageRequest);
+        return new BoxSearchByTitleResponse(boxByTitle);
+    }
 
 
+    /**
+     *  보관함 검색 (보관함 생성자)
+     *
+     *  10개씩 검색하기
+     */
+    public BoxSearchByCreatorResponse searchBoxByCreator(String search, Integer page) {
+        PageRequest pageRequest = PageRequest.of(page - 1, 10);
 
+        List<BoxSearchInfo> boxByCreator = boxRepository.findBoxByMember(search, pageRequest);
+        return new BoxSearchByCreatorResponse(boxByCreator);
+    }
 }

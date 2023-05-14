@@ -1,5 +1,4 @@
-package NovelForm.NovelForm.domain.box.exception;
-
+package NovelForm.NovelForm.global.exception;
 
 public class LoginInterceptorException extends Exception{
 
