@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +40,7 @@ public class FavoriteController {
     @PostMapping("/novel/{novelId}")
     public BaseResponse<Long> createFavoriteNovel(
             @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId,
-            @Parameter(description = "소설 번호(id)", in = ParameterIn.PATH) @PathVariable Long novelId) throws Exception {
+            @Parameter(description = "소설 번호(id)", in = ParameterIn.PATH) @PathVariable @NotBlank Long novelId) throws Exception {
 
 
 

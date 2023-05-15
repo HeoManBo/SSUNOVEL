@@ -7,6 +7,7 @@ import NovelForm.NovelForm.domain.member.exception.WrongLoginException;
 import NovelForm.NovelForm.global.BaseResponse;
 import NovelForm.NovelForm.global.ErrorResultCreater;
 import NovelForm.NovelForm.global.SessionConst;
+import NovelForm.NovelForm.global.exception.CustomFieldException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,6 +19,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 
 @Tag(name = "회원", description = "회원 관련 api입니다.")
@@ -49,8 +52,8 @@ public class MemberController {
 
         // field 에러 체크
         if(bindingResult.hasFieldErrors()){
-            String message = ErrorResultCreater.objectErrorToJson(bindingResult.getFieldErrors());
-            throw new IllegalArgumentException(message);
+            Map<String, String> map = ErrorResultCreater.fieldErrorToMap(bindingResult.getFieldErrors());
+            throw new CustomFieldException(map);
         }
 
         Long id = memberService.createMember(createMemberRequest);

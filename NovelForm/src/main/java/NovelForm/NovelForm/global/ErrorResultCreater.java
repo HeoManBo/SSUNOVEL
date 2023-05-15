@@ -8,6 +8,7 @@ import org.springframework.validation.ObjectError;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  에러 결과 메시지 생성 클래스
@@ -28,6 +29,17 @@ public class ErrorResultCreater {
         System.out.println("objectMapper.writeValueAsString(map) = " + objectMapper.writeValueAsString(map));
         
         return objectMapper.writeValueAsString(map);
+    }
+
+
+    public static Map<String, String> fieldErrorToMap(List<FieldError> errorList){
+        HashMap<String, String> map = new HashMap<>();
+
+        for (FieldError error : errorList) {
+            map.put(error.getField(), error.getDefaultMessage());
+        }
+
+        return map;
     }
 
 }

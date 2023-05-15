@@ -2,6 +2,7 @@ package NovelForm.NovelForm.global;
 
 
 
+import NovelForm.NovelForm.global.exception.CustomFieldException;
 import NovelForm.NovelForm.global.exception.LoginInterceptorException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
@@ -17,6 +18,12 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 @RestControllerAdvice
 public class GlobalControllerAdvice {
 
+
+    /**
+     * 로그인 인터셉터에서 발생한 예외를 처리하는 부분
+     * @param e
+     * @return
+     */
     @ResponseStatus(BAD_REQUEST)
     @ExceptionHandler(LoginInterceptorException.class)
     public BaseResponse loginInterceptorExHandler(Exception e){
@@ -24,10 +31,27 @@ public class GlobalControllerAdvice {
         return new BaseResponse(BAD_REQUEST, e.getMessage(), "로그인 필요");
     }
 
+
+    /**
+     * 지정한 예외가 아닌 서비스 로직 등에서 발생한 알 수 없는 예외를 처리하는 핸들러
+     * @param e
+     * @return
+     */
     @ResponseStatus(INTERNAL_SERVER_ERROR)
     @ExceptionHandler
     public BaseResponse exHandler(Exception e){
         log.error("[global exception handler] ex", e);
         return new BaseResponse(INTERNAL_SERVER_ERROR, e.getMessage(),"서버 내부 오류");
+    }
+
+
+    /**
+     * BindingResult로 잡는 필드 에러들에 대한 처리를 위한 핸들러
+     */
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(CustomFieldException.class)
+    public BaseResponse fieldExHandler(CustomFieldException e){
+        log.error("[global exception handler] ex", e);
+        return new BaseResponse(BAD_REQUEST, e.getExResponse(), "필드 에러");
     }
 }

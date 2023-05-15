@@ -4,6 +4,7 @@ package NovelForm.NovelForm.domain.box;
 import NovelForm.NovelForm.domain.box.dto.*;
 import NovelForm.NovelForm.global.BaseResponse;
 import NovelForm.NovelForm.global.ErrorResultCreater;
+import NovelForm.NovelForm.global.exception.CustomFieldException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -20,6 +21,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 import static NovelForm.NovelForm.global.SessionConst.*;
 
@@ -51,10 +53,10 @@ public class BoxController {
             @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId,
             @Valid @RequestBody CreateBoxRequest createBoxRequest, BindingResult bindingResult) throws Exception {
 
-        // 필드 에러 발생 시 예외 호출
+        // field 에러 체크
         if(bindingResult.hasFieldErrors()){
-            String message = ErrorResultCreater.objectErrorToJson(bindingResult.getFieldErrors());
-            throw new IllegalArgumentException(message);
+            Map<String, String> map = ErrorResultCreater.fieldErrorToMap(bindingResult.getFieldErrors());
+            throw new CustomFieldException(map);
         }
 
 
@@ -109,10 +111,10 @@ public class BoxController {
             @Parameter(description = "보관함 번호(id)", in = ParameterIn.PATH) @PathVariable Long boxId) throws Exception {
 
 
-        // 필드 에러 발생 시 예외 호출
+        // field 에러 체크
         if(bindingResult.hasFieldErrors()){
-            String message = ErrorResultCreater.objectErrorToJson(bindingResult.getFieldErrors());
-            throw new IllegalArgumentException(message);
+            Map<String, String> map = ErrorResultCreater.fieldErrorToMap(bindingResult.getFieldErrors());
+            throw new CustomFieldException(map);
         }
 
 
