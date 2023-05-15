@@ -1,6 +1,7 @@
 package NovelForm.NovelForm.domain.novel;
 
 
+import NovelForm.NovelForm.domain.novel.dto.MainDto;
 import NovelForm.NovelForm.domain.novel.dto.detailnoveldto.DetailNovelInfo;
 import NovelForm.NovelForm.domain.novel.dto.searchdto.MidFormmat;
 import NovelForm.NovelForm.domain.novel.dto.searchdto.NovelDto;
@@ -75,7 +76,7 @@ public class NovelService {
         }
         List<NovelDto> novelDtoList = findNovels.getContent().stream()
                 .map(novel -> new NovelDto(novel.getTitle(), novel.getAuthor().getName(), novel.getCover_image(),
-                        novel.getRating(), novel.getDownload_cnt(), novel.getCategory(), novel.getId())).toList();
+                        novel.averageRating(), novel.getReview_cnt(), novel.getCategory(), novel.getId())).toList();
         return new MidFormmat((int)findNovels.getTotalElements(), novelDtoList);
     }
 
@@ -91,7 +92,7 @@ public class NovelService {
         }
         List<NovelDto> novelDtoList =  findNovels.getContent().stream()
                 .map(novel -> new NovelDto(novel.getTitle(),novel.getAuthor().getName(), novel.getCover_image(),
-                        novel.getRating(), novel.getDownload_cnt(), novel.getCategory(), novel.getId())).toList();
+                        novel.averageRating(), novel.getReview_cnt(), novel.getCategory(), novel.getId())).toList();
         return new MidFormmat((int)findNovels.getTotalElements(), novelDtoList);
     }
 
@@ -131,6 +132,16 @@ public class NovelService {
     private List<NovelDto> makeNovelDtoList(Page<Novel> findNovels){
         return findNovels.getContent().stream()
                 .map(novel -> new NovelDto(novel.getTitle(), novel.getAuthor().getName(), novel.getCover_image(),
-                        novel.getRating(), novel.getDownload_cnt(), novel.getCategory(), novel.getId())).toList();
+                        novel.averageRating(), novel.getReview_cnt(), novel.getCategory(), novel.getId())).toList();
+    }
+
+    /**
+     * 크롤링 당시 웹 소설에서 댓글이 많은 순으로 소설 20개를 출력합니다.
+     */
+    public List<NovelDto> findRankingNovel() {
+        List<Novel> findNovels = novelRepository.findByNovelRanking();
+        return findNovels.stream()
+                .map(novel -> new NovelDto(novel.getTitle(), novel.getAuthor().getName(), novel.getCover_image(),
+                        novel.averageRating(), novel.getReview_cnt(), novel.getCategory(), novel.getId())).toList();
     }
 }
