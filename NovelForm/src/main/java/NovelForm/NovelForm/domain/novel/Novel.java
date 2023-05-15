@@ -46,51 +46,34 @@ public class Novel extends BaseEntityTime {
     @Column
     private int review_cnt;
 
-
     // 플랫폼 추가
     @Column
-    private int is_naver;
+    private String is_naver;
     @Column
-    private int is_kakao;
+    private String is_kakao;
     @Column
-    private int is_ridi;
+    private String is_ridi;
     @Column
-    private int is_munpia;
-
+    private String is_munpia;
 
     //작품 관점에서 여러 작품은 하나의 작가에 속하므로 N:1
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_idx")
     private Author author;
 
-    // 수정 해야함..
-    /**
-     * @OneToOne 은 주인이 아닌쪽에 lazy를 걸어도 즉시 로딩 됨. --> 바꿔야 함
-     *
-     */
-    @OneToMany(mappedBy = "novel", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<Platform> platforms = new ArrayList<>();
-
-
     @Column
     private String is_finished;
 
     @Column
-    // @Convert(converter = CategoryConverter.class)
     private String category;
 
-//    @OneToOne(mappedBy = "novel", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-//    private Week week;
-//
-//    @OneToOne(mappedBy = "novel", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-//    private Platform platforms;
     @OneToMany(mappedBy = "novel",fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
 
     @Builder
     public Novel(String title, String summary, int episode, int price, int download_cnt, String is_finished,
                  String cover_image, double rating, int review_cnt, String category, Author author,
-                 int is_naver, int is_kakao, int is_ridi, int is_munpia) {
+                 String is_naver, String is_kakao, String is_ridi, String is_munpia) {
         this.title = title;
         this.summary = summary;
         this.episode = episode;
@@ -114,10 +97,6 @@ public class Novel extends BaseEntityTime {
     }
 
 
-    public void addPlatform(Platform platform){
-        this.platforms.add(platform);
-    }
-
     public void addReview(Review review){
         this.reviews.add(review);
         calculateRating(review);
@@ -131,8 +110,20 @@ public class Novel extends BaseEntityTime {
 
     //평점 부여시 평점 평가
     public double averageRating(){
-        if(review_cnt == 0 ) return 0.0;
+        if(review_cnt == 0) return 0.0;
         return rating / review_cnt;
+    }
+
+    //리뷰 삭제시 수행됨
+    public void deleteReview(Review deleteReview) {
+        this.rating -= deleteReview.getRating(); //리뷰 점수 제거
+        this.review_cnt -= 1;
+        this.reviews.remove(deleteReview);
+    }
+
+    public void modifyRating(double before_rating, double after_rating){
+        this.rating -= before_rating;
+        this.rating += after_rating;
     }
 
     //해당 소설 정보
@@ -141,4 +132,5 @@ public class Novel extends BaseEntityTime {
        return "novel id : " + this.id
                + "title : " + this.title;
     }
+
 }
