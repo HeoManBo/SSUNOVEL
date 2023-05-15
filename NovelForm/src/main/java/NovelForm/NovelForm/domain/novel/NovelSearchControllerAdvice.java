@@ -3,6 +3,7 @@ package NovelForm.NovelForm.domain.novel;
 
 import NovelForm.NovelForm.domain.novel.exception.NoSuchNovelListException;
 import NovelForm.NovelForm.global.BaseResponse;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -33,7 +34,7 @@ public class NovelSearchControllerAdvice {
     @ExceptionHandler(NumberFormatException.class)
     public BaseResponse numberFormatArgumentException(NumberFormatException e){
         log.error("[novel exception handler] ex ", e);
-        return new BaseResponse(HttpStatus.BAD_REQUEST, e.getMessage(), "페이지 번호는 0이상이여야 합니다.");
+        return new BaseResponse(HttpStatus.BAD_REQUEST, e.getMessage(), "잘못된 값 입니다.");
     }
 
     /**
@@ -44,6 +45,16 @@ public class NovelSearchControllerAdvice {
     public BaseResponse noSuchNovelListException(NoSuchNovelListException e){
         log.error("[novel exception handler] ex ", e);
         return new BaseResponse(HttpStatus.BAD_REQUEST, e.getMessage(), "검색어에 일치하는 소설이 존재하지 않습니다.");
+    }
+
+    /**
+     * PathvVariable, Pagenum 유효성 체크 예외 발생 추가
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ConstraintViolationException.class)
+    public BaseResponse BadPathOrPagingNum(ConstraintViolationException e){
+        log.error("[novel exception handler] ex ", e);
+        return new BaseResponse(HttpStatus.BAD_REQUEST, "메시지 에러확인", "잘못된 pathVariable 값이나, Paging 번호입니다.");
     }
 
 }

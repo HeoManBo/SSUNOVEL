@@ -17,6 +17,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,6 +40,7 @@ import static NovelForm.NovelForm.global.SessionConst.LOGIN_MEMBER_ID;
 @Tag(name = "소설 검색", description = "소설 검색 관련 api입니다")
 @RequiredArgsConstructor
 @RequestMapping("/novel")
+@Validated //RequestParam, PathVariable 검증 추가
 public class NovelSearchController {
     private final NovelService novelService;
     private final ReviewService reviewService;
@@ -81,7 +85,7 @@ public class NovelSearchController {
                responses = @ApiResponse(responseCode = "200", description = "상세 검색 성공", content = @Content(schema = @Schema(implementation = MidFormmat.class))))
     @GetMapping(value = "/search/novel", produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse<MidFormmat> searchNovel(@RequestParam String search,
-                                                @RequestParam(required = false, defaultValue = "0") int pageNum,
+                                                @RequestParam(required = false, defaultValue = "0") @Min(0) int pageNum,
                                                 @RequestParam(required = false, defaultValue = "None") String orderBy){
         //검색어가 빈문자 or 공백으로만 차있는 경우 : bad request;
         if(!StringUtils.hasText(search)){
@@ -98,7 +102,7 @@ public class NovelSearchController {
                responses = @ApiResponse(responseCode = "200", description = "상세 검색 성공", content = @Content(schema = @Schema(implementation = MidFormmat.class))))
     @GetMapping(value = "/search/author", produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse<MidFormmat> searchAuthor(@RequestParam String search,
-                                                @RequestParam(required = false, defaultValue = "0") int pageNum,
+                                                 @RequestParam(required = false, defaultValue = "0") @Min(0) int pageNum,
                                                 @RequestParam(required = false, defaultValue = "None") String orderBy){
         //검색어가 빈문자 or 공백으로만 차있는 경우 : bad request;
         if(!StringUtils.hasText(search)){
@@ -117,7 +121,7 @@ public class NovelSearchController {
     @Operation(summary = "소설 상세 정보", description = "소설 상세 정보를 보여줍니다. ",
                responses = @ApiResponse(responseCode = "200", description = "소설 상세 정보 조회 성공", content = @Content(schema = @Schema(implementation = DetailNovelInfo.class))))
     @GetMapping("/{novel_id}")
-    public BaseResponse<DetailNovelInfo> detailSearchNovel(@PathVariable("novel_id") Long id,
+    public BaseResponse<DetailNovelInfo> detailSearchNovel(@PathVariable("novel_id") @Min(0) Long id,
                                             @SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId) throws Exception{
         //소설 정보를 가져온다.
         Novel novel = novelService.findNovel(id);
