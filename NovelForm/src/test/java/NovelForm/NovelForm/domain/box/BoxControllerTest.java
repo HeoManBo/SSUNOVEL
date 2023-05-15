@@ -144,7 +144,5 @@ class BoxControllerTest {
         // then
                 .andExpect(status().isOk());
 
-
-
     }
 }

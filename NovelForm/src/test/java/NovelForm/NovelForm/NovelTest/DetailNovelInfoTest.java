@@ -14,6 +14,7 @@ import NovelForm.NovelForm.repository.ReviewRepository;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -45,9 +46,6 @@ public class DetailNovelInfoTest {
     @Autowired
     private  ReviewRepository reviewRepository;
 
-
-
-
     void makeReview(Novel novel, Member member, int i){
         Review review = Review.builder()
                 .content(i + "너무 재밌어요")
@@ -63,8 +61,8 @@ public class DetailNovelInfoTest {
         Novel novel = Novel.builder()
                 .title("콩쥐 팥쥐")
                 .category("판타지")
-                .is_kakao(1)
-                .is_munpia(1)
+                .is_kakao("test@kakao.co.kr")
+                .is_munpia("test@munpia.co.kr")
                 .summary("테스트 summary")
                 .cover_image("asdf1234")
                 .build();
@@ -104,8 +102,8 @@ public class DetailNovelInfoTest {
         Novel kp = novels.get(0);
         //log.info("kp review size = {}", kp.getReview_cnt());
 
-        Pageable pageable = PageRequest.of(1, 10); //처음 10개를 가져옴
-        Page<Review> result = reviewRepository.findByReview(kp, pageable);
+        Pageable pageable = PageRequest.of(0, 10); //처음 10개를 가져옴
+        Page<Review> result = reviewRepository.findByReviewWithPaging(kp, pageable);
         List<Review> reviews = result.getContent();
         //log.info("리뷰 사이즈 : {}", result.getTotalElements());
         for (Review reivew : reviews) {

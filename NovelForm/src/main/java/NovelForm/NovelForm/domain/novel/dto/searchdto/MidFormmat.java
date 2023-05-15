@@ -1,6 +1,7 @@
-package NovelForm.NovelForm.domain.novel.dto;
+package NovelForm.NovelForm.domain.novel.dto.searchdto;
 
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -24,7 +25,11 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class MidFormmat {
+
+    @Schema(description = "조회한 전체 소설 수")
     private int count;
+
+    @Schema(description = "조건에 맞게 조회한 소설 List")
     private List<NovelDto> dto;
 
 }

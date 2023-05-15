@@ -25,8 +25,8 @@ public class    ParsingTest {
     @Autowired
     private AuthorRepository authorRepository;
 
-    //              0       1         2       3        4          5           6            7        8
-    // CSV  순서 : title	is_complete	genre	author	synopsis	price	total_episode	comment	 img_link
+    //              0       1         2       3        4          5           6            7        8        9
+    // CSV  순서 : title	is_complete	genre	author	synopsis	price	total_episode	comment	 img_link url_link
 
     // 고려사향 1 : 작가가 이미 DB상에 존재하는 경우 --> DB를 검색해서 있으면 해당 객체로 넣고
     // 없다면 작가 이름에 맞는 객체를 하나 만들어서 해당 작가를 DB에 삽입

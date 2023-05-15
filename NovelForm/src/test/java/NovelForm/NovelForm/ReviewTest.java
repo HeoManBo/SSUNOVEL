@@ -70,8 +70,6 @@ public class ReviewTest {
                 .build();
         authorRepository.save(author);
 
-        char[] day = {'n','y','n','n','n','n','n'};
-        char[] list = {'y','n','n','n'};
 
         Novel novel1 = Novel.builder()
                 .title("홍길동전")

@@ -1,6 +1,9 @@
 package NovelForm.NovelForm.NovelTest;
 
 
+import NovelForm.NovelForm.domain.member.domain.Gender;
+import NovelForm.NovelForm.domain.member.domain.LoginType;
+import NovelForm.NovelForm.domain.member.domain.Member;
 import NovelForm.NovelForm.domain.novel.Author;
 import NovelForm.NovelForm.domain.novel.Novel;
 import NovelForm.NovelForm.repository.AuthorRepository;
@@ -75,8 +78,8 @@ public class SearchControllerTest {
         //given : 페이징과 동일한 조건 (10명의 작가가 작가당 10개의 작품을 가지고 있음)
 
         //when : '1번째' 라는 소설을 조회해보자.
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/search")
-                .param("keyword", "1번째 소설입니다.")
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/novel/search")
+                .param("search", "1번째 소설입니다.")
                 .accept(MediaType.APPLICATION_JSON));
 
         //then : 결과 json을 출력해보자
@@ -91,8 +94,8 @@ public class SearchControllerTest {
         //given : 페이징과 동일한 조건 (10명의 작가가 작가당 10개의 작품을 가지고 있음)
 
         //when : '5번째' 라는 작가의 소설을 조회해보자.
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/search")
-                .param("keyword", "5번째 작가입니다")
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/novel/search")
+                .param("search", "5번째 작가입니다")
                 .accept(MediaType.APPLICATION_JSON));
 
         //then : 결과 json을 출력해보자
@@ -107,8 +110,8 @@ public class SearchControllerTest {
         //given : 페이징과 동일한 조건 (10명의 작가가 작가당 10개의 작품을 가지고 있음)
 
         //when : 검색어가 없는("")경우를 고려해보자 -> bad_request여야함
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/search")
-                .param("keyword", "")
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/novel/search")
+                .param("search", "")
                 .accept(MediaType.APPLICATION_JSON));
 
         //then : 결과 json을 출력해보자
@@ -123,8 +126,8 @@ public class SearchControllerTest {
         //given : 페이징과 동일한 조건 (10명의 작가가 작가당 10개의 작품을 가지고 있음)
 
         //when : 검색어가 공백인("    ")경우를 고려해보자 -> bad_request여야함
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/search")
-                .param("keyword", "     ")
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/novel/search")
+                .param("search", "     ")
                 .accept(MediaType.APPLICATION_JSON));
 
         //then : 결과 json을 출력해보자
@@ -133,9 +136,5 @@ public class SearchControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("BAD_REQUEST")) //내부코드가 bad
                 .andDo(print()); //조회 결과 출력
     }
-
-
-
-
 
 }

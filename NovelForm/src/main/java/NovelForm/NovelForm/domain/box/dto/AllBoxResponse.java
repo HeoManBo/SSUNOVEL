@@ -34,7 +34,4 @@ public class AllBoxResponse {
     @Schema(description = "해당 보관함에 좋아요 개수", defaultValue = "3")
     private Long likeCnt;
 
-
-
-
 }

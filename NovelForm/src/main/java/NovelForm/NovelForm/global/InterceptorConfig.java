@@ -13,6 +13,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
      *  로그인 인터셉터 설정
      *  /member 하위의 url에 대해서 설정
      *  /member/login, /member/create 은 인터셉터 예외
+     *  5/14 , 리뷰 작성시 Interceptor 추가
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -20,6 +21,6 @@ public class InterceptorConfig implements WebMvcConfigurer {
                 .order(1)
                 .addPathPatterns("/member/**", "/box", "/favorite/**")
                 .excludePathPatterns("/member/login", "/member/create",
-                                    "/box/all", "/box/search");
+                                    "/box/all", "/box/search", "/novel/review");
     }
 }

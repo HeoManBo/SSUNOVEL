@@ -16,7 +16,7 @@ import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.test.annotation.Rollback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +43,7 @@ public class BasicTest {
     @Test
     void 멤버생성테스트(){
         Member member1 = RegisterMember("asdf@naver.com", "ssu");
-        Member member2 = RegisterMember("aaaa@naver.com", "ssu");
+        Member member2 = RegisterMember("aaaa@naver.com", "test");
 
         memberRepository.save(member1);
         memberRepository.save(member2);
@@ -114,18 +114,17 @@ public class BasicTest {
         /**
          * 즐겨 찾기 생성
          */
-        FavoriteNovel favoriteNovel1 = new FavoriteNovel(novel1);
+        FavoriteNovel favoriteNovel1 = new FavoriteNovel();
         favoriteNovel1.addMember(member1);
         favoriteNovel1.addNovel(novel1);
         favoriteNovelRepository.save(favoriteNovel1);
 
-        FavoriteNovel favoriteNovel2 = new FavoriteNovel(novel2);
+        FavoriteNovel favoriteNovel2 = new FavoriteNovel();
         favoriteNovel2.addMember(member1);
         favoriteNovel2.addNovel(novel2);
         favoriteNovelRepository.save(favoriteNovel2);
 
-        PageRequest pageRequest = PageRequest.of(0, 10);
-        List<FavoriteNovel> findNovels = favoriteNovelRepository.findByMember(member1, pageRequest);
+        List<FavoriteNovel> findNovels = favoriteNovelRepository.findByMemberNoPaging(member1);
         List<Novel> result = new ArrayList<>();
         for (FavoriteNovel findNovel : findNovels) {
             System.out.print("member nickname = " + findNovel.getMember().getNickname());

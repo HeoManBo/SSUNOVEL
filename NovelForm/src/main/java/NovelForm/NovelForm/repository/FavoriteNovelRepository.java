@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface FavoriteNovelRepository extends JpaRepository<FavoriteNovel, Long> {
@@ -21,4 +22,10 @@ public interface FavoriteNovelRepository extends JpaRepository<FavoriteNovel, Lo
 
     @Query("select fn from FavoriteNovel fn join fetch fn.novel where fn.member = :member and fn.novel = :novel")
     FavoriteNovel findByMemberWithNovel(@Param("member") Member member, @Param("novel") Novel novel);
+
+    @Query("select fn from FavoriteNovel fn inner join fn.novel inner join fn.member where fn.member = :member and fn.novel = :novel")
+    List<FavoriteNovel> findByMemberAndNovel(@Param("member") Member member, @Param("novel") Novel novel);
+
+    @Query("select fn from FavoriteNovel fn join fetch fn.novel where fn.member = :member")
+    List<FavoriteNovel> findByMemberNoPaging(@Param("member") Member member);
 }

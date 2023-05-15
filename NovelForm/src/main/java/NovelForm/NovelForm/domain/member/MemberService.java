@@ -13,6 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Slf4j
 @Service
 @Transactional
@@ -86,5 +88,15 @@ public class MemberService {
         
 
         return findMember.getId();
+    }
+
+    /**
+     *
+     * @param memberId에 대응되는 멤버가 DB에 존재하는지 확인함.
+     * @return 존재하면 멤버 객체, 없다면 null을 반환함
+     */
+    public Member isPresentMember(Long memberId){
+        Optional<Member> findMember = memberRepository.findById(memberId);
+        return findMember.orElse(null);
     }
 }

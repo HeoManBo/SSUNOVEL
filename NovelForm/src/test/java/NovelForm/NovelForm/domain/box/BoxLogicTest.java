@@ -94,10 +94,10 @@ public class BoxLogicTest {
                 198,
                 "판타지",
                 testAuthor1,
-                0,
-                1,
-                1,
-                1
+                "navernaver",
+                "kakaokakao",
+                "ridiridi",
+                "munpiamunpia"
         );
 
         Novel testNovel2 = new Novel(
@@ -112,10 +112,10 @@ public class BoxLogicTest {
                 1981,
                 "판타지",
                 testAuthor2,
-                0,
-                1,
-                1,
-                1
+                "navernaver",
+                "kakaokakao",
+                "ridiridi",
+                "munpiamunpia"
         );
 
         Novel testNovel3 = new Novel(
@@ -130,10 +130,10 @@ public class BoxLogicTest {
                 198,
                 "판타지",
                 testAuthor3,
-                0,
-                1,
-                1,
-                1
+                "navernaver",
+                "kakaokakao",
+                "ridiridi",
+                "munpiamunpia"
         );
 
         Novel testNovel4 = new Novel(
@@ -148,10 +148,10 @@ public class BoxLogicTest {
                 198,
                 "판타지",
                 testAuthor1,
-                0,
-                1,
-                1,
-                1
+                "navernaver",
+                "kakaokakao",
+                "ridiridi",
+                "munpiamunpia"
         );
 
         Novel testNovel5 = new Novel(
@@ -166,10 +166,10 @@ public class BoxLogicTest {
                 198,
                 "판타지",
                 testAuthor2,
-                0,
-                1,
-                1,
-                1
+                "navernaver",
+                "kakaokakao",
+                "ridiridi",
+                "munpiamunpia"
         );
 
         Novel testNovel6 = new Novel(
@@ -184,10 +184,10 @@ public class BoxLogicTest {
                 1986,
                 "판타지",
                 testAuthor3,
-                0,
-                1,
-                1,
-                1
+                "navernaver",
+                "kakaokakao",
+                "ridiridi",
+                "munpiamunpia"
         );
 
 
@@ -266,7 +266,7 @@ public class BoxLogicTest {
         HttpEntity<String> createHttpEntity = new HttpEntity<>(objectMapper.writeValueAsString(createMemberRequest), loginHeader);
         //restTemplate.postForEntity("http://localhost:8080/member/create", createHttpEntity, BaseResponse.class);
 
-        
+
         // 헤더를 포함해 HttpEntity 생성
         HttpEntity<String> loginHttpEntity = new HttpEntity<>(objectMapper.writeValueAsString(loginMemberRequest), loginHeader);
 
@@ -296,10 +296,11 @@ public class BoxLogicTest {
                 38,
                 "판타지",
                 testAuthor,
-                1,
-                0,
-                0,
-                0);
+                "navernaver",
+                "kakaokakao",
+                "ridiridi",
+                "munpiamunpia"
+                );
 
         Novel save = novelRepository.save(testNovel);
 

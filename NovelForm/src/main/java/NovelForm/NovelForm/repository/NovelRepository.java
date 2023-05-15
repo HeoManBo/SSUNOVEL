@@ -59,4 +59,14 @@ public interface NovelRepository extends JpaRepository<Novel, Long> {
     @Query(value = "select n from Novel n join fetch n.author au where n.id = :novelId")
     Novel DetailNovelInfo(@Param("novelId") Long id);
 
+
+    //장르에 따른 필터링 조건에 맞춰 Novel List를 반환함
+    @Query(value = "select n from Novel as n join fetch n.author au where n.category = :genre",
+           countQuery = "select count(n) from Novel n inner join n.author au where n.category = :genre")
+    Page<Novel> findByGenreWithFiltering(@Param("genre") String genre, Pageable pageable);
+
+
+    //novel_id의 소설과, 해당 소설의 리뷰 List를 가져온다 (제거를 위해)
+    @Query("select n from Novel n join fetch n.reviews rs join fetch rs.member where n.id = :novel_id")
+    Novel findByNovelIdWithReviews(@Param("novel_id") Long novel_id);
 }

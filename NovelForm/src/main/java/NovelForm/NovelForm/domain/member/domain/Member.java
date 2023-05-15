@@ -126,4 +126,8 @@ public class Member extends BaseEntityTime {
         this.reviews.add(review);
     }
 
+    //리뷰 삭제 메소드
+    public void deleteMyReview(Review deleteReview) {
+        this.reviews.remove(deleteReview);
+    }
 }

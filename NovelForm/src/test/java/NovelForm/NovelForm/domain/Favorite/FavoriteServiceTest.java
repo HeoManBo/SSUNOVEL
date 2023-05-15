@@ -78,10 +78,10 @@ public class FavoriteServiceTest {
                 198,
                 "판타지",
                 testAuthor1,
-                0,
-                1,
-                1,
-                1
+                "navernaver",
+                "kakaokakao",
+                "ridiridi",
+                "munpiamunpia"
         );
 
         Novel testNovel2 = new Novel(
@@ -96,10 +96,10 @@ public class FavoriteServiceTest {
                 1981,
                 "판타지",
                 testAuthor2,
-                0,
-                1,
-                1,
-                1
+                "navernaver",
+                "kakaokakao",
+                "ridiridi",
+                "munpiamunpia"
         );
 
         Novel testNovel3 = new Novel(
@@ -114,10 +114,10 @@ public class FavoriteServiceTest {
                 198,
                 "판타지",
                 testAuthor3,
-                0,
-                1,
-                1,
-                1
+                "navernaver",
+                "kakaokakao",
+                "ridiridi",
+                "munpiamunpia"
         );
 
         Novel testNovel4 = new Novel(
@@ -132,10 +132,10 @@ public class FavoriteServiceTest {
                 198,
                 "판타지",
                 testAuthor1,
-                0,
-                1,
-                1,
-                1
+                "navernaver",
+                "kakaokakao",
+                "ridiridi",
+                "munpiamunpia"
         );
 
         Novel testNovel5 = new Novel(
@@ -150,10 +150,10 @@ public class FavoriteServiceTest {
                 198,
                 "판타지",
                 testAuthor2,
-                0,
-                1,
-                1,
-                1
+                "navernaver",
+                "kakaokakao",
+                "ridiridi",
+                "munpiamunpia"
         );
 
         Novel testNovel6 = new Novel(
@@ -168,10 +168,10 @@ public class FavoriteServiceTest {
                 1986,
                 "판타지",
                 testAuthor3,
-                0,
-                1,
-                1,
-                1
+                "navernaver",
+                "kakaokakao",
+                "ridiridi",
+                "munpiamunpia"
         );
 
 
@@ -376,7 +376,7 @@ public class FavoriteServiceTest {
 
     /**
      * 즐겨찾기 삭제 테스트 - 성공 테스트
-     * 
+     *
      * 각 소설, 보관함, 작가의 번호와 사용자의 번호를 가지고 favorite 객체를 찾은 후 삭제를 진행
      */
     @DisplayName("즐겨찾기 삭제 테스트 (성공 테스트 - 소설, 보관함, 작가)")
