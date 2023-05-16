@@ -4,7 +4,7 @@ package NovelForm.NovelForm.NovelTest;
 import NovelForm.NovelForm.domain.member.domain.Gender;
 import NovelForm.NovelForm.domain.member.domain.LoginType;
 import NovelForm.NovelForm.domain.member.domain.Member;
-import NovelForm.NovelForm.domain.review.domain.Review;
+import NovelForm.NovelForm.domain.novel.Review;
 import NovelForm.NovelForm.domain.novel.Author;
 import NovelForm.NovelForm.domain.novel.Novel;
 import NovelForm.NovelForm.repository.AuthorRepository;

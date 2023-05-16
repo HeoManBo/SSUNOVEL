@@ -1,7 +1,6 @@
 package NovelForm.NovelForm.domain.novel;
 
 
-import NovelForm.NovelForm.domain.review.domain.Review;
 import NovelForm.NovelForm.global.BaseEntityTime;
 import jakarta.persistence.*;
 import lombok.*;

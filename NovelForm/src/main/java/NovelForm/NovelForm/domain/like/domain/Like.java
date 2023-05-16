@@ -2,7 +2,7 @@ package NovelForm.NovelForm.domain.like.domain;
 
 import NovelForm.NovelForm.domain.box.domain.Box;
 import NovelForm.NovelForm.domain.member.domain.Member;
-import NovelForm.NovelForm.domain.review.domain.Review;
+import NovelForm.NovelForm.domain.novel.Review;
 import NovelForm.NovelForm.global.BaseEntityTime;
 import jakarta.persistence.*;
 import lombok.Getter;

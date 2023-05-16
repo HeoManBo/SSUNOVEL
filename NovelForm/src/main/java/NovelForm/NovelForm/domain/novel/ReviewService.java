@@ -2,7 +2,6 @@ package NovelForm.NovelForm.domain.novel;
 
 
 import NovelForm.NovelForm.domain.member.domain.Member;
-import NovelForm.NovelForm.domain.review.domain.Review;
 import NovelForm.NovelForm.domain.novel.dto.detailnoveldto.ReviewDto;
 import NovelForm.NovelForm.domain.novel.dto.reivewdto.ReviewBodyDto;
 import NovelForm.NovelForm.repository.MemberRepository;
@@ -33,7 +32,7 @@ public class ReviewService {
             return null; //공 List를 반환함
         }
         return reviews.stream().map(r -> new ReviewDto(r.getMember().getNickname(), r.getContent(), r.getRating(),
-                r.getCreate_at(), r.getUp())).collect(Collectors.toList());
+                r.getCreate_at(), 0)).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -65,7 +64,7 @@ public class ReviewService {
         Review review = Review.builder()
                 .rating(reviewBodyDto.getRating())
                 .content(inputContent)
-                .up(0).build();
+                .build();
 
         review.addNovel(novel);
         review.addMember(member);

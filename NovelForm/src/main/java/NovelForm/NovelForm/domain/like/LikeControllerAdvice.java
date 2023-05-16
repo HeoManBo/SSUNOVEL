@@ -2,6 +2,7 @@ package NovelForm.NovelForm.domain.like;
 
 
 import NovelForm.NovelForm.domain.like.exception.DuplicateAddLikeException;
+import NovelForm.NovelForm.domain.like.exception.EmptyLikeException;
 import NovelForm.NovelForm.domain.like.exception.WrongBoxException;
 import NovelForm.NovelForm.domain.like.exception.WrongMemberException;
 import NovelForm.NovelForm.global.BaseResponse;
@@ -42,6 +43,14 @@ public class LikeControllerAdvice {
     public BaseResponse wrongBoxExHandler(WrongBoxException e){
         log.error("[like exception handler] ex", e);
         return new BaseResponse(BAD_REQUEST, e.getMessage(), "잘못된 보관함");
+    }
+
+
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(EmptyLikeException.class)
+    public BaseResponse emptyLikeExHandler(EmptyLikeException e){
+        log.error("[like exception handler] ex", e);
+        return new BaseResponse(BAD_REQUEST, e.getErrorFieldMap(), "등록하지 않은 좋아요에 대한 취소 요청");
     }
 
 }

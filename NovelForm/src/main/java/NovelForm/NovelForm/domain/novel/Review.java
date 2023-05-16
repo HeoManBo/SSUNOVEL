@@ -1,7 +1,6 @@
-package NovelForm.NovelForm.domain.review.domain;
+package NovelForm.NovelForm.domain.novel;
 
 import NovelForm.NovelForm.domain.member.domain.Member;
-import NovelForm.NovelForm.domain.novel.Novel;
 import NovelForm.NovelForm.global.BaseEntityTime;
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,18 +11,18 @@ import lombok.*;
 public class Review extends BaseEntityTime {
     @Id
     @GeneratedValue
-    @Column(name = "review_id")
+    @Column(name = "review_idx")
     private Long id;
 
     @Column
     private String status;
 
     @ManyToOne
-    @JoinColumn(name = "novel_id")
+    @JoinColumn(name = "novel_idx")
     private Novel novel;
 
     @ManyToOne
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_idx")
     private Member member;
 
     @Column
@@ -33,18 +32,14 @@ public class Review extends BaseEntityTime {
     @Lob
     private String content;
 
-    @Column
-    private int up;
-
 
     @Builder
-    public Review(String status, Novel novel, Member member, double rating, String content, int up) {
+    public Review(String status, Novel novel, Member member, double rating, String content) {
         this.status = status;
         this.novel = novel;
         this.member = member;
         this.rating = rating;
         this.content = content;
-        this.up = up;
     }
 
     //연관관계메소드

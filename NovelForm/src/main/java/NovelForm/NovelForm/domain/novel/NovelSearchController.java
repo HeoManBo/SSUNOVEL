@@ -4,7 +4,6 @@ package NovelForm.NovelForm.domain.novel;
 import NovelForm.NovelForm.domain.favorite.domain.FavoriteNovel;
 import NovelForm.NovelForm.domain.member.MemberService;
 import NovelForm.NovelForm.domain.member.domain.Member;
-import NovelForm.NovelForm.domain.review.domain.Review;
 import NovelForm.NovelForm.domain.novel.dto.detailnoveldto.DetailNovelInfo;
 import NovelForm.NovelForm.domain.novel.dto.detailnoveldto.ReviewDto;
 import NovelForm.NovelForm.domain.novel.dto.searchdto.MidFormmat;

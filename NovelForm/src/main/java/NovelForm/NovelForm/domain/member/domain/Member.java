@@ -7,7 +7,7 @@ import NovelForm.NovelForm.domain.community.CommunityPost;
 import NovelForm.NovelForm.domain.favorite.domain.FavoriteAuthor;
 import NovelForm.NovelForm.domain.favorite.domain.FavoriteBox;
 import NovelForm.NovelForm.domain.favorite.domain.FavoriteNovel;
-import NovelForm.NovelForm.domain.review.domain.Review;
+import NovelForm.NovelForm.domain.novel.Review;
 import NovelForm.NovelForm.global.BaseEntityTime;
 import jakarta.persistence.*;
 import lombok.*;

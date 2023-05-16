@@ -4,12 +4,13 @@ import NovelForm.NovelForm.domain.box.domain.Box;
 import NovelForm.NovelForm.domain.box.domain.BoxItem;
 import NovelForm.NovelForm.domain.like.domain.Like;
 import NovelForm.NovelForm.domain.like.exception.DuplicateAddLikeException;
+import NovelForm.NovelForm.domain.like.exception.EmptyLikeException;
 import NovelForm.NovelForm.domain.member.domain.Gender;
 import NovelForm.NovelForm.domain.member.domain.LoginType;
 import NovelForm.NovelForm.domain.member.domain.Member;
 import NovelForm.NovelForm.domain.novel.Author;
 import NovelForm.NovelForm.domain.novel.Novel;
-import NovelForm.NovelForm.domain.review.domain.Review;
+import NovelForm.NovelForm.domain.novel.Review;
 import NovelForm.NovelForm.repository.*;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,14 +18,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -100,15 +98,15 @@ class LikeServiceTest {
                 member1,
                 3.5,
                 "너무 재맜습니다." +
-                        "흑흑",
-                0);
+                        "흑흑"
+                );
 
         reviewRepository.save(review);
     }
 
 
     @Test
-    @DisplayName("보관함 좋아요 서비스 테스트")
+    @DisplayName("보관함 좋아요 등록/취소 테스트")
     void addLikeToBox() throws DuplicateAddLikeException {
 
         // given
@@ -163,12 +161,43 @@ class LikeServiceTest {
                     Like save2 = likeRepository.save(like);
                 }
         );
+
+
+
+
+        // when
+        // 등록한 좋아요를 취소
+        likeRepository.delete(save);
+
+        // then
+        // 취소한 후에는 찾을 수 없어야 한다.
+        // 취소한걸 취소하는 건 불가능
+        Assertions.assertThat(likeRepository.findLikesByMemberAndBox(member, box)).isEmpty();
+
+        org.junit.jupiter.api.Assertions.assertThrows(
+                EmptyLikeException.class,
+                () -> {
+
+                    List<Like> likeList2 = likeRepository.findLikesByMemberAndBox(member, box);
+
+                    if(likeList2.isEmpty()){
+                        Map<String, Long> errorFieldMap = new HashMap<>();
+                        errorFieldMap.put("memberId", member.getId());
+                        errorFieldMap.put("boxId", box.getId());
+
+                        throw new EmptyLikeException(errorFieldMap);
+                    }
+
+                    likeRepository.delete(save);
+                }
+        );
+
     }
 
 
 
     @Test
-    @DisplayName("리뷰 좋아요 서비스 테스트")
+    @DisplayName("리뷰 좋아요 등록/취소 테스트")
     void addLikeToReview() throws DuplicateAddLikeException {
 
         // given
@@ -216,6 +245,59 @@ class LikeServiceTest {
                     }
                 }
         );
+
+
+        // when
+        // 등록한 좋아요 취소
+        likeRepository.delete(save);
+
+        // then
+        // 취소한 좋아요는 찾을 수 없어야 한다.
+        Assertions.assertThat(likeRepository.findLikesByMemberAndReview(member, review)).isEmpty();
+
+        org.junit.jupiter.api.Assertions.assertThrows(
+                EmptyLikeException.class,
+                () -> {
+
+                    List<Like> likeList2 = likeRepository.findLikesByMemberAndReview(member, review);
+
+                    if(likeList2.isEmpty()){
+                        Map<String, Long> errorFieldMap = new HashMap<>();
+                        errorFieldMap.put("memberId", member.getId());
+                        errorFieldMap.put("reviewId", review.getId());
+
+                        throw new EmptyLikeException(errorFieldMap);
+                    }
+
+                    likeRepository.delete(save);
+                }
+        );
+
     }
 
+
+
+    @Test
+    @DisplayName("리뷰 별 좋아요 수 체크 테스트")
+    void checkLikeCntByReview(){
+
+
+        // given
+        // 리뷰, 사용자, 리뷰별 좋아요 개수가 있다.
+        Member member = new Member("testtt99@gmail.com","12121212", "testtn", Gender.MALE, LoginType.USER, 31);
+        memberRepository.save(member);
+
+        Review review = reviewRepository.findAll().get(0);
+
+        Integer reviewCnt = likeRepository.findLikeCountByReview(review);
+
+        // when
+        // 리뷰를 하나 추가하면,
+        Like like = new Like(member, review);
+        likeRepository.save(like);
+
+        // then
+        // 추가분이 반영된다.
+        Assertions.assertThat(likeRepository.findLikeCountByReview(review)).isEqualTo(reviewCnt + 1);
+    }
 }

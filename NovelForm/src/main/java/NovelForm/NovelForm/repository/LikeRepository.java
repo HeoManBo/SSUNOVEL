@@ -6,10 +6,9 @@ import NovelForm.NovelForm.domain.box.domain.Box;
 import NovelForm.NovelForm.domain.box.dto.AllBoxResponse;
 import NovelForm.NovelForm.domain.like.domain.Like;
 import NovelForm.NovelForm.domain.member.domain.Member;
-import NovelForm.NovelForm.domain.review.domain.Review;
+import NovelForm.NovelForm.domain.novel.Review;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -102,5 +101,12 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
      * 사용자가 특정 리뷰에 대해 좋아요를 했는지 확인
      */
     List<Like> findLikesByMemberAndReview(Member member, Review review);
+
+
+    /**
+     * 특정 리뷰에 대해 좋아요가 몇개인지 확인
+     */
+    @Query("select count(l) from Like l inner join l.review r on r = :review")
+    Integer findLikeCountByReview(Review review);
 
 }
