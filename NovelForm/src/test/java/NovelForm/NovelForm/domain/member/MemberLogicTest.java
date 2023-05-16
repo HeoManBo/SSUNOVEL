@@ -84,7 +84,7 @@ public class MemberLogicTest {
                 password,
                 "testNickname",
                 Gender.MALE,
-                10);
+                "2000-01-01");
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -158,7 +158,7 @@ public class MemberLogicTest {
                 password,
                 "testn",
                 Gender.stringToGender("MALE"),
-                10
+                "2000-01-01"
         );
         LoginMemberRequest testDto = new LoginMemberRequest(email, password);
 

@@ -71,17 +71,17 @@ class MemberControllerTest {
         ArrayList<CreateMemberRequest> testList = new ArrayList<>();
 
         // null 체크
-        testList.add(new CreateMemberRequest("test@naver.com", null, "testNickname", null, 1));
+        testList.add(new CreateMemberRequest("test@naver.com", null, "testNickname", null, "2000-01-01"));
 
         // 길이 체크
-        testList.add(new CreateMemberRequest("test@naver.com", "12345", "testNickname", Gender.MALE, 1));
+        testList.add(new CreateMemberRequest("test@naver.com", "12345", "testNickname", Gender.MALE, "2000-01-01"));
 
         // 이메일 형식 체크
-        testList.add(new CreateMemberRequest("testnaver.com", "1234567", "testNickname", Gender.MALE, 10));
+        testList.add(new CreateMemberRequest("testnaver.com", "1234567", "testNickname", Gender.MALE, "2000-01-01"));
 
         // 정상 통과 체크
         CreateMemberRequest successTest =
-                new CreateMemberRequest("test@naver.com", "123456789", "testNickname", Gender.MALE,1);
+                new CreateMemberRequest("test@naver.com", "123456789", "testNickname", Gender.MALE,"2000-01-01");
 
 
 

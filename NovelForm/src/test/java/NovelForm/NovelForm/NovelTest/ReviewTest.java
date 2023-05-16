@@ -4,11 +4,9 @@ package NovelForm.NovelForm.NovelTest;
 import NovelForm.NovelForm.domain.member.domain.Gender;
 import NovelForm.NovelForm.domain.member.domain.LoginType;
 import NovelForm.NovelForm.domain.member.domain.Member;
-import NovelForm.NovelForm.domain.member.domain.Review;
+import NovelForm.NovelForm.domain.review.domain.Review;
 import NovelForm.NovelForm.domain.novel.Author;
 import NovelForm.NovelForm.domain.novel.Novel;
-import NovelForm.NovelForm.domain.novel.ReviewService;
-import NovelForm.NovelForm.domain.novel.dto.detailnoveldto.ReviewDto;
 import NovelForm.NovelForm.domain.novel.dto.reivewdto.ReviewBodyDto;
 import NovelForm.NovelForm.repository.AuthorRepository;
 import NovelForm.NovelForm.repository.MemberRepository;
@@ -18,14 +16,13 @@ import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 @Slf4j
 public class ReviewTest {
+
 
     @Autowired
     private MemberRepository memberRepository;
@@ -183,15 +181,15 @@ public class ReviewTest {
 
         //when : SSU 유저가 성냥팔이 소녀에 대한 리뷰를 삭제한다.
         Review SSUReview = reviewRepository.findSingleReivew(SSU, novel).get();
-        log.info("SSU 리뷰 삭제전 리뷰 수 : {}", SSU.getReviews().size());
-        log.info("성냥팔이 소녀 리뷰 삭제 전 리뷰 수  : {}", novel.getReviews().size());
+        //log.info("SSU 리뷰 삭제전 리뷰 수 : {}", SSU.getReviews().size());
+        //log.info("성냥팔이 소녀 리뷰 삭제 전 리뷰 수  : {}", novel.getReviews().size());
 
 
         SSU.deleteMyReview(SSUReview);
         novel.deleteReview(SSUReview);
-        log.info("SSUReview id = {}", SSUReview.getId());
-        log.info("SSU 리뷰 삭제후 리뷰 수 : {}", SSU.getReviews().size());
-        log.info("novel 리뷰 삭제후 리뷰 수 : {}", novel.getReviews().size());
+//        log.info("SSUReview id = {}", SSUReview.getId());
+//        log.info("SSU 리뷰 삭제후 리뷰 수 : {}", SSU.getReviews().size());
+//        log.info("novel 리뷰 삭제후 리뷰 수 : {}", novel.getReviews().size());
         reviewRepository.deleteReviewById(SSUReview.getId());
 
         em.clear();
@@ -201,14 +199,14 @@ public class ReviewTest {
         Member findSSU = memberRepository.findByMemberIdWithReviews(findMember1.getId());
         Novel findNovel = novelRepository.findByNovelIdWithReviews(list.get(0).getId());
 
-        log.info("이름 : {}", findSSU.getNickname());
+//        log.info("이름 : {}", findSSU.getNickname());
         for(Review r : findSSU.getReviews()){
-            log.info("리뷰 번호 : {}", r.getId());
+//            log.info("리뷰 번호 : {}", r.getId());
         }
 
-        log.info("소설 이름 : {}", findNovel.getTitle());
+//        log.info("소설 이름 : {}", findNovel.getTitle());
         for(Review r : findNovel.getReviews()){
-            log.info("리뷰 번호 : {}", r.getId());
+//            log.info("리뷰 번호 : {}", r.getId());
         }
 
         //then : ssu 유저는 성냥팔이 리뷰를 삭제했으므로 ssu의 리뷰 수는 1개, 성냥팔이 소녀의 리뷰 수는 1개가 되어야한다.
@@ -243,7 +241,7 @@ public class ReviewTest {
         Novel findNovel = novelRepository.findById(novel.getId()).get();
 
         for (Review review : reviews) {
-            log.info("리뷰 평점 : {}, 리뷰 내용 : {}", review.getRating(), review.getContent());
+//            log.info("리뷰 평점 : {}, 리뷰 내용 : {}", review.getRating(), review.getContent());
         }
 
         /**

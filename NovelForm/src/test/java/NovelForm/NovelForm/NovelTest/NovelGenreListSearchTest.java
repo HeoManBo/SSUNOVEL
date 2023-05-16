@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
@@ -87,8 +89,8 @@ public class NovelGenreListSearchTest {
         assertThat(novels.size()).isEqualTo(10);
         // 정보를 출력해보자.
         for (Novel novel : novels) {
-            log.info("소설 이름 : {}, 이미지 URL : {}, 작가 이름 : {}, 리뷰 수 : {}, 장르 : {}", novel.getTitle(), novel.getAuthor().getName(),
-                    novel.getCover_image(), novel.getDownload_cnt(), novel.getCategory());
+//            log.info("소설 이름 : {}, 이미지 URL : {}, 작가 이름 : {}, 리뷰 수 : {}, 장르 : {}", novel.getTitle(), novel.getAuthor().getName(),
+//                    novel.getCover_image(), novel.getDownload_cnt(), novel.getCategory());
         }
     }
 

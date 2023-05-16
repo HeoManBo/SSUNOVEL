@@ -259,7 +259,7 @@ public class BoxLogicTest {
         loginHeader.set("Content-Type", "application/json");
 
 
-        CreateMemberRequest createMemberRequest = new CreateMemberRequest("tm999@naver.com", "12123838", "tnname", Gender.MALE,23);
+        CreateMemberRequest createMemberRequest = new CreateMemberRequest("tm999@naver.com", "12123838", "tnname", Gender.MALE, "2000-01-01");
         LoginMemberRequest loginMemberRequest = new LoginMemberRequest("tm999@naver.com", "12123838");
 
         // 회원 가입

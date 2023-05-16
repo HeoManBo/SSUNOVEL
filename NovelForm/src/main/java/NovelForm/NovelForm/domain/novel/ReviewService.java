@@ -2,7 +2,7 @@ package NovelForm.NovelForm.domain.novel;
 
 
 import NovelForm.NovelForm.domain.member.domain.Member;
-import NovelForm.NovelForm.domain.member.domain.Review;
+import NovelForm.NovelForm.domain.review.domain.Review;
 import NovelForm.NovelForm.domain.novel.dto.detailnoveldto.ReviewDto;
 import NovelForm.NovelForm.domain.novel.dto.reivewdto.ReviewBodyDto;
 import NovelForm.NovelForm.repository.MemberRepository;

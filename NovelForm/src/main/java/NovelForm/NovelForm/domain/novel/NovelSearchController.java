@@ -4,7 +4,7 @@ package NovelForm.NovelForm.domain.novel;
 import NovelForm.NovelForm.domain.favorite.domain.FavoriteNovel;
 import NovelForm.NovelForm.domain.member.MemberService;
 import NovelForm.NovelForm.domain.member.domain.Member;
-import NovelForm.NovelForm.domain.member.domain.Review;
+import NovelForm.NovelForm.domain.review.domain.Review;
 import NovelForm.NovelForm.domain.novel.dto.detailnoveldto.DetailNovelInfo;
 import NovelForm.NovelForm.domain.novel.dto.detailnoveldto.ReviewDto;
 import NovelForm.NovelForm.domain.novel.dto.searchdto.MidFormmat;
@@ -17,21 +17,16 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 import static NovelForm.NovelForm.global.SessionConst.LOGIN_MEMBER_ID;
 

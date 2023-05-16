@@ -19,7 +19,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new LoginInterceptor())
                 .order(1)
-                .addPathPatterns("/member/**", "/box", "/favorite/**", "/box/**")
+                .addPathPatterns("/member/**", "/box", "/favorite/**", "/box/**", "/like/**")
                 .excludePathPatterns("/member/login", "/member/create",
                                     "/box/all", "/box/search", "/novel/review");
     }

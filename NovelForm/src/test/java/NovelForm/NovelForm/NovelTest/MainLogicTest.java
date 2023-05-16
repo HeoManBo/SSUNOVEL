@@ -78,7 +78,7 @@ public class MainLogicTest {
 
         //로그를 찍어보자
         for (Novel findNovel : findNovels) {
-            log.info("소설 이름 : {}, 소설 작가 : {}, 리뷰 수 : {}", findNovel.getTitle(), findNovel.getAuthor().getName(), findNovel.getDownload_cnt());
+            //log.info("소설 이름 : {}, 소설 작가 : {}, 리뷰 수 : {}", findNovel.getTitle(), findNovel.getAuthor().getName(), findNovel.getDownload_cnt());
         }
 
         //가져온 소설 수가 20개인지 확인한다

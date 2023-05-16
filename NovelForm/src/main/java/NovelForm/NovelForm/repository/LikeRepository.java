@@ -2,8 +2,11 @@ package NovelForm.NovelForm.repository;
 
 
 
+import NovelForm.NovelForm.domain.box.domain.Box;
 import NovelForm.NovelForm.domain.box.dto.AllBoxResponse;
 import NovelForm.NovelForm.domain.like.domain.Like;
+import NovelForm.NovelForm.domain.member.domain.Member;
+import NovelForm.NovelForm.domain.review.domain.Review;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -11,6 +14,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface LikeRepository extends JpaRepository<Like, Long> {
@@ -85,4 +90,17 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
                     " group by b "
     )
     Page<AllBoxResponse> findAllBoxByPublicWithLikeDesc(PageRequest pageRequest);
+
+
+    /**
+     * 사용자가 특정 보관함에 대해 좋아요를 했는지 확인
+     */
+    List<Like> findLikesByMemberAndBox(Member member, Box box);
+
+
+    /**
+     * 사용자가 특정 리뷰에 대해 좋아요를 했는지 확인
+     */
+    List<Like> findLikesByMemberAndReview(Member member, Review review);
+
 }

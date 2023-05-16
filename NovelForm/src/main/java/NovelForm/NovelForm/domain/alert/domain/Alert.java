@@ -1,6 +1,7 @@
-package NovelForm.NovelForm.domain.member.domain;
+package NovelForm.NovelForm.domain.alert.domain;
 
 
+import NovelForm.NovelForm.domain.member.domain.Member;
 import NovelForm.NovelForm.global.BaseEntityTime;
 import jakarta.persistence.*;
 import lombok.Getter;

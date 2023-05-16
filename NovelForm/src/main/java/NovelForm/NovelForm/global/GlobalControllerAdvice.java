@@ -10,6 +10,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
@@ -54,4 +55,19 @@ public class GlobalControllerAdvice {
         log.error("[global exception handler] ex", e);
         return new BaseResponse(BAD_REQUEST, e.getExResponse(), "필드 에러");
     }
+
+
+    /**
+     *  PathVariable 등에서 잘못된 값을 줄 때 발생한 에러를 처리하는 핸들러
+     */
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public BaseResponse methodArgumentTypeMismatchExHandler(MethodArgumentTypeMismatchException e){
+        log.error("[global exception handler] ex", e);
+        return new BaseResponse(BAD_REQUEST, e.getName(), "컨버팅 오류");
+    }
+
+
+
+
 }
