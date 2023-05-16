@@ -1,10 +1,7 @@
 package NovelForm.NovelForm.domain.like;
 
 
-import NovelForm.NovelForm.domain.like.exception.DuplicateAddLikeException;
-import NovelForm.NovelForm.domain.like.exception.EmptyLikeException;
-import NovelForm.NovelForm.domain.like.exception.WrongBoxException;
-import NovelForm.NovelForm.domain.like.exception.WrongMemberException;
+import NovelForm.NovelForm.domain.like.exception.*;
 import NovelForm.NovelForm.global.BaseResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
@@ -42,7 +39,14 @@ public class LikeControllerAdvice {
     @ExceptionHandler(WrongBoxException.class)
     public BaseResponse wrongBoxExHandler(WrongBoxException e){
         log.error("[like exception handler] ex", e);
-        return new BaseResponse(BAD_REQUEST, e.getMessage(), "잘못된 보관함");
+        return new BaseResponse(BAD_REQUEST, e.getMessage(), "잘못된 보관함 접근");
+    }
+
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(WrongReviewException.class)
+    public BaseResponse wrongReviewExHandler(WrongReviewException e){
+        log.error("[like exception handler] ex", e);
+        return new BaseResponse(BAD_REQUEST, e.getMessage(), "잘못된 리뷰 접근");
     }
 
 
