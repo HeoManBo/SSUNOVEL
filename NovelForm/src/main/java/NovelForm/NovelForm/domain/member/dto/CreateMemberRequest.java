@@ -39,7 +39,7 @@ public class CreateMemberRequest {
     @NotNull
     private Gender gender;
 
-    @Schema(description = "나이", defaultValue = "10")
+    @Schema(description = "나이", defaultValue = "2023-05-16")
     @NotNull
-    private Integer age;
+    private String age;
 }

@@ -1,8 +1,22 @@
 package NovelForm.NovelForm.domain.member.exception;
 
+import lombok.Getter;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@Getter
 public class MemberDuplicateException extends Exception{
+
+    private Map<String, String> errorFieldMap = new HashMap<>();
+
     public MemberDuplicateException() {
         super();
+    }
+
+    public MemberDuplicateException(Map<String, String> errorFieldMap){
+        super();
+        this.errorFieldMap = errorFieldMap;
     }
 
     public MemberDuplicateException(String message) {

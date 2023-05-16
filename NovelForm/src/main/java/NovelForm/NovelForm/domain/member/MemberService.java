@@ -7,12 +7,18 @@ import NovelForm.NovelForm.domain.member.dto.LoginMemberRequest;
 import NovelForm.NovelForm.domain.member.exception.MemberDuplicateException;
 import NovelForm.NovelForm.domain.member.exception.WrongLoginException;
 import NovelForm.NovelForm.repository.MemberRepository;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -28,14 +34,30 @@ public class MemberService {
      *  비밀번호 암호화 수행 (BCryptPasswordEncoder 사용)
      */
     private final PasswordEncoder encoder;
-    public Long createMember(CreateMemberRequest createMemberRequest) throws MemberDuplicateException {
-        
+    public Long createMember(CreateMemberRequest createMemberRequest) throws Exception {
+
+        Map<String, String> errorFieldMap = new HashMap<>();
+
         // 이미 같은 이메일로 회원 가입이 되어 있다면, 에러
         if(memberRepository.findByEmail(createMemberRequest.getEmail()) != null){
-            throw new MemberDuplicateException("이미 같은 이메일로 회원 가입이 되어 있습니다.");
+            errorFieldMap.put("email", createMemberRequest.getEmail());
+        }
+
+        // 이미 같은 닉네임으로 회원 가입이 되어 있다면, 에러
+        if(memberRepository.findByNickname(createMemberRequest.getNickname()) != null){
+            errorFieldMap.put("nickname", createMemberRequest.getNickname());
+        }
+
+        if(!errorFieldMap.isEmpty()){
+            throw new MemberDuplicateException(errorFieldMap);
         }
 
 
+        // 출생 연도로 나이를 구하기
+        LocalDate birth = LocalDate.parse(createMemberRequest.getAge());
+        LocalDate nowDate = LocalDate.now();
+
+        Integer age = (int) ChronoUnit.YEARS.between(birth, nowDate);
 
 
         // 비밀번호는 암호화 처리
@@ -53,7 +75,7 @@ public class MemberService {
                 .nickname(createMemberRequest.getNickname())
                 .gender(createMemberRequest.getGender())
                 .loginType(LoginType.USER)
-                .age(createMemberRequest.getAge())
+                .age(age)
                 .build();
 
         log.info("member = {}", member);
@@ -92,7 +114,7 @@ public class MemberService {
 
     /**
      *
-     * @param memberId에 대응되는 멤버가 DB에 존재하는지 확인함.
+     * @param memberId 에 대응되는 멤버가 DB에 존재하는지 확인함.
      * @return 존재하면 멤버 객체, 없다면 null을 반환함
      */
     public Member isPresentMember(Long memberId){

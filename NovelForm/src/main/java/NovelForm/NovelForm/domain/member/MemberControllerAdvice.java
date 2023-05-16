@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.time.format.DateTimeParseException;
+
 import static org.springframework.http.HttpStatus.*;
 
 @Slf4j
@@ -69,9 +71,9 @@ public class MemberControllerAdvice {
      */
     @ResponseStatus(BAD_REQUEST)
     @ExceptionHandler(MemberDuplicateException.class)
-    public BaseResponse memberDuplicateExHandler(Exception e){
+    public BaseResponse memberDuplicateExHandler(MemberDuplicateException e){
         log.error("[member exception handler] ex", e);
-        return new BaseResponse(BAD_REQUEST, null, e.getMessage());
+        return new BaseResponse(BAD_REQUEST, e.getErrorFieldMap(), "해당 필드 값으로 이미 회원 가입이 되어 있습니다.");
     }
 
 
@@ -84,4 +86,16 @@ public class MemberControllerAdvice {
         log.error("[member exception handler] ex", e);
         return new BaseResponse(BAD_REQUEST, e.getMessage(), "회원 가입이 안 되어 있습니다.");
     }
+
+
+    /**
+     * 출생연도를 파싱할 수 없을 때 호출 될 핸들러
+     */
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(DateTimeParseException.class)
+    public BaseResponse dateTimeParseExHandler(Exception e){
+        log.error("[member seception handler] ex", e);
+        return new BaseResponse(BAD_REQUEST, e.getMessage(), "출생연도 파싱 오류 format: 2023-01-01");
+    }
+
 }
