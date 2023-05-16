@@ -69,4 +69,8 @@ public interface NovelRepository extends JpaRepository<Novel, Long> {
     //novel_id의 소설과, 해당 소설의 리뷰 List를 가져온다 (제거를 위해)
     @Query("select n from Novel n join fetch n.reviews rs join fetch rs.member where n.id = :novel_id")
     Novel findByNovelIdWithReviews(@Param("novel_id") Long novel_id);
+
+    //Download_cnt 내림차순으로 정렬한 소설 20개를 반환합니다. 정렬 기준은 차후 변경될 수 있습니다.
+    @Query("select n from Novel n join fetch n.author order by n.download_cnt desc limit 20")
+    List<Novel> findByNovelRanking();
 }
