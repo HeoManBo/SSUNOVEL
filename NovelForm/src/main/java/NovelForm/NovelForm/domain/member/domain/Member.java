@@ -2,6 +2,7 @@ package NovelForm.NovelForm.domain.member.domain;
 
 
 import NovelForm.NovelForm.domain.alert.domain.Alert;
+import NovelForm.NovelForm.domain.box.domain.Box;
 import NovelForm.NovelForm.domain.comment.Comment;
 import NovelForm.NovelForm.domain.community.CommunityPost;
 import NovelForm.NovelForm.domain.favorite.domain.FavoriteAuthor;
@@ -18,6 +19,13 @@ import java.util.List;
 
 /**
  * 멤버 Table mapping
+ * 
+ * cascade의 경우에는 member 하나 하고만 연관이 있는 이들에만 걸어야 한다.
+ * 여러 멤버와 연관이 있는 경우에는 cascade로 삭제하지 말자
+ *
+ * Cascade.REMOVE 적용 : FavoriteNovel, FavoriteAuthor, FavoriteBox, Like, Alert
+ * 삭제 시 직접 삭제 해야 하는 것들 : Box, Review, Comment, CommunityPost
+ *
  */
 @Entity
 @Getter
@@ -71,16 +79,16 @@ public class Member extends BaseEntityTime {
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<FavoriteNovel> favorite_novels = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "member")
     private List<CommunityPost> communityPosts = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<FavoriteBox> favoriteBoxes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "member")
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "member")
     private List<Review> reviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
@@ -88,6 +96,9 @@ public class Member extends BaseEntityTime {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<Like> likes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<Box> boxes = new ArrayList<>();
 
 
     @Builder

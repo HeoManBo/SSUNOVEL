@@ -265,4 +265,7 @@ public class MemberLogicTest {
 
         Assertions.assertThat(logoutResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
+
+
+
 }

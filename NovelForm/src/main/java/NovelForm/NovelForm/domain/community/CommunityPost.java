@@ -49,6 +49,10 @@ public class CommunityPost extends BaseEntityTime {
         return chk == true ? true : false;
     }
 
-
-
+    // 게시글 생성자로 처음 입력받을 수 있는 제목, 본문, 작성자를 전달받는다.
+    public CommunityPost(String title, String content, Member member) {
+        this.title = title;
+        this.content = content;
+        this.member = member;
+    }
 }

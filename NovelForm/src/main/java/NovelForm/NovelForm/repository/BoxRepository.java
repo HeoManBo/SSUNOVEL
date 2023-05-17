@@ -7,6 +7,7 @@ import NovelForm.NovelForm.domain.member.domain.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -124,9 +125,28 @@ public interface BoxRepository extends JpaRepository<Box, Long> {
     List<BoxSearchInfo> findBoxByMember(@Param("search") String search, PageRequest pageRequest);
 
 
+    /**
+     * Member 객체와 보관함 id로 해당 회원이 작성한 보관함 찾아오기
+     *
+     * @param boxId
+     * @param findMember
+     * @return
+     */
     @Query("select b from Box b where b.id = :boxId and b.member = :findMember")
     Optional<Box> findExistBoxWithBoxIDAndMember(@Param("boxId") Long boxId, @Param("findMember") Member findMember);
 
 
+    /**
+     * memberId로 해당 회원이 작성한 보관함 찾아오기
+     */
+    List<Box> findBoxesByMemberId(Long memberId);
+
+
+    /**
+     * 특정 회원이 작성한 모든 보관함 삭제
+     */
+    @Modifying(clearAutomatically = true)
+    @Query("delete from Box b where b.member = :member ")
+    void bulkDeleteBoxByMember(@Param("member") Member member);
 
 }

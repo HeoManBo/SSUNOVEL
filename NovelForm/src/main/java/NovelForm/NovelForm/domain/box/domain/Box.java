@@ -42,7 +42,8 @@ public class Box extends BaseEntityTime {
     @OneToMany(mappedBy = "box", cascade = CascadeType.REMOVE)
     private List<Like> likes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "box", cascade = CascadeType.ALL)
+    // boxItem은 box가 그 생명주기를 모두 관리한다.
+    @OneToMany(mappedBy = "box", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BoxItem> boxItems = new ArrayList<>();
 
     public Box() {

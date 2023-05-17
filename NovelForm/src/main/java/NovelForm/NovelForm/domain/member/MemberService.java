@@ -8,7 +8,10 @@ import NovelForm.NovelForm.domain.member.dto.UpdateMemberRequest;
 import NovelForm.NovelForm.domain.member.exception.MemberDuplicateException;
 import NovelForm.NovelForm.domain.member.exception.WrongLoginException;
 import NovelForm.NovelForm.domain.member.exception.WrongMemberException;
+import NovelForm.NovelForm.repository.BoxRepository;
+import NovelForm.NovelForm.repository.FavoriteBoxRepository;
 import NovelForm.NovelForm.repository.MemberRepository;
+import NovelForm.NovelForm.repository.ReviewRepository;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +33,13 @@ import java.util.Optional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+
+    private final ReviewRepository reviewRepository;
+
+    private final FavoriteBoxRepository favoriteBoxRepository;
+
+    private final BoxRepository boxRepository;
+
     /**
      *  사이트 회원가입 서비스 로직
      *
@@ -169,6 +179,10 @@ public class MemberService {
     /**
      * 회원이 작성한 모든 내용을 삭제...
      *
+     * 멤버 하나 하고만 연관 관계를 맺는 즐겨찾기나 좋아요 같은 경우에는 Cascade.REMOVE로 삭제 처리를 하되,
+     * 여러 멤버와 연관을 맺을 수 있는 보관함이나 리뷰는 직접 bulk연산으로 삭제 처리 했다.
+     * 다만, 여기서 보관함 삭제 시, 외래키로 연결된 보관함 즐겨찾기
+     *
      * @param memberId
      * @return
      */
@@ -184,6 +198,20 @@ public class MemberService {
         member = optionalMember.get();
 
 
+        // 삭제 부분은 bulk 연산으로 진행했는데,
+        // delete 문은 조건에 맞지 않으면 삭제가 안되고 끝이기 때문에 별도의 예외처리를 하지 않았다.
+        
+        // 리뷰 먼저 삭제
+        reviewRepository.bulkDeleteReviewByMember(member);
+
+        // 보관함 즐겨찾기 삭제
+        favoriteBoxRepository.deleteAllByMember(member);
+
+        // 보관함 삭제
+        boxRepository.bulkDeleteBoxByMember(member);
+
+
+        // 마지막으로 멤버 삭제
         memberRepository.delete(member);
 
         return "삭제 완료";
