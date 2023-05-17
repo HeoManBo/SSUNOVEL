@@ -1,5 +1,6 @@
 package NovelForm.NovelForm.domain.community;
 
+import NovelForm.NovelForm.domain.comment.Comment;
 import NovelForm.NovelForm.domain.member.domain.Member;
 import NovelForm.NovelForm.global.BaseEntityTime;
 import jakarta.persistence.*;
@@ -14,8 +15,8 @@ import java.util.List;
 @NoArgsConstructor
 public class CommunityPost extends BaseEntityTime {
     @Id
-    @GeneratedValue
-    @Column(name ="community_post_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name ="community_post_idx")
     private Long id;
 
     @Column(length = 100, nullable = false)
@@ -26,7 +27,7 @@ public class CommunityPost extends BaseEntityTime {
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
+    @JoinColumn(name = "member_idx", nullable = false)
     private Member member;
 
     //해당 게시글이 가지고 있는 댓글/대댓글의 모임 -> 게시글 삭제시 댓글까지 모두 삭제

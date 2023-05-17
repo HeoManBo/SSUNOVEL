@@ -3,16 +3,20 @@ package NovelForm.NovelForm.domain.member;
 
 import NovelForm.NovelForm.domain.member.dto.CreateMemberRequest;
 import NovelForm.NovelForm.domain.member.dto.LoginMemberRequest;
+import NovelForm.NovelForm.domain.member.dto.UpdateMemberRequest;
 import NovelForm.NovelForm.domain.member.exception.WrongLoginException;
+import NovelForm.NovelForm.domain.member.exception.WrongMemberException;
 import NovelForm.NovelForm.global.BaseResponse;
 import NovelForm.NovelForm.global.ErrorResultCreater;
 import NovelForm.NovelForm.global.SessionConst;
 import NovelForm.NovelForm.global.exception.CustomFieldException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,6 +25,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+
+import static NovelForm.NovelForm.global.SessionConst.LOGIN_MEMBER_ID;
 
 
 @Tag(name = "회원", description = "회원 관련 api입니다.")
@@ -60,7 +66,7 @@ public class MemberController {
 
 
         HttpSession session = request.getSession();
-        session.setAttribute(SessionConst.LOGIN_MEMBER_ID, id);
+        session.setAttribute(LOGIN_MEMBER_ID, id);
 
         return new BaseResponse<Long>(HttpStatus.OK, id, "생성 성공");
     }
@@ -75,12 +81,12 @@ public class MemberController {
             @Validated @RequestBody LoginMemberRequest loginMemberRequest,
             BindingResult bindingResult,
             HttpServletRequest request
-    ) throws JsonProcessingException, WrongLoginException {
+    ) throws Exception {
 
         // field 에러 체크
         if(bindingResult.hasFieldErrors()){
-            String message = ErrorResultCreater.objectErrorToJson(bindingResult.getFieldErrors());
-            throw new IllegalArgumentException(message);
+            Map<String, String> map = ErrorResultCreater.fieldErrorToMap(bindingResult.getFieldErrors());
+            throw new CustomFieldException(map);
         }
 
         Long id = memberService.loginMember(loginMemberRequest);
@@ -89,7 +95,7 @@ public class MemberController {
         HttpSession session = request.getSession(false);
         if(session == null){
             session = request.getSession();
-            session.setAttribute(SessionConst.LOGIN_MEMBER_ID, id);
+            session.setAttribute(LOGIN_MEMBER_ID, id);
         }
 
         return new BaseResponse<Long>(HttpStatus.OK, id, "생성 성공");
@@ -117,6 +123,49 @@ public class MemberController {
 
         return new BaseResponse(HttpStatus.OK, null, "로그아웃에 성공했습니다.");
     }
+
+
+    /**
+     *  회원 수정 메서드
+     *
+     *  이메일을 제외한 나머지 요소들을 변경할 수 있게끔 처리
+     */
+    @Operation(summary = "회원 수정", description = "회원 수정 기능입니다. 이메일을 제외한 나머지 요소를 변경할 수 있습니다.")
+    @PatchMapping("/update")
+    public BaseResponse<String> updateMember(
+            @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId,
+            @Validated @RequestBody UpdateMemberRequest updateMemberRequest,
+            BindingResult bindingResult) throws Exception {
+
+        if(bindingResult.hasFieldErrors()){
+            Map<String, String> map = ErrorResultCreater.fieldErrorToMap(bindingResult.getFieldErrors());
+            throw new CustomFieldException(map);
+        }
+
+        String result = memberService.updateMember(memberId, updateMemberRequest);
+        return new BaseResponse<>(result);
+    }
+
+
+    /**
+     *  회원 삭제 메서드
+     *
+     *  삭제를 원할 경우 바로 삭제 되도록 처리
+     *  회원을 비록한 연관 관계를 맺은 이들을 모두 삭제 처리 한다.
+     */
+    @Operation(summary = "회원 탈퇴", description = "회원 탈퇴 기능입니다. 해당 회원이 작성한 모든 내용이 사라집니다.")
+    @DeleteMapping("/delete")
+    public BaseResponse<String> deleteMember(
+            @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId
+    ) throws WrongMemberException {
+
+
+        String result = memberService.deleteMember(memberId);
+
+        return new BaseResponse<>(result);
+    }
+
+
 
 
 }

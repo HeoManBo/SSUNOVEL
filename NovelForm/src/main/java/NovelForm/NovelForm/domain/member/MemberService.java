@@ -4,8 +4,10 @@ import NovelForm.NovelForm.domain.member.domain.LoginType;
 import NovelForm.NovelForm.domain.member.domain.Member;
 import NovelForm.NovelForm.domain.member.dto.CreateMemberRequest;
 import NovelForm.NovelForm.domain.member.dto.LoginMemberRequest;
+import NovelForm.NovelForm.domain.member.dto.UpdateMemberRequest;
 import NovelForm.NovelForm.domain.member.exception.MemberDuplicateException;
 import NovelForm.NovelForm.domain.member.exception.WrongLoginException;
+import NovelForm.NovelForm.domain.member.exception.WrongMemberException;
 import NovelForm.NovelForm.repository.MemberRepository;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
@@ -120,5 +122,70 @@ public class MemberService {
     public Member isPresentMember(Long memberId){
         Optional<Member> findMember = memberRepository.findById(memberId);
         return findMember.orElse(null);
+    }
+
+
+    /**
+     * 회원 수정 서비스 로직
+     *
+     * @param memberId
+     * @param updateMemberRequest
+     * @return
+     */
+    public String updateMember(Long memberId, UpdateMemberRequest updateMemberRequest) throws Exception {
+
+        Member member;
+        Optional<Member> optionalMember = memberRepository.findById(memberId);
+
+        if(!optionalMember.isPresent()){
+            throw new WrongMemberException("잘못된 회원 번호 : " + memberId);
+        }
+
+        member = optionalMember.get();
+
+
+        if (memberRepository.findByNickname(updateMemberRequest.getNickname()) != null){
+            Map<String, String> errorFieldMap = new HashMap<>();
+            errorFieldMap.put("nickname", updateMemberRequest.getNickname());
+            throw new MemberDuplicateException(errorFieldMap);
+        }
+
+        LocalDate birth = LocalDate.parse(updateMemberRequest.getAge());
+        LocalDate nowDate = LocalDate.now();
+
+        Integer age = (int) ChronoUnit.YEARS.between(birth, nowDate);
+
+        String password = encoder.encode(updateMemberRequest.getPassword());
+
+        member.updateMember(password,
+                updateMemberRequest.getNickname(),
+                updateMemberRequest.getGender(),
+                age);
+
+        return "수정 완료";
+
+    }
+
+    /**
+     * 회원이 작성한 모든 내용을 삭제...
+     *
+     * @param memberId
+     * @return
+     */
+    public String deleteMember(Long memberId) throws WrongMemberException {
+
+        Member member;
+        Optional<Member> optionalMember = memberRepository.findById(memberId);
+
+        if(!optionalMember.isPresent()){
+            throw new WrongMemberException("잘못된 회원 번호 : " + memberId);
+        }
+
+        member = optionalMember.get();
+
+
+        memberRepository.delete(member);
+
+        return "삭제 완료";
     }
 }

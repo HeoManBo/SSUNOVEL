@@ -3,6 +3,7 @@ package NovelForm.NovelForm.domain.member;
 import NovelForm.NovelForm.domain.member.exception.LoginInterceptorException;
 import NovelForm.NovelForm.domain.member.exception.MemberDuplicateException;
 import NovelForm.NovelForm.domain.member.exception.WrongLoginException;
+import NovelForm.NovelForm.domain.member.exception.WrongMemberException;
 import NovelForm.NovelForm.global.BaseResponse;
 import jakarta.validation.UnexpectedTypeException;
 import lombok.extern.slf4j.Slf4j;
@@ -44,27 +45,6 @@ public class MemberControllerAdvice {
     }
 
 
-    /**
-     * 서버의 로직에서 문제가 생긴 경우 밑의 핸들러가 호출된다.
-     */
-//    @ResponseStatus(INTERNAL_SERVER_ERROR)
-//    @ExceptionHandler
-//    public BaseResponse exHandler(Exception e){
-//        log.error("[member exception handler] ex", e);
-//        return new BaseResponse(INTERNAL_SERVER_ERROR, null,"서버 내부 오류");
-//    }
-
-
-    /**
-     * Login Interceptor에서 에러가 생긴 경우 호출 된다.
-     */
-//    @ResponseStatus(BAD_REQUEST)
-//    @ExceptionHandler(LoginInterceptorException.class)
-//    public BaseResponse loginInterceptorExHandler(Exception e){
-//        log.error("[member exception handler] ex ", e);
-//        return new BaseResponse(BAD_REQUEST, null, e.getMessage());
-//    }
-
 
     /**
      * 회원 중복 생성 시 호출될 핸들러
@@ -74,6 +54,17 @@ public class MemberControllerAdvice {
     public BaseResponse memberDuplicateExHandler(MemberDuplicateException e){
         log.error("[member exception handler] ex", e);
         return new BaseResponse(BAD_REQUEST, e.getErrorFieldMap(), "해당 필드 값으로 이미 회원 가입이 되어 있습니다.");
+    }
+
+
+    /**
+     * 잘못된 회원 번호가 들어온 경우 호출될 핸들러
+     */
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(WrongMemberException.class)
+    public BaseResponse wrongMemberExHandler(WrongMemberException e){
+        log.error("[member exception handler] ex", e);
+        return new BaseResponse(BAD_REQUEST, e.getMessage(), "해당 회원이 없습니다.");
     }
 
 

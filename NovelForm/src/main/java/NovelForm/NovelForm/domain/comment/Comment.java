@@ -1,5 +1,6 @@
-package NovelForm.NovelForm.domain.community;
+package NovelForm.NovelForm.domain.comment;
 
+import NovelForm.NovelForm.domain.community.CommunityPost;
 import NovelForm.NovelForm.domain.member.domain.Member;
 import NovelForm.NovelForm.global.BaseEntityTime;
 import jakarta.persistence.*;
@@ -16,8 +17,8 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment extends BaseEntityTime {
     @Id
-    @GeneratedValue
-    @Column(name = "commment_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "comment_idx")
     private Long id;
 
     @Column(length = 45)
@@ -28,16 +29,16 @@ public class Comment extends BaseEntityTime {
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
+    @JoinColumn(name = "member_idx", nullable = false)
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "community_post_id")
+    @JoinColumn(name = "community_post_idx")
     private CommunityPost communityPost;
 
     //대댓글 작성시 작성할 댓글
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "comment_id")
+    @JoinColumn(name = "co_comment_idx")
     private Comment parentComment;
 
     //댓글에 달린 대댓글 모음 --> 부모 댓글이 삭제되도 자식 댓글은 살아 있음

@@ -2,11 +2,12 @@ package NovelForm.NovelForm.domain.member.domain;
 
 
 import NovelForm.NovelForm.domain.alert.domain.Alert;
-import NovelForm.NovelForm.domain.community.Comment;
+import NovelForm.NovelForm.domain.comment.Comment;
 import NovelForm.NovelForm.domain.community.CommunityPost;
 import NovelForm.NovelForm.domain.favorite.domain.FavoriteAuthor;
 import NovelForm.NovelForm.domain.favorite.domain.FavoriteBox;
 import NovelForm.NovelForm.domain.favorite.domain.FavoriteNovel;
+import NovelForm.NovelForm.domain.like.domain.Like;
 import NovelForm.NovelForm.domain.novel.Review;
 import NovelForm.NovelForm.global.BaseEntityTime;
 import jakarta.persistence.*;
@@ -64,26 +65,29 @@ public class Member extends BaseEntityTime {
     private String profile_image;
 
     // mapped 를 통해 member를 참조하고 있는 aler 리t스트를 모음.
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<Alert> alerts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<FavoriteNovel> favorite_novels = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<CommunityPost> communityPosts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<FavoriteBox> favoriteBoxes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<Review> reviews = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<FavoriteAuthor> favoriteAuthors = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<Like> likes = new ArrayList<>();
 
 
     @Builder
@@ -95,6 +99,16 @@ public class Member extends BaseEntityTime {
         this.loginType = loginType;
         this.age = age;
     }
+
+
+    public void updateMember(String password, String nickname, Gender gender, Integer age){
+        this.password = password;
+        this.nickname = nickname;
+        this.gender = gender;
+        this.age = age;
+        this.updateTime();
+    }
+
 
     //연관관계 메소드 --> 파라미터로 넘어온 객체에서 해당 함수 호출
     //알람 추가

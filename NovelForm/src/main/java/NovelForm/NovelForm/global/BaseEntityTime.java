@@ -29,4 +29,9 @@ public abstract class BaseEntityTime {
     @Column(name = "updated_at")
     @LastModifiedDate
     private LocalDateTime update_at;
+
+
+    public void updateTime(){
+        this.update_at = LocalDateTime.now();
+    }
 }

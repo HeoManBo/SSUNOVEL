@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class Alert extends BaseEntityTime {
     @Id
     @GeneratedValue
-    @Column(name = "alert_id")
+    @Column(name = "alert_idx")
     private Long id;
 
     /**
@@ -21,19 +21,22 @@ public class Alert extends BaseEntityTime {
      * N 쪽에 참조하는 키값 설정 --> 멤버 설정
      * 1 쪽에는 List<Alert> 설정.
      */
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "member_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_idx")
     private Member member;
 
-    @Column
+    @Column(name = "title")
     private String title;
 
+    @Column(name = "status")
+    private String status;
+
     //맨 처음은 읽지 않음 처리.
-    @Column
-    private int read;
+    @Column(name = "read_check")
+    private int readCheck;
 
     //알림이 발생한 곳의 url;
-    @Column
+    @Column(name = "url")
     private String url;
 
     public void addMember(Member member){
