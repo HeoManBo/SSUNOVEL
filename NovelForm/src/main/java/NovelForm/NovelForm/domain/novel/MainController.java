@@ -5,7 +5,6 @@ import NovelForm.NovelForm.domain.member.MemberService;
 import NovelForm.NovelForm.domain.novel.dto.MainDto;
 import NovelForm.NovelForm.domain.novel.dto.searchdto.NovelDto;
 import NovelForm.NovelForm.global.BaseResponse;
-import com.sun.tools.javac.Main;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,4 +43,5 @@ public class MainController {
         result.setRankingNovel(rankingNovel);
         return new BaseResponse(HttpStatus.OK, result);
     }
+
 }
