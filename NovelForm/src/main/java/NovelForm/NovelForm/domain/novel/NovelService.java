@@ -5,9 +5,7 @@ import NovelForm.NovelForm.domain.novel.dto.MainDto;
 import NovelForm.NovelForm.domain.novel.dto.detailnoveldto.DetailNovelInfo;
 import NovelForm.NovelForm.domain.novel.dto.searchdto.MidFormmat;
 import NovelForm.NovelForm.domain.novel.dto.searchdto.NovelDto;
-import NovelForm.NovelForm.repository.AuthorRepository;
 import NovelForm.NovelForm.repository.NovelRepository;
-import NovelForm.NovelForm.util.NovelCSVParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -26,7 +24,6 @@ import java.util.Optional;
 @Transactional
 public class NovelService {
     private final NovelRepository novelRepository;
-    private final AuthorRepository authorRepository;
     private static final int PagingSize = 10; //페이징할 때 크기 기본적으로 10개로 설정,
 
     /**
@@ -146,13 +143,5 @@ public class NovelService {
         return findNovels.stream()
                 .map(novel -> new NovelDto(novel.getTitle(), novel.getAuthor().getName(), novel.getCover_image(),
                         novel.averageRating(), novel.getReview_cnt(), novel.getCategory(), novel.getId())).toList();
-    }
-
-    /**
-     * 초기 DB생성
-     */
-    public void initDB() {
-        NovelCSVParser novelCSVParser = new NovelCSVParser();
-        novelCSVParser.initInsert(authorRepository, novelRepository);
     }
 }
