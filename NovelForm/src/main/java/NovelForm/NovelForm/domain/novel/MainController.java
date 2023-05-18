@@ -5,6 +5,7 @@ import NovelForm.NovelForm.domain.member.MemberService;
 import NovelForm.NovelForm.domain.novel.dto.MainDto;
 import NovelForm.NovelForm.domain.novel.dto.searchdto.NovelDto;
 import NovelForm.NovelForm.global.BaseResponse;
+import NovelForm.NovelForm.util.NovelCSVParser;
 import com.sun.tools.javac.Main;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -43,5 +44,12 @@ public class MainController {
         List<NovelDto> rankingNovel = novelService.findRankingNovel();
         result.setRankingNovel(rankingNovel);
         return new BaseResponse(HttpStatus.OK, result);
+    }
+
+
+    @GetMapping("/initSetting")
+    public BaseResponse<String> initDB(){
+        novelService.initDB();
+        return new BaseResponse<>(HttpStatus.OK, "DB 삽입 성공!");
     }
 }

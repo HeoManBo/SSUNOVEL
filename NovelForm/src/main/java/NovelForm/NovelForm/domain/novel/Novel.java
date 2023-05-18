@@ -4,6 +4,7 @@ package NovelForm.NovelForm.domain.novel;
 import NovelForm.NovelForm.global.BaseEntityTime;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.validator.constraints.Length;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ public class Novel extends BaseEntityTime {
     @Column
     private String title;
 
-    @Column
+    @Lob
     private String cover_image;
 
     @Column
@@ -124,6 +125,43 @@ public class Novel extends BaseEntityTime {
         this.rating -= before_rating;
         this.rating += after_rating;
     }
+
+    /**
+     * url 추가 메소드
+     */
+    public void updateNaverUrl(String is_naver) {
+        this.is_naver = is_naver;
+    }
+
+    public void updateKakaoUrl(String is_kakao) {
+        this.is_kakao = is_kakao;
+    }
+
+    public void updateRidiUrl(String is_ridi) {
+        this.is_ridi = is_ridi;
+    }
+
+    public void updateMunpiaUrl(String is_munpia) {
+        this.is_munpia = is_munpia;
+    }
+
+    //download_cnt 증가 메소드
+    public void plusDownload_cnt(int cnt){
+        this.download_cnt += cnt;
+    }
+
+    //더 낮은 가격으로 갱신
+    public void lowerPrice(int price){
+        if(this.price > price){
+            this.price = price;
+        }
+    }
+
+    //더 긴 장르로 선택
+    public void updateGenre(String genre){
+        this.category = genre;
+    }
+
 
     //해당 소설 정보
     @Override
