@@ -6,6 +6,7 @@ import NovelForm.NovelForm.domain.novel.dto.MainDto;
 import NovelForm.NovelForm.domain.novel.dto.searchdto.NovelDto;
 import NovelForm.NovelForm.global.BaseResponse;
 import com.sun.tools.javac.Main;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +39,7 @@ public class MainController {
      * 메인화면 조회 페이지입니다.
      */
     @GetMapping("")
-    public BaseResponse<MainDto> mainPage(@SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId){
+    public BaseResponse<MainDto> mainPage(@Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId){
         MainDto result = new MainDto();
         List<NovelDto> rankingNovel = novelService.findRankingNovel();
         result.setRankingNovel(rankingNovel);

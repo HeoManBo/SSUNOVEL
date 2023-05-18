@@ -104,7 +104,7 @@ public class BoxController {
      */
     @Operation(summary = "보관함 수정", description = "보관함 번호(id)를 받아 해당 보관함을 수정하는 메서드입니다.")
     @PostMapping("/{boxId}")
-    public BaseResponse<Long> updateBox(
+    public BaseResponse<String> updateBox(
             @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId,
             @Validated @RequestBody CreateBoxRequest createBoxRequest,
             BindingResult bindingResult,
@@ -118,9 +118,14 @@ public class BoxController {
         }
 
 
-        Long newBoxId = boxService.updateBox(createBoxRequest, memberId, boxId);
+        // 보관함 아이템 리스트에 대표 작품 번호가 있는지 체크
+        if(!createBoxRequest.getBoxItems().contains(createBoxRequest.getLeadItemId())){
+            throw new IllegalArgumentException("보관함 아이템 리스트에 대표 작품 번호가 없습니다 : " + createBoxRequest.getLeadItemId());
+        }
 
-        return new BaseResponse<>(newBoxId);
+        String result = boxService.updateBox(createBoxRequest, memberId, boxId);
+
+        return new BaseResponse<>(result);
     }
 
 

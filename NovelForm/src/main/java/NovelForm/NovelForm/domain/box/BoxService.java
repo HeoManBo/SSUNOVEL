@@ -111,7 +111,7 @@ public class BoxService {
         Optional<Box> boxById = boxRepository.findById(boxId);
 
         if(!memberById.isPresent()){
-            throw new WrongMemberException("잘못 된 사용자");
+            throw new WrongMemberException("잘못 된 사용자: " + memberId);
         }
 
         if(!boxById.isPresent()){
@@ -140,15 +140,73 @@ public class BoxService {
      * @param boxId
      * @return
      */
-    public Long updateBox(CreateBoxRequest createBoxRequest, Long memberId, Long boxId) throws Exception{
+    public String updateBox(CreateBoxRequest createBoxRequest, Long memberId, Long boxId) throws Exception{
 
-        // 삭제
-        deleteBox(memberId, boxId);
 
-        // 생성
-        Long createBoxId = createBox(memberId, createBoxRequest);
+        // 입력으로 들어온 멤버와 보관함이 있는지 체크
+        Optional<Member> optionalMember = memberRepository.findById(memberId);
+        Optional<Box> optionalBox = boxRepository.findById(boxId);
 
-        return createBoxId;
+        if(!optionalMember.isPresent()){
+            throw new WrongMemberException("잘못 된 사용자: " + memberId);
+        }
+
+        if(!optionalBox.isPresent()){
+            throw new WrongBoxException("잘못 된 보관함: " + boxId);
+        }
+
+        Member findMember = optionalMember.get();
+        Box findBox = optionalBox.get();
+
+
+        // 해당 보관함이 본인게 맞는지 체크
+        Optional<Box> existBox = boxRepository.findExistBoxWithBoxIDAndMember(findBox.getId(), findMember);
+
+        if(!existBox.isPresent()){
+            throw new WrongAccessBoxException("권한 없는 사용자의 접근");
+        }
+
+
+        // 본인게 맞다면, 수정 시작
+        // 먼저 리스트 생성
+        List<BoxItem> boxItemList = new ArrayList<>();
+
+        // 보관함 아이템
+        for (Long boxItemId : createBoxRequest.getBoxItems()) {
+
+            Optional<Novel> optionalNovel = novelRepository.findById(boxItemId);
+            Novel findNovel;
+
+
+            // 없는 작품을 보관함에 넣으려고 하면, 실패
+            if(optionalNovel.isPresent()){
+                findNovel = novelRepository.findById(boxItemId).get();
+            }
+            else{
+                throw new NoSuchBoxItemException("없는 소설 번호: " + boxItemId);
+            }
+
+
+            BoxItem updateBoxItem;
+
+            if (boxItemId == createBoxRequest.getLeadItemId()){
+                updateBoxItem = new BoxItem(1, findNovel);
+            }
+            else{
+                updateBoxItem = new BoxItem(0, findNovel);
+            }
+
+            boxItemList.add(updateBoxItem);
+        }
+
+        findBox.updateBox(
+                createBoxRequest.getTitle(),
+                createBoxRequest.getContent(),
+                createBoxRequest.getIs_private(),
+                boxItemList
+        );
+
+        return "수정 완료";
     }
 
     /**

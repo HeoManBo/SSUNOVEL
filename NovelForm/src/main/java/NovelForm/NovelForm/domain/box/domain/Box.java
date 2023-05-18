@@ -64,4 +64,20 @@ public class Box extends BaseEntityTime {
         this.member = member;
         this.status = "activated";
     }
+
+
+    // 기존 박스 아이템들을 삭제하고 새로운 박스 아이템을 넣어준다.
+    // 이외의 변경사항 또한 반영되면서 업데이트 일자또한 변경된다.
+    public void updateBox(String title, String content, int is_private, List<BoxItem> boxItemList) {
+        this.title =title;
+        this.content = content;
+        this.is_private = is_private;
+        this.updateTime();
+
+        this.boxItems.clear();
+
+        for (BoxItem boxItem : boxItemList) {
+            addBoxItem(boxItem);
+        }
+    }
 }
