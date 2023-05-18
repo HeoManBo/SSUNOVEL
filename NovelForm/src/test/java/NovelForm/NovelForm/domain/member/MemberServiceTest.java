@@ -22,8 +22,11 @@ import jakarta.persistence.EntityManager;
 import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -34,6 +37,7 @@ import java.util.Map;
 
 @SpringBootTest
 @Transactional
+@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 public class MemberServiceTest {
 
     @Autowired
@@ -258,6 +262,21 @@ public class MemberServiceTest {
         }
         em.flush();
 
+        // 보관함 즐겨찾기 삭제
+        for (Box delBox : delBoxs) {
+            favoriteBoxRepository.deleteAllByBox(delBox);
+        }
+
+        // 보관함 좋아요 삭제
+        for (Box delBox : delBoxs){
+            likeRepository.deleteAllByBox(delBox);
+        }
+
+
+        favoriteBoxRepository.deleteAllByMember(member);
+
+
+
         // 보관함 삭제
         boxRepository.bulkDeleteBoxByMember(member);
 
@@ -283,7 +302,6 @@ public class MemberServiceTest {
         org.assertj.core.api.Assertions.assertThat(boxRepository.findBoxesByMemberId(memberId)).isEmpty();
         org.assertj.core.api.Assertions.assertThat(favoriteAuthorRepository.findFavoriteAuthorsByMemberId(memberId)).isEmpty();
 
-        //Assertions.
 
 
     }

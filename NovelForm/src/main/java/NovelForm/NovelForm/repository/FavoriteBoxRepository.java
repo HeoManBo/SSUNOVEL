@@ -26,4 +26,8 @@ public interface FavoriteBoxRepository extends JpaRepository<FavoriteBox, Long> 
 
     @Modifying(clearAutomatically = true)
     void deleteAllByMember(Member member);
+
+
+    @Modifying(clearAutomatically = true)
+    void deleteAllByBox(Box box);
 }

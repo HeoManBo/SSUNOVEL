@@ -10,6 +10,7 @@ import NovelForm.NovelForm.domain.novel.Review;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -109,4 +110,10 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     @Query("select count(l) from Like l inner join l.review r on r = :review")
     Integer findLikeCountByReview(Review review);
 
+
+    /**
+     * 특정 박스의 좋아요 삭제
+     */
+    @Modifying(clearAutomatically = true)
+    void deleteAllByBox(Box box);
 }
