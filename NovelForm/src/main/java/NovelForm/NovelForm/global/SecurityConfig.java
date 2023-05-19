@@ -4,6 +4,8 @@ package NovelForm.NovelForm.global;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.SecurityBuilder;
+import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -13,7 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity // Spring Security 설정 활성화
-public class SecurityConfig{
+public class SecurityConfig {
 
     // filterChain을 설정해두면, 컨트롤러로 정상적으로 요청이 들어온다.
     // 다만, disable() 처리를 한 부분이 문제가 될 수 있다.
@@ -26,6 +28,8 @@ public class SecurityConfig{
         http.csrf().disable();
         return http.build();
     }
+
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
