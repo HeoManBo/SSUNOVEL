@@ -1,9 +1,12 @@
 package NovelForm.NovelForm.domain.community;
 
 import NovelForm.NovelForm.domain.comment.Comment;
+import NovelForm.NovelForm.domain.community.dto.PostDto;
+import NovelForm.NovelForm.domain.community.dto.WriteDto;
 import NovelForm.NovelForm.domain.member.domain.Member;
 import NovelForm.NovelForm.global.BaseEntityTime;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -31,7 +34,7 @@ public class CommunityPost extends BaseEntityTime {
     private Member member;
 
     //해당 게시글이 가지고 있는 댓글/대댓글의 모임 -> 게시글 삭제시 댓글까지 모두 삭제
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "communityPost", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "communityPost")
     List<Comment> comments = new ArrayList<>();
 
     public void addMember(Member member){
@@ -43,16 +46,21 @@ public class CommunityPost extends BaseEntityTime {
         this.comments.add(comment);
     }
 
-    //해당 게시글을 작성한 멤버인지 확인
-    public boolean vaildMember(Member member){
-        boolean chk = this.member.equals(member);
-        return chk == true ? true : false;
-    }
 
+    @Builder
     // 게시글 생성자로 처음 입력받을 수 있는 제목, 본문, 작성자를 전달받는다.
     public CommunityPost(String title, String content, Member member) {
         this.title = title;
         this.content = content;
         this.member = member;
+    }
+
+    // == 게시글 수정 메소드 === //
+    public void changeTitle(String newTitle){
+        this.title = newTitle;
+    }
+
+    public void changeContent(String newContent){
+        this.content = newContent;
     }
 }

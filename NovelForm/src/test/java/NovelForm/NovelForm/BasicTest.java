@@ -7,7 +7,6 @@ import NovelForm.NovelForm.domain.member.domain.LoginType;
 import NovelForm.NovelForm.domain.member.domain.Member;
 import NovelForm.NovelForm.domain.novel.Author;
 import NovelForm.NovelForm.domain.novel.Novel;
-import NovelForm.NovelForm.domain.novel.Platform;
 import NovelForm.NovelForm.repository.AuthorRepository;
 import NovelForm.NovelForm.repository.FavoriteNovelRepository;
 import NovelForm.NovelForm.repository.MemberRepository;
@@ -16,7 +15,6 @@ import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -319,19 +317,6 @@ public class BasicTest {
         return member;
     }
 
-
-    private Platform registerPlatform(char[] list){
-        if(list.length != 4) return null;
-
-        Platform platform = Platform.builder()
-                .naver(list[0])
-                .kakao(list[1])
-                .munpia(list[2])
-                .ridibooks(list[3])
-                .build();
-
-        return platform;
-    }
 
     private Novel RegisterNovel(String name, Author author, char[] day, char[] list){
         Novel novel = Novel.builder()
