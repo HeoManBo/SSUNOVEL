@@ -62,6 +62,8 @@ public class MemberController {
             throw new CustomFieldException(map);
         }
 
+
+
         Long id = memberService.createMember(createMemberRequest);
 
 
@@ -89,14 +91,26 @@ public class MemberController {
             throw new CustomFieldException(map);
         }
 
+
+        // 세션이 있는 상황에서 로그인 하려고 하면 기존 세션 삭제하고 다시 로그인 처리
+        // 세션 삭제
+        if(request.getSession(false) != null){
+
+            // 세션 무효화
+            request.getSession(false).invalidate();
+        }
+
+
         Long id = memberService.loginMember(loginMemberRequest);
 
 
-        HttpSession session = request.getSession(false);
-        if(session == null){
-            session = request.getSession();
-            session.setAttribute(LOGIN_MEMBER_ID, id);
-        }
+        //HttpSession session = request.getSession(false);
+        HttpSession session = request.getSession();
+        session.setAttribute(LOGIN_MEMBER_ID, id);
+
+
+
+
 
         return new BaseResponse<Long>(HttpStatus.OK, id, "생성 성공");
     }
