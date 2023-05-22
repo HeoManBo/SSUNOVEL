@@ -79,7 +79,7 @@ public class Member extends BaseEntityTime {
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<FavoriteNovel> favorite_novels = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<CommunityPost> communityPosts = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
@@ -91,7 +91,7 @@ public class Member extends BaseEntityTime {
     @OneToMany(mappedBy = "member")
     private List<Review> reviews = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "member")
     private List<FavoriteAuthor> favoriteAuthors = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
