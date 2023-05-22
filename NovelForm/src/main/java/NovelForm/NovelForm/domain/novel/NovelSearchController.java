@@ -78,8 +78,8 @@ public class NovelSearchController {
         return new BaseResponse<SearchDto>(HttpStatus.OK, result);
     }
 
-    @Operation(summary = "소설 상세 검색", description = "페이징이 가능한 소설 검색 결과를 보여줍니다.",
-               responses = @ApiResponse(responseCode = "200", description = "상세 검색 성공", content = @Content(schema = @Schema(implementation = MidFormmat.class))))
+    @Operation(summary = "소설만 상세 검색", description = "페이징이 가능한 소설 검색 결과를 보여줍니다.",
+               responses = @ApiResponse(responseCode = "200", description = "소설 상세 검색 성공", content = @Content(schema = @Schema(implementation = MidFormmat.class))))
     @GetMapping(value = "/search/novel", produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse<MidFormmat> searchNovel(@RequestParam String search,
                                                 @RequestParam(required = false, defaultValue = "0") @Min(0) int pageNum,
@@ -95,8 +95,8 @@ public class NovelSearchController {
         return new BaseResponse<MidFormmat>(HttpStatus.OK, result);
     }
 
-    @Operation(summary = "소설 상세 검색", description = "페이징이 가능한 소설 검색 결과를 보여줍니다.",
-               responses = @ApiResponse(responseCode = "200", description = "상세 검색 성공", content = @Content(schema = @Schema(implementation = MidFormmat.class))))
+    @Operation(summary = "작가만 상세 검색", description = "페이징이 가능한 작가가 가지는 소설 검색 결과를 보여줍니다.",
+               responses = @ApiResponse(responseCode = "200", description = "작가 상세 검색 성공", content = @Content(schema = @Schema(implementation = MidFormmat.class))))
     @GetMapping(value = "/search/author", produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse<MidFormmat> searchAuthor(@RequestParam String search,
                                                  @RequestParam(required = false, defaultValue = "0") @Min(0) int pageNum,
@@ -207,7 +207,8 @@ public class NovelSearchController {
     /**
      * Category 페이지 API 기능 컨트롤러입니다.
      */
-    @Operation(summary = "category 조회", description = "장르별, 플랫폼 별 카테고리 분류 조회 기능입니다.")
+    @Operation(summary = "category 조회", description = "장르별, 플랫폼 별 카테고리 분류 조회 기능입니다.",
+            responses = @ApiResponse(responseCode = "200", description = "카테고리별 상세 검색 성공", content = @Content(schema = @Schema(implementation = MidFormmat.class))))
     @GetMapping(value = "/category", produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse<MidFormmat> novelCategoryList(@RequestBody CategoryDto categoryDto, BindingResult bindingResult) throws JsonMappingException {
         if(bindingResult.hasErrors()){

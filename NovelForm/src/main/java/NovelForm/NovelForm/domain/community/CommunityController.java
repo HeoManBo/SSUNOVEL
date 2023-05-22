@@ -11,10 +11,14 @@ import NovelForm.NovelForm.global.BaseResponse;
 import NovelForm.NovelForm.global.ErrorResultCreater;
 import NovelForm.NovelForm.global.exception.CustomFieldException;
 import NovelForm.NovelForm.global.exception.NoSuchListElement;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,8 +49,9 @@ public class CommunityController {
      * 게시글 등록 메서드, 게시글 등록 성공시 등록한 게시글 번호를 반환합니다.
      */
     @PostMapping()
-    public BaseResponse<Long> writePost(@RequestBody @Valid WriteDto writeDto,
-                              BindingResult bindingResult, @SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId) throws Exception {
+    @Operation(description = "게시글 작성 메소드입니다", responses = @ApiResponse(responseCode = "200", description = "게시글 작성 성공, 성공시 게시글 번호를 result에 반환합니다."))
+    public BaseResponse<Long> writePost(@Parameter(description = "게시글 작성 형식") @RequestBody @Valid WriteDto writeDto,
+                              BindingResult bindingResult, @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId) throws Exception {
 
         // 게시글 형태에 오류가 존재하는 경우 throw;
         if(bindingResult.hasErrors()){
@@ -74,7 +79,9 @@ public class CommunityController {
      * 파라미터로 넘어오는 페이지 번호에 맞는 게시글을 반환합니다.
      */
     @GetMapping()
-    public BaseResponse totalPost(@RequestParam(value = "page", required = false, defaultValue = "0") int pageNum)
+    @Operation(description = "전체 게시글 조회 메소드입니다", responses = @ApiResponse(responseCode = "200", description = "게사글 조회 목록 리스트 형태로 제공", content = @Content(schema = @Schema(implementation = PostDto.class))))
+    public BaseResponse totalPost(    @Parameter(description = "페이지 번호", in = ParameterIn.QUERY)
+                                      @RequestParam(value = "page", required = false, defaultValue = "0") int pageNum)
             throws NoSuchListElement {
 
         if(pageNum < 0){
@@ -93,11 +100,14 @@ public class CommunityController {
 
     /**
      *
-     * @param post_id 에 대응되는 게시글 상세 조회
+       게시글 번호에 대응되는 게시글 상세 조회
      * 상쇄 페이지 결과 Dto인 DetailPostDto을 반환합니다.
      */
     @GetMapping("/{post_id}")
-    public BaseResponse<DetailPostDto> detailPost(@PathVariable("post_id") Long post_id) throws Exception{
+    @Operation(description = "게시글 상세 조회 메소드입니다", responses = @ApiResponse(responseCode = "200", description = "게시글 상세 조회 성공", content = @Content(schema = @Schema(implementation = DetailPostDto.class))))
+    public BaseResponse<DetailPostDto> detailPost(
+            @Parameter(description = "상세 조회할 게시글 번호", in = ParameterIn.PATH)
+            @PathVariable("post_id") Long post_id) throws Exception{
 
         DetailPostDto result = communityService.getDetailPost(post_id);
 
@@ -114,10 +124,11 @@ public class CommunityController {
      * 게시글 수정 성공시 수정한 상세 게시글 Dto 를 반환합니다.
      */
     @PatchMapping("/{post_id}")
-    public BaseResponse<DetailPostDto> modifyPost(@RequestBody @Valid WriteDto writeDto,
-                                           BindingResult bindingResult,
-                                           @SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId,
-                                           @PathVariable("post_id") Long post_id) throws Exception {
+    @Operation(description = "전체 게시글 수정 메소드입니다", responses = @ApiResponse(responseCode = "200", description = "수정 성공시 수정된 내용의 게시글 상세 조회 Dto를 반환합니다.", content = @Content(schema = @Schema(implementation = DetailPostDto.class))))
+    public BaseResponse<DetailPostDto> modifyPost(
+            @Parameter(description = "수정할 게시글의 내용")@RequestBody @Valid WriteDto writeDto,
+            BindingResult bindingResult, @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId,
+            @Parameter(description = "수정할 게시글 번호", in = ParameterIn.PATH) @PathVariable("post_id") Long post_id) throws Exception {
 
         // 수정할 게시글 형태에 오류가 존재하는 경우 throw;
         if(bindingResult.hasErrors()){
@@ -139,8 +150,9 @@ public class CommunityController {
      * 삭제 성공시 문자열 success를 반환합니다.
      */
     @DeleteMapping("/{post_id}")
-    public BaseResponse<String> deletePost(@SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId,
-                                           @PathVariable("post_id") Long post_id) throws Exception {
+    @Operation(description = "게시글 삭제 메소드입니다", responses = @ApiResponse(responseCode = "200", description = "게시글 삭제 성공사 result : 삭제 완료 값이 존재합니다."))
+    public BaseResponse<String> deletePost(@Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId,
+                                           @Parameter(description = "삭제할 게시글 번호", in = ParameterIn.PATH) @PathVariable("post_id") Long post_id) throws Exception {
 
         if(memberId == null){ //ssession 값이 없으면
             throw new NotFoundSessionException();
@@ -154,11 +166,13 @@ public class CommunityController {
 
     /**
      *
-     * @param keyword 검색어
+     * @param 검색어
      * @return 검색어가 포함된 게시글 리스트를 반환합니다.
      */
     @GetMapping("/search")
-    public BaseResponse<List<PostDto>> keywordPost(@RequestParam("keyword") String keyword) throws NoSuchListElement {
+    @Operation(description = "게시글 검색어 포함 조회 메소드입니다", responses = @ApiResponse(responseCode = "200", description = "게사글 검색어 포함 조회 성공, List 형태로 제공됩니다.", content = @Content(schema = @Schema(implementation = PostDto.class))))
+    public BaseResponse<List<PostDto>> keywordPost(    @Parameter(description = "검색어", in = ParameterIn.QUERY)
+                                                       @RequestParam("keyword") String keyword) throws NoSuchListElement {
         List<PostDto> result = communityService.keywordPost(keyword);
 
         log.info("keyword = {}", keyword);
