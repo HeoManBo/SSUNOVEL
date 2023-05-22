@@ -3,6 +3,7 @@ package NovelForm.NovelForm.domain.novel;
 
 import NovelForm.NovelForm.domain.novel.exception.NoSuchNovelListException;
 import NovelForm.NovelForm.global.BaseResponse;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -57,4 +58,10 @@ public class NovelSearchControllerAdvice {
         return new BaseResponse(HttpStatus.BAD_REQUEST, "메시지 에러확인", "잘못된 pathVariable 값이나, Paging 번호입니다.");
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(JsonMappingException.class)
+    public BaseResponse badJsonValue(JsonMappingException e){
+        log.error("[novel exception handler] ex ", e);
+        return new BaseResponse(HttpStatus.BAD_REQUEST, e.getMessage(), "잘못된 JSON 값 전달입니다.");
+    }
 }

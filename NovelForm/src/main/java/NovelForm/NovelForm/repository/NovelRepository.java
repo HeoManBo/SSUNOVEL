@@ -1,5 +1,6 @@
 package NovelForm.NovelForm.repository;
 
+import NovelForm.NovelForm.domain.novel.CustomNovelRepository;
 import NovelForm.NovelForm.domain.novel.Novel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +14,7 @@ import java.util.List;
 
 
 @Repository
-public interface NovelRepository extends JpaRepository<Novel, Long> {
+public interface NovelRepository extends JpaRepository<Novel, Long>, CustomNovelRepository {
 
 
     /**

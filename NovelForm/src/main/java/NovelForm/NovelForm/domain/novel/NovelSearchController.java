@@ -4,6 +4,7 @@ package NovelForm.NovelForm.domain.novel;
 import NovelForm.NovelForm.domain.favorite.domain.FavoriteNovel;
 import NovelForm.NovelForm.domain.member.MemberService;
 import NovelForm.NovelForm.domain.member.domain.Member;
+import NovelForm.NovelForm.domain.novel.dto.CategoryDto;
 import NovelForm.NovelForm.domain.novel.dto.detailnoveldto.DetailNovelInfo;
 import NovelForm.NovelForm.domain.novel.dto.detailnoveldto.ReviewDto;
 import NovelForm.NovelForm.domain.novel.dto.searchdto.MidFormmat;
@@ -11,6 +12,7 @@ import NovelForm.NovelForm.domain.novel.dto.searchdto.SearchDto;
 import NovelForm.NovelForm.domain.novel.exception.NoSuchNovelListException;
 import NovelForm.NovelForm.global.BaseResponse;
 import NovelForm.NovelForm.repository.FavoriteNovelRepository;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -176,29 +179,43 @@ public class NovelSearchController {
     }
 
 
+//    /**
+//     *  소설 목록 조회 기능 API 장르에 따른 필터링 조건에 따라 분류함
+//     *  default 는 크롤링 당시 웹 소설 사이트의 댓글 수로 하며 높은 평점순, 최신 소설 등록 순으로 분류,
+//     */
+//    @Operation(summary = "소설 목록 조회", description = "장르별, 리뷰 많은순과 같은 필터링 조건에 따른 리스트 조회 기능입니다.",
+//               responses = @ApiResponse(responseCode = "200", description = "소설 목록 조회 성공", content = @Content(schema = @Schema(implementation = MidFormmat.class))))
+//    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+//    public BaseResponse<MidFormmat> novelGenreListSearch(@RequestParam("genre") String genre, @RequestParam(value = "filtering", required = false, defaultValue = "download_cnt") String filtering,
+//                                     @RequestParam(value = "pageNum", required = false, defaultValue = "0") int pageNum) throws NoSuchNovelListException {
+//        // binding error -> 페이지 번호가 음수로 들어오거나 문자열로 들어오는 경우.
+//        if(pageNum < 0){
+//            throw new NumberFormatException("페이지 번호는 양수가 되어야합니다.");
+//        }
+//
+//        //조건에 맞는 소설을 검색해온다.
+//        MidFormmat result = novelService.findNovelWithGenre(genre, filtering, pageNum);
+//
+//        //잘못된 필터링 조건, 장르인경우 에러 발생 --> 소설을 찾을 수 없음
+//        if(result == null){
+//            throw new NoSuchNovelListException("잘못된 검색어 입니다.");
+//        }
+//
+//        return new BaseResponse<>(HttpStatus.OK, result);
+//    }
+
     /**
-     *  소설 목록 조회 기능 API 장르에 따른 필터링 조건에 따라 분류함
-     *  default 는 크롤링 당시 웹 소설 사이트의 댓글 수로 하며 높은 평점순, 최신 소설 등록 순으로 분류,
+     * Category 페이지 API 기능 컨트롤러입니다.
      */
-    @Operation(summary = "소설 목록 조회", description = "장르별, 리뷰 많은순과 같은 필터링 조건에 따른 리스트 조회 기능입니다.",
-               responses = @ApiResponse(responseCode = "200", description = "소설 목록 조회 성공", content = @Content(schema = @Schema(implementation = MidFormmat.class))))
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public BaseResponse<MidFormmat> novelGenreListSearch(@RequestParam("genre") String genre, @RequestParam(value = "filtering", required = false, defaultValue = "download_cnt") String filtering,
-                                     @RequestParam(value = "pageNum", required = false, defaultValue = "0") int pageNum) throws NoSuchNovelListException {
-        // binding error -> 페이지 번호가 음수로 들어오거나 문자열로 들어오는 경우.
-        if(pageNum < 0){
-            throw new NumberFormatException("페이지 번호는 양수가 되어야합니다.");
+    @Operation(summary = "category 조회", description = "장르별, 플랫폼 별 카테고리 분류 조회 기능입니다.")
+    @GetMapping(value = "/category", produces = MediaType.APPLICATION_JSON_VALUE)
+    public BaseResponse<MidFormmat> novelCategoryList(@RequestBody CategoryDto categoryDto, BindingResult bindingResult) throws JsonMappingException {
+        if(bindingResult.hasErrors()){
+            throw new JsonMappingException("잘못된 JSON값입니다.");
         }
+        MidFormmat novelsWithCategory = novelService.findNovelsWithCategory(categoryDto);
 
-        //조건에 맞는 소설을 검색해온다.
-        MidFormmat result = novelService.findNovelWithGenre(genre, filtering, pageNum);
-
-        //잘못된 필터링 조건, 장르인경우 에러 발생 --> 소설을 찾을 수 없음
-        if(result == null){
-            throw new NoSuchNovelListException("잘못된 검색어 입니다.");
-        }
-
-        return new BaseResponse<>(HttpStatus.OK, result);
+        return new BaseResponse<MidFormmat>(HttpStatus.OK, novelsWithCategory);
     }
 
 
