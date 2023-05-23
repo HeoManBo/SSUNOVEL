@@ -216,4 +216,27 @@ public class MemberService {
 
         return "삭제 완료";
     }
+
+
+    /**
+     * 이메일 중복 체크용 서비스
+     *
+     * @param check
+     * @return
+     */
+    public String checkEmail(String check) throws MemberDuplicateException {
+
+        Map<String, String> errorFieldMap = new HashMap<>();
+
+        // 헤당 메일로 사용자를 찾을 수 있는가?
+        if(memberRepository.findByEmail(check) != null){
+            errorFieldMap.put("email", check);
+        }
+
+        if(!errorFieldMap.isEmpty()){
+            throw new MemberDuplicateException(errorFieldMap);
+        }
+
+        return "사용 가능";
+    }
 }

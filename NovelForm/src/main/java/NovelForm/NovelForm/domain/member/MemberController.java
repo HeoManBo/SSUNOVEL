@@ -13,9 +13,13 @@ import NovelForm.NovelForm.global.exception.CustomFieldException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +49,7 @@ public class MemberController {
      *  CreateMemberRequest DTO를 입력으로 받는다.
      *
      *  request body에 대한 type체크는 아직이다.
-     *  다른 에러에 대한 다른 메시지가 나오게 해야 한다 (미 구현)
+     *  다른 에러에 대한 다른 메시지가 나오게 해야 한다
      */
     @Operation(summary = "회원 가입", description = "회원 가입 메서드입니다.")
     @PostMapping("/create")
@@ -62,6 +66,9 @@ public class MemberController {
             throw new CustomFieldException(map);
         }
 
+
+
+
         Long id = memberService.createMember(createMemberRequest);
 
 
@@ -70,6 +77,31 @@ public class MemberController {
 
         return new BaseResponse<Long>(HttpStatus.OK, id, "생성 성공");
     }
+
+
+    /**
+     * 회원 가입 전 이메일 중복 체크
+     */
+    @Operation(summary = "이메일 중복 체크", description = "회원가입 시 사용될 이메일 중복 체크")
+    @GetMapping("/email")
+    public BaseResponse<String> checkEmail(
+            @Parameter(description = "중복체크할 이메일 주소(test@test.com)", in = ParameterIn.QUERY)
+            @RequestParam("check")
+            String check) throws Exception {
+
+
+        boolean matchResult = java.util.regex.Pattern.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", check);
+
+        if(!matchResult){
+            throw new IllegalArgumentException("이메일 형식 오류: " + check);
+        }
+
+
+        String result = memberService.checkEmail(check);
+
+        return new BaseResponse<>(result);
+    }
+
 
 
     /**
@@ -110,6 +142,8 @@ public class MemberController {
 
         return new BaseResponse<Long>(HttpStatus.OK, id, "생성 성공");
     }
+
+
 
 
     /**
