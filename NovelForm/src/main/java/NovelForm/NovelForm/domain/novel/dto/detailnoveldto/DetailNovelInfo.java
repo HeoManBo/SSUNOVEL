@@ -1,5 +1,6 @@
 package NovelForm.NovelForm.domain.novel.dto.detailnoveldto;
 
+import NovelForm.NovelForm.domain.novel.dto.searchdto.NovelDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -57,6 +58,11 @@ public class DetailNovelInfo {
     //전체 리뷰 수, 전체 리뷰 평균,
     @Schema(description = "해당 웹 소설 리뷰 List")
     List<ReviewDto> reviewInfos = new ArrayList<>();
+
+    @Schema(description = "해당 소설 작가가 쓴 다른 소설 리스트 ")
+    //해당 소설의 작가가 쓴 다른 소설 리스트
+    List<NovelDto> anotherNovels = new ArrayList<>();
+
 
     //favorite repo를 통해 가져와야할 값
     //상세 조회한 회원이 이미 좋아하는 소설인 경우 1
