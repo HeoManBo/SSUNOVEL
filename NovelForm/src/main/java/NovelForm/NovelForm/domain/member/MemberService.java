@@ -1,20 +1,19 @@
 package NovelForm.NovelForm.domain.member;
 
+import NovelForm.NovelForm.domain.community.dto.PostDto;
 import NovelForm.NovelForm.domain.member.domain.LoginType;
 import NovelForm.NovelForm.domain.member.domain.Member;
-import NovelForm.NovelForm.domain.member.dto.CreateMemberRequest;
-import NovelForm.NovelForm.domain.member.dto.LoginMemberRequest;
-import NovelForm.NovelForm.domain.member.dto.UpdateMemberRequest;
+import NovelForm.NovelForm.domain.member.dto.*;
 import NovelForm.NovelForm.domain.member.exception.MemberDuplicateException;
 import NovelForm.NovelForm.domain.member.exception.WrongLoginException;
 import NovelForm.NovelForm.domain.member.exception.WrongMemberException;
-import NovelForm.NovelForm.repository.BoxRepository;
-import NovelForm.NovelForm.repository.FavoriteBoxRepository;
-import NovelForm.NovelForm.repository.MemberRepository;
-import NovelForm.NovelForm.repository.ReviewRepository;
+import NovelForm.NovelForm.domain.novel.Author;
+import NovelForm.NovelForm.domain.novel.Novel;
+import NovelForm.NovelForm.repository.*;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,9 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -33,12 +30,15 @@ import java.util.Optional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-
-    private final ReviewRepository reviewRepository;
-
-    private final FavoriteBoxRepository favoriteBoxRepository;
-
     private final BoxRepository boxRepository;
+    private final FavoriteBoxRepository favoriteBoxRepository;
+    private final FavoriteNovelRepository favoriteNovelRepository;
+    private final FavoriteAuthorRepository favoriteAuthorRepository;
+    private final LikeRepository likeRepository;
+    private final ReviewRepository reviewRepository;
+    private final AuthorRepository authorRepository;
+    private final NovelRepository novelRepository;
+    private final CommunityPostRepository communityPostRepository;
 
     /**
      *  사이트 회원가입 서비스 로직
@@ -144,14 +144,7 @@ public class MemberService {
      */
     public String updateMember(Long memberId, UpdateMemberRequest updateMemberRequest) throws Exception {
 
-        Member member;
-        Optional<Member> optionalMember = memberRepository.findById(memberId);
-
-        if(!optionalMember.isPresent()){
-            throw new WrongMemberException("잘못된 회원 번호 : " + memberId);
-        }
-
-        member = optionalMember.get();
+        Member member = checkMember(memberId);
 
 
         if (memberRepository.findByNickname(updateMemberRequest.getNickname()) != null){
@@ -188,14 +181,7 @@ public class MemberService {
      */
     public String deleteMember(Long memberId) throws WrongMemberException {
 
-        Member member;
-        Optional<Member> optionalMember = memberRepository.findById(memberId);
-
-        if(!optionalMember.isPresent()){
-            throw new WrongMemberException("잘못된 회원 번호 : " + memberId);
-        }
-
-        member = optionalMember.get();
+        Member member = checkMember(memberId);
 
 
         // 삭제 부분은 bulk 연산으로 진행했는데,
@@ -215,5 +201,180 @@ public class MemberService {
         memberRepository.delete(member);
 
         return "삭제 완료";
+    }
+
+
+    /**
+     * 이메일 중복 체크용 서비스
+     *
+     * @param check
+     * @return
+     */
+    public String checkEmail(String check) throws MemberDuplicateException {
+
+        Map<String, String> errorFieldMap = new HashMap<>();
+
+        // 헤당 메일로 사용자를 찾을 수 있는가?
+        if(memberRepository.findByEmail(check) != null){
+            errorFieldMap.put("email", check);
+        }
+
+        if(!errorFieldMap.isEmpty()){
+            throw new MemberDuplicateException(errorFieldMap);
+        }
+
+        return "사용 가능";
+    }
+
+
+    /**
+     * 해당 회원이 작성한 글 목록 가져오기
+     *
+     * @param memberId
+     */
+    public MemberPostResponse getMemberPost(Long memberId) throws WrongMemberException {
+
+        // 사용자 확인
+        Member member = checkMember(memberId);
+
+        // 작성글 가져오기
+        List<PostDto> memberPostList = communityPostRepository.findPostByMember(member);
+        MemberPostResponse memberPostResponse = new MemberPostResponse(memberPostList.size(), memberPostList);
+
+        return memberPostResponse;
+    }
+
+
+    /**
+     * 사용자가 작성한 리뷰 가져오기
+     *
+     * @param memberId
+     * @return
+     */
+    public MemberReviewResponse getMemberReview(Long memberId) throws WrongMemberException {
+
+        Member member = checkMember(memberId);
+
+        List<MemberReviewInfo> memberReviewInfoList = reviewRepository.findMemberReviewByMember(member);
+
+        MemberReviewResponse memberReviewResponse = new MemberReviewResponse(memberReviewInfoList.size(), memberReviewInfoList);
+
+        return memberReviewResponse;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private Member checkMember(Long memberId) throws WrongMemberException {
+        Member member;
+        Optional<Member> optionalMember = memberRepository.findById(memberId);
+
+        if(!optionalMember.isPresent()){
+            throw new WrongMemberException("잘못된 회원 번호 : " + memberId);
+        }
+
+        member = optionalMember.get();
+        return member;
+    }
+
+
+    /**
+     * 사용자가 생성한 모든 보관함을 가저오기
+     *
+     * @param memberId
+     * @return
+     */
+    public MemberBoxResponse getMemberBox(Long memberId) throws WrongMemberException {
+        Member member = checkMember(memberId);
+
+        List<MemberBoxInfo> memberBoxInfoList = boxRepository.findMemberBoxByMember(member);
+
+        MemberBoxResponse memberBoxResponse = new MemberBoxResponse(memberBoxInfoList.size(), memberBoxInfoList);
+
+        return memberBoxResponse;
+    }
+
+    /**
+     * 사용자가 즐겨찾기로 등록한 작가 목록 가져오기
+     *
+     * @param memberId
+     * @return
+     */
+    public MemberFavoriteAuthorResponse getMemberFavoriteAuthor(Long memberId) throws WrongMemberException {
+
+        Member member = checkMember(memberId);
+
+        List<Author> authorList = authorRepository.findAuthorsByMemberFavorite(member);
+        List<MemberFavoriteAuthorInfo> memberFavoriteAuthorInfoList = new ArrayList<>();
+
+        for (Author author : authorList) {
+            // Comparator의 람다식
+            // 식의 결과가 양수이면 자리를 바꾸고, 음수이면 그대로 유지하게 된다.
+            // 뒤에 있는 값이 크면 앞으로 오게 되기에 내림차순 정렬이 가능하다.
+            author.getNovels().sort((a, b) -> b.getDownload_cnt() - a.getDownload_cnt());
+
+            Novel mostNovel = author.getNovels().get(0);
+
+            log.info("novel: {}", mostNovel);
+
+
+
+            MemberFavoriteAuthorInfo memberFavoriteAuthorInfo = new MemberFavoriteAuthorInfo(
+                    author.getId(),
+                    author.getName(),
+                    mostNovel.getCover_image(),
+                    mostNovel.getTitle());
+
+            memberFavoriteAuthorInfoList.add(memberFavoriteAuthorInfo);
+        }
+
+        MemberFavoriteAuthorResponse memberFavoriteAuthorResponse =
+                new MemberFavoriteAuthorResponse(memberFavoriteAuthorInfoList.size(), memberFavoriteAuthorInfoList);
+
+        return memberFavoriteAuthorResponse;
+    }
+
+    /**
+     * 즐겨찾기로 등록한 보관함 목록 가져오기
+     *
+     * @param memberId
+     * @return
+     */
+    public MemberFavoriteBoxResponse getMemberFavoriteBox(Long memberId) throws WrongMemberException {
+
+        Member member = checkMember(memberId);
+
+        List<MemberBoxInfo> memberFavoriteBoxList = favoriteBoxRepository.findMemberFavoriteBoxByMember(member);
+
+        MemberFavoriteBoxResponse memberFavoriteBoxResponse = new MemberFavoriteBoxResponse(memberFavoriteBoxList.size(), memberFavoriteBoxList);
+
+        return memberFavoriteBoxResponse;
+    }
+
+    /**
+     * 즐겨찾기로 등록한 소설 목록 가져오기
+     *
+     * @param memberId
+     * @return
+     */
+    public MemberFavoriteNovelResponse getMemberFavoriteNovel(Long memberId) throws WrongMemberException {
+
+        Member member = checkMember(memberId);
+
+        List<MemberFavoriteNovelInfo> novelInfoList = novelRepository.findFavoriteNovelInfoByMember(member);
+
+        MemberFavoriteNovelResponse memberFavoriteNovelResponse = new MemberFavoriteNovelResponse(novelInfoList.size(), novelInfoList);
+
+        return memberFavoriteNovelResponse;
     }
 }

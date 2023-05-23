@@ -4,6 +4,7 @@ import NovelForm.NovelForm.domain.box.domain.Box;
 import NovelForm.NovelForm.domain.box.dto.AllBoxResponse;
 import NovelForm.NovelForm.domain.box.dto.BoxSearchInfo;
 import NovelForm.NovelForm.domain.member.domain.Member;
+import NovelForm.NovelForm.domain.member.dto.MemberBoxInfo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -149,4 +150,24 @@ public interface BoxRepository extends JpaRepository<Box, Long> {
     @Query("delete from Box b where b.member = :member ")
     void bulkDeleteBoxByMember(@Param("member") Member member);
 
+
+
+    /**
+     * 내가 작성한 보관함 가져오기
+     * @return
+     */
+    @Query("select new NovelForm.NovelForm.domain.member.dto.MemberBoxInfo(" +
+            " b.id, " +
+            " b.title, " +
+            " m.nickname, " +
+            " (select n.cover_image from BoxItem bi2 inner join bi2.novel n where bi2.box = b and bi2.is_lead_item = 1), " +
+            " b.update_at, " +
+            " count(bi), " +
+            " (select cast(count(l) as integer) from Like l inner join l.box b2 on b2 = b), " +
+            " b.is_private )" +
+            " from Box b " +
+            " inner join b.member m " +
+            " left join b.boxItems bi " +
+            " where m = :member" )
+    List<MemberBoxInfo> findMemberBoxByMember(@Param("member") Member member);
 }

@@ -1,7 +1,10 @@
 package NovelForm.NovelForm.repository;
 
+import NovelForm.NovelForm.domain.member.domain.Member;
+import NovelForm.NovelForm.domain.member.dto.MemberFavoriteNovelInfo;
 import NovelForm.NovelForm.domain.novel.CustomNovelRepository;
 import NovelForm.NovelForm.domain.novel.Novel;
+import NovelForm.NovelForm.domain.novel.dto.searchdto.NovelDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -74,4 +77,24 @@ public interface NovelRepository extends JpaRepository<Novel, Long>, CustomNovel
     //Download_cnt 내림차순으로 정렬한 소설 20개를 반환합니다. 정렬 기준은 차후 변경될 수 있습니다.
     @Query("select n from Novel n join fetch n.author order by n.download_cnt desc limit 20")
     List<Novel> findByNovelRanking();
+
+
+    // 즐겨찾기한 소설에 대해 소설 정보를 가져온다.
+    @Query("select new NovelForm.NovelForm.domain.member.dto.MemberFavoriteNovelInfo(" +
+            " n.id, " +
+            " n.title, " +
+            " n.cover_image, " +
+            " a.name, " +
+            " cast(count(r) as int), " +
+            " avg(r.rating), " +
+            " n.category " +
+            " ) " +
+            " from FavoriteNovel fn " +
+            " inner join fn.novel n " +
+            " inner join n.author a " +
+            " inner join n.reviews r " +
+            " where fn.member = :member" +
+            " group by n ")
+    List<MemberFavoriteNovelInfo> findFavoriteNovelInfoByMember(@Param("member") Member member);
+
 }

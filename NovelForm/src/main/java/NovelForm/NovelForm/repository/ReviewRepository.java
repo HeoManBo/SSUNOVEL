@@ -2,6 +2,7 @@ package NovelForm.NovelForm.repository;
 
 
 import NovelForm.NovelForm.domain.member.domain.Member;
+import NovelForm.NovelForm.domain.member.dto.MemberReviewInfo;
 import NovelForm.NovelForm.domain.novel.Review;
 import NovelForm.NovelForm.domain.novel.Novel;
 import org.springframework.data.domain.Page;
@@ -50,5 +51,21 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Modifying(clearAutomatically = true)
     @Query("delete from Review r where r.member = :member")
     void bulkDeleteReviewByMember(@Param("member") Member member);
+
+
+    @Query("select new NovelForm.NovelForm.domain.member.dto.MemberReviewInfo(" +
+            " r.content, " +
+            " r.rating," +
+            " r.update_at," +
+            " (select cast(count(l) as int) from Like l inner join l.review r2 on r2 = r), " +
+            " n.title, " +
+            " n.cover_image," +
+            " a.name," +
+            " n.id," +
+            " r.id ) from Review r " +
+            " inner join r.novel n " +
+            " inner join n.author a" +
+            " where r.member = :member")
+    List<MemberReviewInfo> findMemberReviewByMember(@Param("member") Member member);
 
 }

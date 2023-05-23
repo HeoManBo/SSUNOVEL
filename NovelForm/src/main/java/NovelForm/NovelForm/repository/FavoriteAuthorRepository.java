@@ -2,6 +2,7 @@ package NovelForm.NovelForm.repository;
 
 import NovelForm.NovelForm.domain.favorite.domain.FavoriteAuthor;
 import NovelForm.NovelForm.domain.member.domain.Member;
+import NovelForm.NovelForm.domain.member.dto.MemberFavoriteAuthorInfo;
 import NovelForm.NovelForm.domain.novel.Author;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -44,5 +45,6 @@ public interface FavoriteAuthorRepository extends JpaRepository<FavoriteAuthor, 
      *
      */
     List<FavoriteAuthor> findFavoriteAuthorsByMemberId(Long memberId);
+
 
 }

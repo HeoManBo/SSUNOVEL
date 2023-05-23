@@ -1,6 +1,7 @@
 package NovelForm.NovelForm.repository;
 
-import NovelForm.NovelForm.domain.community.domain.CommunityPost;
+import NovelForm.NovelForm.domain.community.CommunityPost;
+import NovelForm.NovelForm.domain.community.dto.PostDto;
 import NovelForm.NovelForm.domain.member.domain.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -57,5 +58,16 @@ public interface CommunityPostRepository extends JpaRepository<CommunityPost, Lo
     @Modifying
     @Query("delete from CommunityPost c where c.member = :member")
     void deleteAllPostByMember(@Param("member") Member member);
+
+
+    /**
+     * 마이페이지 작성글 조회시 가져올 내 작성글
+     */
+    @Query("select new NovelForm.NovelForm.domain.community.dto.PostDto( " +
+            " cp.id, " +
+            " cp.title, " +
+            " cp.content " +
+            " ) from CommunityPost cp where cp.member = :member")
+    List<PostDto> findPostByMember(@Param("member") Member member);
 
 }
