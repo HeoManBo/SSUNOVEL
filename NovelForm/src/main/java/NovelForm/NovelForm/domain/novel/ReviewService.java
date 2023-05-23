@@ -2,8 +2,10 @@ package NovelForm.NovelForm.domain.novel;
 
 
 import NovelForm.NovelForm.domain.member.domain.Member;
+import NovelForm.NovelForm.domain.member.exception.WrongMemberException;
 import NovelForm.NovelForm.domain.novel.dto.detailnoveldto.ReviewDto;
 import NovelForm.NovelForm.domain.novel.dto.reivewdto.ReviewBodyDto;
+import NovelForm.NovelForm.domain.novel.exception.NotReviewOwner;
 import NovelForm.NovelForm.repository.MemberRepository;
 import NovelForm.NovelForm.repository.NovelRepository;
 import NovelForm.NovelForm.repository.ReviewRepository;
@@ -32,7 +34,7 @@ public class ReviewService {
             return null; //공 List를 반환함
         }
         return reviews.stream().map(r -> new ReviewDto(r.getMember().getNickname(), r.getContent(), r.getRating(),
-                r.getCreate_at(), 0)).collect(Collectors.toList());
+                r.getCreate_at(), 0, r.getMember().getId(), r.getId())).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -47,11 +49,25 @@ public class ReviewService {
      * 리뷰를 DB상에 등록합니다.
      * 리턴 값은 String 으로 성공시 Success, 실패시 fail 문자열을 반환합니다.
      */
-    public String writeReview(ReviewBodyDto reviewBodyDto, Long memberId, Long novelId){
+    public Long writeReview(ReviewBodyDto reviewBodyDto, Long memberId, Long novelId) throws Exception{
         Member member = memberRepository.findById(memberId).orElse(null); //멤버 찾기
-        if(member == null) return "fail"; //memberId에 대응되는 소설이 없다면 fail 반환
         Novel novel = novelRepository.findById(novelId).orElse(null);
-        if(novel == null) return "fail"; //novelId에 대응되는 소설이 없다면 fail
+
+        //세션값에 대응되는 멤버를 못찾으면
+        if(member == null) {
+            throw new WrongMemberException("잘못된 유저 아이디입니다.");
+        }
+        //novelId에 대응되는 소설을 못찾으면
+        if(novel == null) {
+            throw new IllegalArgumentException("해당하는 소설이 존재하지 않습니다.");
+        }
+
+        Optional<Review> reivew = reviewRepository.findSingleReivew(member, novel);
+
+        //이미 리뷰를 작성한 소설에 또 리뷰를 작성하려는 경우 fail;
+        if(reivew.isPresent()){
+            throw new IllegalArgumentException("잘못된 리뷰 등록입니다.");
+        }
 
         // 리뷰 등록
         String inputContent;
@@ -68,29 +84,45 @@ public class ReviewService {
 
         review.addNovel(novel);
         review.addMember(member);
-        reviewRepository.save(review);
+        Review save = reviewRepository.save(review);
 
-        return "success";
+        return save.getId();
     }
 
     /**
      * 리뷰를 삭제하는 method
      *
      */
-    public String deleteReview(Long memberId, Long novelId) {
+    public String deleteReview(Long memberId, Long novelId, Long review_idx) throws Exception {
         Member member = memberRepository.findByMemberIdWithReviews(memberId); //멤버 찾기 이때 리뷰까지 같이 가져온다.
-        if(member == null) return "fail"; //memberId에 대응되는 소설이 없다면 fail 반환
         Novel novel = novelRepository.findByNovelIdWithReviews(novelId);
-        if(novel == null) return "fail"; //novelId에 대응되는 소설이 없다면 fail
 
-        //본인이 작성한 리뷰 조회
-        Optional<Review> myReview = reviewRepository.findSingleReivew(member, novel);
+        //세션값에 대응되는 멤버를 못찾으면
+        if(member == null) {
+            throw new WrongMemberException("잘못된 유저 아이디입니다.");
+        }
+        //novelId에 대응되는 소설을 못찾으면
+        if(novel == null) {
+            throw new IllegalArgumentException("해당하는 소설이 존재하지 않습니다.");
+        }
+
+        //본인이 작성한 리뷰 조회 리뷰는 소설당 하나 밖에 작성하지 못하므로 하나만 가져올 수 있다.
+        Optional<Review> myReview = reviewRepository.reviewForDelete(review_idx);
 
         if(myReview.isEmpty()){ //내 리뷰가 없으면 fail
-            return "fail";
+            throw new WrongMemberException("잘못된 유저 아이디입니다.");
         }
 
         Review deleteReview = myReview.get();
+
+        if(!novel.getReviews().contains(deleteReview)){
+            throw new IllegalArgumentException("소설에 없는 리뷰를 삭제하려합니다.");
+        }
+
+        //로그인한 사람이 자기가 작성한 글이 아닌 다른 사람의 글을 삭제하려는 경우
+        if(!member.getId().equals(deleteReview.getMember().getId())){
+            throw new NotReviewOwner();
+        }
 
         member.deleteMyReview(deleteReview); //일관성을 위해 현재 멤버 객체에서도 제거해줌
         novel.deleteReview(deleteReview); //일관성을 위해 현재 소설 객체에서도 제거해줌
@@ -102,25 +134,38 @@ public class ReviewService {
     /**
      * 리뷰 수정 Method
      */
-    public String modifyReview(ReviewBodyDto reviewBodyDto, Long memberId, Long novelId) {
-        Member member = memberRepository.findById(memberId).orElse(null); //멤버 찾기
-        if(member == null) return "fail"; //memberId에 대응되는 소설이 없다면 fail 반환
+    public String modifyReview(ReviewBodyDto reviewBodyDto, Long memberId, Long novelId, Long reviewId) throws Exception {
+        Member member = memberRepository.findById(memberId).orElse(null);
+
         Novel novel = novelRepository.findById(novelId).orElse(null);
-        if(novel == null) return "fail"; //novelId에 대응되는 소설이 없다면 fail
 
-        //본인이 작성한 리뷰 조회
-        Optional<Review> myReview = reviewRepository.modifyReview(member, novel);
-
-        if(myReview.isEmpty()){ //내 리뷰가 없으면 fail
-            return "fail";
+        //세션값에 대응되는 멤버를 못찾으면
+        if(member == null) {
+            throw new WrongMemberException("잘못된 유저 아이디입니다.");
+        }
+        //novelId에 대응되는 소설을 못찾으면
+        if(novel == null) {
+            throw new IllegalArgumentException("해당하는 소설이 존재하지 않습니다.");
         }
 
-        Review deleteReview = myReview.get();
+        //본인이 작성한 리뷰 조회
+        Optional<Review> myReview = reviewRepository.findById(reviewId);
+
+        if(myReview.isEmpty()){ //내 리뷰가 없으면 fail
+            throw new WrongMemberException("잘못된 유저 아이디입니다.");
+        }
+
+        Review modifyReview = myReview.get();
+
+        //로그인한 사람이 자기가 작성한 글이 아닌 다른 사람의 리뷰를 수정하려는 경우
+        if(!member.getId().equals(modifyReview.getMember().getId())){
+            throw new NotReviewOwner();
+        }
 
         //deleteReview는 영속성 컨텍스트 내에 있으므로
         //deleteReview를 수정하면 자연스럽게 update Query가 나가게 된다 --> 변경감지
-        deleteReview.modifyContent(reviewBodyDto.getContent());
-        deleteReview.modifyRating(deleteReview.getRating(), reviewBodyDto.getRating(), novel); //리뷰 값 수정
+        modifyReview.modifyContent(reviewBodyDto.getContent());
+        modifyReview.modifyRating(modifyReview.getRating(), reviewBodyDto.getRating(), novel); //리뷰 값 수정
 
         return "success";
     }

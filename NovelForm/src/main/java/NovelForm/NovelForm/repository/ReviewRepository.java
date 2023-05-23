@@ -30,6 +30,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByReview(@Param("novel") Novel novel);
 
     //파라미터로 넘어오는 소설의 멤버의 리뷰를 조회함
+    @Query(value = "select r from Review r join fetch r.member where r.id = :review_id ")
+    Optional<Review> reviewForDelete(@Param("review_id") Long review_id);
+
+    //파라미터로 넘어오는 소설의 멤버의 리뷰를 조회함
     @Query(value = "select r from Review r join fetch r.member where r.novel = :novel and r.member = :member ")
     Optional<Review> findSingleReivew(@Param("member")Member member, @Param("novel")Novel novel);
 
@@ -41,6 +45,12 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Modifying
     @Query(value = "delete from Review where review_id = :review_id", nativeQuery = true)
     void deleteReviewById(@Param("review_id") Long review_id);
+
+    //특정 리뷰 찾기
+    @Query("select r from Review r where r.id = :review_id")
+    Review findOneReview(@Param("review_id") Long review_id);
+
+
 
 
     // 멤버가 작성한 리뷰 찾기
@@ -67,5 +77,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             " inner join n.author a" +
             " where r.member = :member")
     List<MemberReviewInfo> findMemberReviewByMember(@Param("member") Member member);
+
 
 }
