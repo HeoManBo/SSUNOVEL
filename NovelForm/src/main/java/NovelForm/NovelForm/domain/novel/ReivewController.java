@@ -3,6 +3,8 @@ package NovelForm.NovelForm.domain.novel;
 import NovelForm.NovelForm.domain.novel.dto.reivewdto.ReviewBodyDto;
 import NovelForm.NovelForm.domain.novel.exception.NotReviewOwner;
 import NovelForm.NovelForm.global.BaseResponse;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,9 +28,10 @@ public class ReivewController {
     private final ReviewService reviewService;
 
     //리뷰 등록 메소드입니다.
+    @ApiResponse(description = "리뷰 등록 API 메소드입니다. 성공시 해당 리뷰 ID를 반환합니다.")
     @PostMapping("/{novel_id}")
     public BaseResponse writeReview(@RequestBody ReviewBodyDto reviewBodyDto, BindingResult bindingResult,
-                                    @SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId,
+                                    @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId,
                                     @PathVariable Long novel_id) throws Exception {
 
         //Binding시 문제가 있을 경우 -> 에러 (제한 범위를 벗어난 별점 부여 )
@@ -42,8 +45,9 @@ public class ReivewController {
     }
 
     //리뷰 삭제 메소드입니다.
+    @ApiResponse(description = "리뷰 삭제 API 메소드입니다. 성공시 result에 success 문자열을 출력합니다.")
     @DeleteMapping("/{novel_id}/{review_id}")
-    public BaseResponse deleteReview(@SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId,
+    public BaseResponse deleteReview(@Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId,
                                      @PathVariable("novel_id") Long novel_id,
                                      @PathVariable("review_id") Long review_id) throws Exception{
 
@@ -53,9 +57,10 @@ public class ReivewController {
     }
 
     //리뷰 수정 메소드입니다.
+    @ApiResponse(description = "리뷰 수정 API 메소드입니다. 성공시 result에 success 문자열을 출력합니다.")
     @PatchMapping("/{novel_id}/{review_id}")
     public BaseResponse modifyReview(@RequestBody ReviewBodyDto reviewBodyDto, BindingResult bindingResult,
-                                     @SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId,
+                                     @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId,
                                      @PathVariable("novel_id") Long novel_id,
                                      @PathVariable("review_id") Long review_id) throws Exception {
 

@@ -124,7 +124,7 @@ public class CommunityController {
      * 게시글 수정 성공시 수정한 상세 게시글 Dto 를 반환합니다.
      */
     @PatchMapping("/{post_id}")
-    @Operation(description = "전체 게시글 수정 메소드입니다", responses = @ApiResponse(responseCode = "200", description = "수정 성공시 수정된 내용의 게시글 상세 조회 Dto를 반환합니다.", content = @Content(schema = @Schema(implementation = DetailPostDto.class))))
+    @Operation(description = "게시글 수정 메소드입니다", responses = @ApiResponse(responseCode = "200", description = "수정 성공시 수정된 내용의 게시글 상세 조회 Dto를 반환합니다.", content = @Content(schema = @Schema(implementation = DetailPostDto.class))))
     public BaseResponse<DetailPostDto> modifyPost(
             @Parameter(description = "수정할 게시글의 내용")@RequestBody @Valid WriteDto writeDto,
             BindingResult bindingResult, @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId,
