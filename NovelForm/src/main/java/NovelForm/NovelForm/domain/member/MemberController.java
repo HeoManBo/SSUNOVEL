@@ -1,9 +1,7 @@
 package NovelForm.NovelForm.domain.member;
 
 
-import NovelForm.NovelForm.domain.member.dto.CreateMemberRequest;
-import NovelForm.NovelForm.domain.member.dto.LoginMemberRequest;
-import NovelForm.NovelForm.domain.member.dto.UpdateMemberRequest;
+import NovelForm.NovelForm.domain.member.dto.*;
 import NovelForm.NovelForm.domain.member.exception.WrongLoginException;
 import NovelForm.NovelForm.domain.member.exception.WrongMemberException;
 import NovelForm.NovelForm.global.BaseResponse;
@@ -210,6 +208,105 @@ public class MemberController {
     }
 
 
+    /**
+     * 마이페이지
+     *
+     * 내가 작성하거나 즐겨찾기에 등록한 것들을 가져오기
+     * 작성 글
+     * 작성 리뷰
+     * 생성한 보관함
+     * 즐겨찾기한 작가 목록
+     * 즐겨찾기한 보관함 목록
+     * 즐겨찾기한 소설 목록
+     */
+
+
+    /**
+     * 마이페이지 작성 글 가져오기
+     */
+    @Operation(summary = "작성 글 가져오기", description = "마이페이지에서 가장 먼저 보여질 작성 글 가져오기")
+    @GetMapping("/mypage/post")
+    public BaseResponse<MemberPostResponse> getMemberPost(
+        @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID) Long memberId) throws WrongMemberException {
+
+        MemberPostResponse memberPost = memberService.getMemberPost(memberId);
+
+        return new BaseResponse<>(memberPost);
+    }
+
+    /**
+     * 마이페이지 작성 리뷰 가져오기
+     */
+    @Operation(summary = "작성 리뷰 가져오기", description = "본인이 작성한 리뷰 가져오기")
+    @GetMapping("/mypage/review")
+    public BaseResponse<MemberReviewResponse> getMemberReview(
+            @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID) Long memberId) throws WrongMemberException {
+
+
+        MemberReviewResponse memberReviewResponse = memberService.getMemberReview(memberId);
+
+        return new BaseResponse<>(memberReviewResponse);
+    }
+
+
+    /**
+     * 마이페이지 생성 보관함 가져오기
+     */
+    @Operation(summary = "생성한 보관함 가져오기", description = "본인이 생성한 보관함 가져오기")
+    @GetMapping("/mypage/box")
+    public BaseResponse<MemberBoxResponse> getMemberBox(
+            @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID) Long memberId) throws WrongMemberException {
+
+
+        MemberBoxResponse memberBoxResponse = memberService.getMemberBox(memberId);
+
+        return new BaseResponse<>(memberBoxResponse);
+    }
+
+
+    /**
+     * 마이페이지 즐겨찾기 한 작가 목록 가져오기
+     */
+    @Operation(summary = "즐겨찾기 한 작가 목록 가져오기", description = "즐겨찾기로 등록한 작가 목록 가져오기")
+    @GetMapping("/mypage/favorite/author")
+    public BaseResponse<MemberFavoriteAuthorResponse> getMemberFavoriteAuthor(
+            @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID) Long memberId) throws WrongMemberException {
+
+
+        MemberFavoriteAuthorResponse memberFavoriteAuthorResponse = memberService.getMemberFavoriteAuthor(memberId);
+
+        return new BaseResponse<>(memberFavoriteAuthorResponse);
+    }
+
+
+    /**
+     * 마이페이지 즐겨찾기 한 보관함 목록 가져오기
+     */
+    @Operation(summary = "즐겨찾기 한 보관함 목록 가져오기", description = "즐겨찾기로 등록한 보관함 목록 가져오기")
+    @GetMapping("/mypage/favorite/box")
+    public BaseResponse<MemberFavoriteBoxResponse> getMemberFavoriteBox(
+            @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID) Long memberId) throws WrongMemberException {
+
+
+        MemberFavoriteBoxResponse memberFavoriteBoxResponse = memberService.getMemberFavoriteBox(memberId);
+
+        return new BaseResponse<>(memberFavoriteBoxResponse);
+    }
+
+
+    /**
+     * 마이페이지 즐겨찾기 한 소설 목록 가져오기
+     */
+    @Operation(summary = "즐겨찾기 한 소설 목록 가져오기", description = "즐겨찾기로 등록한 즐겨찾기 목록 가져오기")
+    @GetMapping("/mypage/favorite/novel")
+    public BaseResponse<MemberFavoriteNovelResponse> getMemberFavoriteNovel(
+            @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID) Long memberId) throws WrongMemberException {
+
+
+        MemberFavoriteNovelResponse memberFavoriteNovelResponse = memberService.getMemberFavoriteNovel(memberId);
+
+        return new BaseResponse<>(memberFavoriteNovelResponse);
+    }
 
 
 }

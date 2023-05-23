@@ -16,16 +16,22 @@ import java.util.Optional;
 @Repository
 public interface FavoriteNovelRepository extends JpaRepository<FavoriteNovel, Long> {
 
+    // 회원으로 즐겨찾기 정보 가져오기
     @Query("select fn from FavoriteNovel fn join fetch fn.novel where fn.member = :member")
     List<FavoriteNovel> findByMember(@Param("member") Member member, PageRequest pageRequest);
 
 
+    // 회원과 소설 번호로 즐겨찾기 정보 가져오기
     @Query("select fn from FavoriteNovel fn join fetch fn.novel where fn.member = :member and fn.novel = :novel")
     FavoriteNovel findByMemberWithNovel(@Param("member") Member member, @Param("novel") Novel novel);
+
 
     @Query("select fn from FavoriteNovel fn inner join fn.novel inner join fn.member where fn.member = :member and fn.novel = :novel")
     List<FavoriteNovel> findByMemberAndNovel(@Param("member") Member member, @Param("novel") Novel novel);
 
     @Query("select fn from FavoriteNovel fn join fetch fn.novel where fn.member = :member")
     List<FavoriteNovel> findByMemberNoPaging(@Param("member") Member member);
+
+
+
 }

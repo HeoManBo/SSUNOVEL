@@ -5,6 +5,7 @@ import NovelForm.NovelForm.domain.box.domain.Box;
 import NovelForm.NovelForm.domain.box.domain.BoxItem;
 import NovelForm.NovelForm.domain.comment.Comment;
 import NovelForm.NovelForm.domain.community.CommunityPost;
+import NovelForm.NovelForm.domain.community.dto.PostDto;
 import NovelForm.NovelForm.domain.favorite.domain.FavoriteAuthor;
 import NovelForm.NovelForm.domain.favorite.domain.FavoriteBox;
 import NovelForm.NovelForm.domain.favorite.domain.FavoriteNovel;
@@ -12,13 +13,14 @@ import NovelForm.NovelForm.domain.like.domain.Like;
 import NovelForm.NovelForm.domain.member.domain.Gender;
 import NovelForm.NovelForm.domain.member.domain.LoginType;
 import NovelForm.NovelForm.domain.member.domain.Member;
-import NovelForm.NovelForm.domain.member.dto.UpdateMemberRequest;
+import NovelForm.NovelForm.domain.member.dto.*;
 import NovelForm.NovelForm.domain.member.exception.MemberDuplicateException;
 import NovelForm.NovelForm.domain.novel.Author;
 import NovelForm.NovelForm.domain.novel.Novel;
 import NovelForm.NovelForm.domain.novel.Review;
 import NovelForm.NovelForm.repository.*;
 import jakarta.persistence.EntityManager;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,13 +33,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @SpringBootTest
 @Transactional
-@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
+//@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 public class MemberServiceTest {
 
     @Autowired
@@ -77,92 +81,173 @@ public class MemberServiceTest {
     @BeforeEach
     void setMember(){
 
-        Member member1 = new Member(
-                "test0101@test.com",
-                "sdsdsdsdsd",
-                "testnick_1",
-                Gender.MALE,
-                LoginType.USER,
-                38
-        );
+        List<Member> memberList = new ArrayList<>();
 
-        Member member2 = new Member(
-                "testDel@test.com",
-                "sdsdsdsdsd",
-                "testnick_del",
-                Gender.MALE,
-                LoginType.USER,
-                15
-        );
-
-        memberRepository.save(member1);
-        memberRepository.save(member2);
+        // 회원 10명 생성
+        for(int i = 0; i < 10; i++){
+            Member member = new Member(
+                    "test" + i + "@test.com",
+                    "sdsdsdsdsd",
+                    "testnick_" + i,
+                    Gender.MALE,
+                    LoginType.USER,
+                    38
+            );
+            memberList.add(member);
+        }
+        memberRepository.saveAll(memberList);
 
 
-        Author testAuthor1 = new Author("test Author1");
-        authorRepository.save(testAuthor1);
+        // 작가 10명 및 각 작가당 소설 1개씩 생성
+        List<Author> authorList = new ArrayList<>();
+        List<Novel> novelList = new ArrayList<>();
 
-        Novel testNovel1 = new Novel(
-                "test title1",
-                "test summary1",
-                121,
-                100,
-                390,
-                "연재중",
-                "https://img/src",
-                3.8,
-                198,
-                "판타지",
-                testAuthor1,
-                "navernaver",
-                "kakaokakao",
-                "ridiridi",
-                "munpiamunpia"
-        );
-        novelRepository.save(testNovel1);
+        for(int i = 0; i < 10; i++){
+            Author testAuthor = new Author("test Author" + i);
+            authorList.add(testAuthor);
 
-        Review review = new Review(
-                "activated",
-                testNovel1,
-                member2,
-                3.5,
-                "test 내용입니다."
-        );
-        reviewRepository.save(review);
+            Novel testNovel = new Novel(
+                    "test title" + i,
+                    "test summary" + i,
+                    121,
+                    100,
+                    390,
+                    "연재중",
+                    "https://img/src/" + i,
+                    3.8,
+                    198,
+                    "판타지",
+                    testAuthor,
+                    "navernaver",
+                    "kakaokakao",
+                    "ridiridi",
+                    "munpiamunpia"
+            );
 
-
-        BoxItem boxItem = new BoxItem(1,testNovel1);
+            novelList.add(testNovel);
+        }
+        authorRepository.saveAll(authorList);
+        novelRepository.saveAll(novelList);
 
 
-        Box box = new Box(
-                "test title",
-                "test content",
-                0,
-                member2
-        );
+        log.info("size = {}", novelList.size());
 
-        box.addBoxItem(boxItem);
-        boxRepository.save(box);
+        // 모든 회원이(10명) 하나씩은 리뷰를 작성
+        List<Review> reviewList = new ArrayList<>();
+        for(int i = 0; i < 10; i++){
+            System.out.println(i);
 
+            Review review = new Review(
+                    "activated",
+                    novelList.get(i),
+                    memberList.get(i),
+                    3.5,
+                    "test review" + i
+            );
+            reviewList.add(review);
+        }
 
-        FavoriteAuthor favoriteAuthor = new FavoriteAuthor(testAuthor1);
-        favoriteAuthorRepository.save(favoriteAuthor);
-
-        FavoriteBox favoriteBox = new FavoriteBox(box);
-        favoriteBoxRepository.save(favoriteBox);
-
-        FavoriteNovel favoriteNovel = new FavoriteNovel(testNovel1);
-        favoriteNovelRepository.save(favoriteNovel);
-
-
-        Like like = new Like(member2, box);
-        likeRepository.save(like);
+        reviewRepository.saveAll(reviewList);
 
 
-        CommunityPost communityPost = new CommunityPost("test titel", "testConde", member2);
-        communityPostRepository.save(communityPost);
+
+        // 보관함
+        // 각 보관함마다 보관함 아이템 5개씩 생성
+        // 모든 보관함은 비공개로 설정
+        List<Box> boxList = new ArrayList<>();
+
+        for(int i = 0; i < 10; i++){
+
+            List<BoxItem> boxItemList = new ArrayList<>();
+            for(int j = 0; j < 5; j++){
+                BoxItem boxItem = new BoxItem(novelList.get(j).getId().intValue(), novelList.get(j));
+               boxItemList.add(boxItem);
+            }
+
+            Box box = new Box(
+                    "test title",
+                    "test content",
+                    1,
+                    memberList.get(i)
+            );
+            for (BoxItem boxItem : boxItemList) {
+                box.addBoxItem(boxItem);
+            }
+            boxList.add(box);
+        }
+
+        boxRepository.saveAll(boxList);
 
 
+
+        // 좋아요 설정
+        // 모든 회윈이 각자의 보관함에는 좋아요를 등록
+        List<Like> likeList = new ArrayList<>();
+
+        for(int i = 0; i < 10; i++){
+            Like like = new Like(memberList.get(i), boxList.get(i));
+            likeList.add(like);
+        }
+        likeRepository.saveAll(likeList);
+
+
+
+        // 커뮤니티에 글 쓰기
+        // 모든 회원이 각각 5개씩 쓴다.
+        for(int i = 0; i < 10; i++){
+            List<CommunityPost> communityPostList = new ArrayList<>();
+
+            for(int j = 0; j < 5; j++){
+                CommunityPost communityPost = new CommunityPost("test tite" + i + "의" + j, "test content" + i + "의" + j, memberList.get(i));
+                communityPostList.add(communityPost);
+            }
+
+            communityPostRepository.saveAll(communityPostList);
+        }
+
+        // 즐겨찾기 보관함 등록
+        // 역순으로 보관함 즐겨찾기
+        List<FavoriteBox> favoriteBoxList = new ArrayList<>();
+
+        for(int i = 0; i < 10; i++){
+            FavoriteBox favoriteBox = new FavoriteBox(boxList.get(9 - i));
+            favoriteBox.addMember(memberList.get(i));
+
+            favoriteBoxList.add(favoriteBox);
+        }
+
+        favoriteBoxRepository.saveAll(favoriteBoxList);
+
+
+        // 즐겨찾기 작가 등록
+        // 각자 자기 번호에 맞는 작가 즐겨찾기
+        List<FavoriteAuthor> favoriteAuthorList = new ArrayList<>();
+
+        for(int i = 0; i < 10; i++){
+            FavoriteAuthor favoriteAuthor = new FavoriteAuthor(authorList.get(i));
+            favoriteAuthor.addMember(memberList.get(i));
+
+            favoriteAuthorList.add(favoriteAuthor);
+        }
+
+        favoriteAuthorRepository.saveAll(favoriteAuthorList);
+
+
+        // 즐겨찾기 소설 등록
+        // 자기 번호에 맞는 소설 즐겨찾기
+        List<FavoriteNovel> favoriteNovelList = new ArrayList<>();
+
+        for(int i = 0; i < 10; i++){
+            FavoriteNovel favoriteNovel = new FavoriteNovel(novelList.get(i));
+            favoriteNovel.addMember(memberList.get(i));
+
+            favoriteNovelList.add(favoriteNovel);
+        }
+
+        favoriteNovelRepository.saveAll(favoriteNovelList);
+
+        em.flush();
+        em.clear();
     }
 
 
@@ -243,6 +328,17 @@ public class MemberServiceTest {
 
         // given
         // 멤버 하나를 가져와서
+        Member givenMember = memberRepository.save(new Member("testdel@naver.com",
+                "123123123",
+                "testnick_del",
+                Gender.MALE,
+                LoginType.USER,
+                40));
+
+        em.flush();
+        em.clear();
+
+
         Member member = memberRepository.findByNickname("testnick_del");
         Long memberId = member.getId();
 
@@ -302,9 +398,152 @@ public class MemberServiceTest {
         org.assertj.core.api.Assertions.assertThat(boxRepository.findBoxesByMemberId(memberId)).isEmpty();
         org.assertj.core.api.Assertions.assertThat(favoriteAuthorRepository.findFavoriteAuthorsByMemberId(memberId)).isEmpty();
 
+    }
+
+
+
+
+    /**
+     * 마이페이지
+     *
+     * 내가 작성하거나 즐겨찾기에 등록한 것들을 가져오기
+     * 작성 글
+     * 작성 리뷰
+     * 생성한 보관함
+     * 즐겨찾기한 작가 목록
+     * 즐겨찾기한 보관함 목록
+     * 즐겨찾기한 소설 목록
+     */
+    @Test
+    @DisplayName("마이페이지 서비스 테스트")
+    void getMyPage(){
+
+        //given
+        //setMember에서 설정한 내역을 바탕으로 작업
+        List<Member> memberList = memberRepository.findAll();
+
+
+
+
+        //when
+        // 작성글 개수 확인
+        for (Member member : memberList) {
+            List<PostDto> memberPostList = communityPostRepository.findPostByMember(member);
+
+            MemberPostResponse memberPostResponse = new MemberPostResponse(memberPostList.size(), memberPostList);
+
+            //then
+            // 모든 회원이 5개씩 글을 썼으므로 5개를 가져와야 함.
+            org.assertj.core.api.Assertions.assertThat(memberPostResponse.getMemberPostCnt()).isEqualTo(5);
+        }
+
+
+        //when
+        // 작성 리뷰 확인
+        for (Member member : memberList) {
+            List<MemberReviewInfo> memberReviewInfoList = reviewRepository.findMemberReviewByMember(member);
+
+            MemberReviewResponse memberReviewResponse = new MemberReviewResponse(memberReviewInfoList.size(), memberReviewInfoList);
+
+            // then
+            // 모든 회원들은 리뷰를 하나씩은 작성했다.
+            org.assertj.core.api.Assertions.assertThat(memberReviewResponse.getReviewCnt()).isEqualTo(1);
+        }
+
+
+        // when
+        // 생성한 보관함 확인
+        for (Member member : memberList) {
+            List<MemberBoxInfo> memberBoxInfoList = boxRepository.findMemberBoxByMember(member);
+
+            MemberBoxResponse memberBoxResponse = new MemberBoxResponse(memberBoxInfoList.size(), memberBoxInfoList);
+
+            // then
+            // 모든 회원은 보관함을 1개씩 작성했다. 보관함내 작품은 5개가 들어가 있다.
+            org.assertj.core.api.Assertions.assertThat(memberBoxResponse.getBoxCnt()).isEqualTo(1);
+            org.assertj.core.api.Assertions.assertThat(memberBoxInfoList.get(0).getItemCnt()).isEqualTo(5);
+        }
+
+
+        // when
+        // 즐겨찾기한 보관함 확인
+        for (Member member : memberList) {
+            List<MemberBoxInfo> memberFavoriteBoxList = favoriteBoxRepository.findMemberFavoriteBoxByMember(member);
+
+            MemberFavoriteBoxResponse memberFavoriteBoxResponse = new MemberFavoriteBoxResponse(memberFavoriteBoxList.size(), memberFavoriteBoxList);
+
+            // then
+            // 모든 회원은 역순으로 보관함을 하나 씩 즐겨 찾기 해두었다.
+            // 좋아요는 모든 보관함이 1개씩 받았다.
+            org.assertj.core.api.Assertions.assertThat(memberFavoriteBoxResponse.getFavoriteBoxCnt()).isEqualTo(1);
+            org.assertj.core.api.Assertions.assertThat(memberFavoriteBoxResponse.getMemberBoxInfoList().get(0).getLikeCnt())
+                    .isEqualTo(1);
+        }
+
+
+        // when
+        // 즐겨찾기한 작가 확인
+        for(Member member : memberList){
+
+            List<Author> authorList = authorRepository.findAuthorsByMemberFavorite(member);
+            List<MemberFavoriteAuthorInfo> memberFavoriteAuthorInfoList = new ArrayList<>();
+
+            for (Author author : authorList) {
+                // Comparator의 람다식
+                // 식의 결과가 양수이면 자리를 바꾸고, 음수이면 그대로 유지하게 된다.
+                // 뒤에 있는 값이 크면 앞으로 오게 되기에 내림차순 정렬이 가능하다.
+                author.getNovels().sort((a, b) -> b.getDownload_cnt() - a.getDownload_cnt());
+
+                Novel mostNovel = author.getNovels().get(0);
+
+                log.info("novel: {}", mostNovel);
+
+
+
+                MemberFavoriteAuthorInfo memberFavoriteAuthorInfo = new MemberFavoriteAuthorInfo(
+                        author.getId(),
+                        author.getName(),
+                        mostNovel.getCover_image(),
+                        mostNovel.getTitle());
+
+                memberFavoriteAuthorInfoList.add(memberFavoriteAuthorInfo);
+            }
+
+            MemberFavoriteAuthorResponse memberFavoriteAuthorResponse =
+                    new MemberFavoriteAuthorResponse(memberFavoriteAuthorInfoList.size(), memberFavoriteAuthorInfoList);
+
+
+            // then
+            // 즐겨찾기 작가는 1명씩
+            org.assertj.core.api.Assertions.assertThat(memberFavoriteAuthorResponse.getAuthorCnt()).isEqualTo(1);
+
+        }
+
+
+        // when
+        // 즐겨찾기한 소설 확인
+        for (Member member : memberList) {
+
+            List<MemberFavoriteNovelInfo> novelInfoList = novelRepository.findFavoriteNovelInfoByMember(member);
+            
+            MemberFavoriteNovelResponse memberFavoriteNovelResponse = new MemberFavoriteNovelResponse(novelInfoList.size(), novelInfoList);
+            
+            //then
+            // 즐겨찾기 한 소설은 모두 1개씩
+            org.assertj.core.api.Assertions.assertThat(memberFavoriteNovelResponse.getNovelCnt()).isEqualTo(1);
+        }
+
+
+
+
+
+
+
+
 
 
     }
+
 
 
 }

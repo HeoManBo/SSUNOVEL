@@ -293,7 +293,7 @@ public class FavoriteServiceTest {
 
                 PageRequest pageRequest = PageRequest.of(0, 10);
 
-                List<FavoriteBox> byBox = favoriteBoxRepository.findByMember(findMember, pageRequest);
+                List<FavoriteBox> byBox = favoriteBoxRepository.findByMember(findMember);
 
 
                 // then
@@ -420,7 +420,7 @@ public class FavoriteServiceTest {
 
         Assertions.assertThat(favoriteNovelRepository.findByMember(testMember, pageRequest)).isEmpty();
         Assertions.assertThat(favoriteAuthorRepository.findByMember(testMember, pageRequest)).isEmpty();
-        Assertions.assertThat(favoriteBoxRepository.findByMember(testMember, pageRequest)).isEmpty();
+        Assertions.assertThat(favoriteBoxRepository.findByMember(testMember).isEmpty());
 
     }
 
