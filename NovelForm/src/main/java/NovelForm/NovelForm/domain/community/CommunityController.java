@@ -38,7 +38,7 @@ import static NovelForm.NovelForm.global.SessionConst.LOGIN_MEMBER_ID;
 
 @RestController
 @Slf4j
-@Tag(name = "커뮤니티 API", description = "커뮤니티 관련 API입니다.")
+@Tag(name = "커뮤니티 게시글 API", description = "커뮤니티 게시글 관련 API입니다.")
 @RequiredArgsConstructor
 @RequestMapping("/community")
 public class CommunityController {

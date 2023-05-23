@@ -3,6 +3,9 @@ package NovelForm.NovelForm.domain.community.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+/**
+ * 게시글 조회시 반환할 DTO
+ */
 @Data
 public class PostDto {
 

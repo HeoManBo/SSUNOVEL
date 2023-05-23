@@ -1,6 +1,7 @@
 package NovelForm.NovelForm.domain.community;
 
 
+import NovelForm.NovelForm.domain.community.domain.CommunityPost;
 import NovelForm.NovelForm.domain.community.dto.DetailPostDto;
 import NovelForm.NovelForm.domain.community.dto.PostDto;
 import NovelForm.NovelForm.domain.community.dto.WriteDto;
@@ -8,13 +9,13 @@ import NovelForm.NovelForm.domain.community.exception.NoPostException;
 import NovelForm.NovelForm.domain.community.exception.NotPostOwner;
 import NovelForm.NovelForm.domain.member.domain.Member;
 import NovelForm.NovelForm.domain.member.exception.WrongMemberException;
+import NovelForm.NovelForm.repository.CommentRepository;
 import NovelForm.NovelForm.repository.CommunityPostRepository;
 import NovelForm.NovelForm.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +32,7 @@ public class CommunityService {
 
     private final CommunityPostRepository communityPostRepository;
     private final MemberRepository memberRepository;
+    private final CommentRepository commentRepository;
 
     /**
      * 게시글 등록을 합니다.
@@ -118,14 +120,13 @@ public class CommunityService {
         log.info("owner id : {}, sesseion id : {}", memberId.longValue(), communityPost.getId());
 
         //로그인한 사람이 자기가 작성한 글이 아닌 다른 사람의 글을 삭제하려는 경우
-        if(!member.getId().equals(communityPost.getId())){
+        if(!member.getId().equals(communityPost.getMember().getId())){
             throw new NotPostOwner();
         }
 
         //게시글 수정
         communityPost.changeContent(writeDto.getContent());
         communityPost.changeTitle(writeDto.getTitle());
-
 
         //수정된 상세 게시글 조회 dto 반환
         return new DetailPostDto(communityPost);
@@ -135,10 +136,10 @@ public class CommunityService {
      * 게시글 삭제 로직입니다.
      */
     public String deletePost(Long memberId, Long postId) throws Exception{
-        Optional<Member> byMemberId = memberRepository.findById(memberId);
+        Member member = memberRepository.findByMemberIdWithPost(memberId);
         Optional<CommunityPost> byPostId = communityPostRepository.findDetailPost(postId);
 
-        if(byMemberId.isEmpty()){ //해당하는 멤버가 없다면
+        if(member == null){ //해당하는 멤버가 없다면
             throw new WrongMemberException("잘못된 유저 아이디입니다.");
         }
 
@@ -146,16 +147,18 @@ public class CommunityService {
             throw new NoPostException();
         }
 
-        Member member = byMemberId.get();
         CommunityPost communityPost = byPostId.get();
 
         //로그인한 사람이 자기가 작성한 글이 아닌 다른 사람의 글을 삭제하려는 경우
-        if(member.getId() != communityPost.getId()){
+        if(!member.getId().equals(communityPost.getMember().getId())){
             throw new NotPostOwner();
         }
 
-        communityPostRepository.deleteById(communityPost.getId());
+        member.getCommunityPosts().remove(communityPost); //연간관계 제거
+        communityPost.getComments().clear(); //연관관계 제거
 
+        commentRepository.deleteWithPost(communityPost); //게시판의 댓글들 제거
+        communityPostRepository.deleteById(communityPost.getId()); //게시판 삭제
 
         return "삭제 완료";
     }

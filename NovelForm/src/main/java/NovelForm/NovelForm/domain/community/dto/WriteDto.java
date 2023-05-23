@@ -10,6 +10,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
+/**
+ * 게시글 작성시 넘어와야할 제목, 내용값
+ */
 @Getter
 @Setter
 @NoArgsConstructor
