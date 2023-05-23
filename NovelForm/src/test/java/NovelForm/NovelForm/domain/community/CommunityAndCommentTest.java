@@ -1,6 +1,7 @@
 package NovelForm.NovelForm.domain.community;
 
 import NovelForm.NovelForm.domain.comment.Comment;
+import NovelForm.NovelForm.domain.community.dto.CreateCommentDto;
 import NovelForm.NovelForm.domain.member.domain.Gender;
 import NovelForm.NovelForm.domain.member.domain.LoginType;
 import NovelForm.NovelForm.domain.member.domain.Member;
@@ -26,14 +27,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 /**
- * 게시글 CRUD 테스트입니다.
- * 댓글의 경우는 별도로 통합테스트진행.
+ * 게시글/댓글 CRUD 테스트입니다.
  */
 
 @SpringBootTest
 @Transactional
 @Slf4j
-public class CommunityTest {
+public class CommunityAndCommentTest {
 
     @Autowired
     private MemberRepository memberRepository;
@@ -295,6 +295,146 @@ public class CommunityTest {
         //batch 전략으로 인해 한번에 쿼리로 댓글을 가져온다. -> N+1 문제 해결
         CommunityPost findPost = communityPostRepository.findDetailPost(5L).get();
         assertThat(findPost.getComments().size()).isEqualTo(5);
+    }
+
+    @Test
+    void 댓글생성테스트(){
+        //given : 1,2,3번 유저가 주어졌을 때,
+        Member member = memberRepository.findById(2L).get();
+        Member m1 = memberRepository.findById(1L).get();
+        Member m2 = memberRepository.findById(3L).get();
+
+        //when : 1번 유저의 3번 게시글에 댓글을 작성한다고 해보자.
+        CommunityPost c = communityPostRepository.findDetailPost(3L).get();
+
+        Comment comment1 = Comment.builder().content("그거 저도 기억날 것 같아요").build();
+        comment1.addCommunityPost(c);
+        comment1.addMember(member);
+
+        Comment comment2 = Comment.builder().content("그거 저도 기억날 것 같아요").build();
+        comment2.addCommunityPost(c);
+        comment2.addMember(m1);
+
+        Comment comment3 = Comment.builder().content("그거 저도 기억날 것 같아요").build();
+        comment3.addCommunityPost(c);
+        comment3.addMember(m2);
+
+        commentRepository.save(comment1);
+        commentRepository.save(comment2);
+        commentRepository.save(comment3);
+
+        em.flush();
+        em.clear();
+
+        log.info("=========================================================");
+
+        //when : 2번 유저와 3번 게시글을 DB에서 다시 조회했을 때 2번의 댓글 개수가 1개이고, 3번 게시글의 댓글 수가 3개인지 확인한다.
+        Member fm = memberRepository.findById(2L).get();
+        CommunityPost fc = communityPostRepository.findDetailPost(3L).get();
+
+        log.info("=========================================================");
+
+        assertThat(fm.getComments().size()).isEqualTo(1);
+        assertThat(fc.getComments().size()).isEqualTo(3);
+    }
+
+
+    @Test
+    void 댓글수정테스트(){
+        //given : 1,2,3번 유저가 주어졌을 때,
+        Member member = memberRepository.findById(2L).get();
+        Member m1 = memberRepository.findById(1L).get();
+        Member m2 = memberRepository.findById(3L).get();
+
+        //when : 3번 댓글을 수정한다.
+        CommunityPost c = communityPostRepository.findDetailPost(3L).get();
+
+        Comment comment1 = Comment.builder().content("tttt").build();
+        comment1.addCommunityPost(c);
+        comment1.addMember(member);
+
+        Comment comment2 = Comment.builder().content("test").build();
+        comment2.addCommunityPost(c);
+        comment2.addMember(m1);
+
+        Comment comment3 = Comment.builder().content("testtest").build();
+        comment3.addCommunityPost(c);
+        comment3.addMember(m2);
+
+        commentRepository.save(comment1);
+        commentRepository.save(comment2);
+        commentRepository.save(comment3);
+
+        em.flush();
+        em.clear();
+
+        Comment comment = commentRepository.findById(3L).get();
+        CreateCommentDto createCommentDto = new CreateCommentDto();
+        createCommentDto.setContent("3214");
+        comment.updateComment(createCommentDto);
+
+        em.flush();
+        em.clear();
+
+        //then : 다시 DB에서 가져왔을 때, 수정한 값이 같은지 비교한다.
+        Comment fc = commentRepository.findById(3L).get();
+
+        assertThat(comment.getContent()).isEqualTo(fc.getContent());
+    }
+
+
+    @Test
+    void 댓글삭제테스트(){
+        //given : 1,2,3번 유저가 주어졌을 때, 3번 게시글의 각자 1개씩 댓글을 단다
+        Member member = memberRepository.findById(2L).get();
+        Member m1 = memberRepository.findById(1L).get();
+        Member m2 = memberRepository.findById(3L).get();
+
+        CommunityPost c = communityPostRepository.findDetailPost(3L).get();
+
+        Comment comment1 = Comment.builder().content("tttt").build();
+        comment1.addCommunityPost(c);
+        comment1.addMember(member);
+
+        Comment comment2 = Comment.builder().content("test").build();
+        comment2.addCommunityPost(c);
+        comment2.addMember(m1);
+
+        Comment comment3 = Comment.builder().content("testtest").build();
+        comment3.addCommunityPost(c);
+        comment3.addMember(m2);
+
+        commentRepository.save(comment1);
+        commentRepository.save(comment2);
+        commentRepository.save(comment3);
+
+        em.flush();
+        em.clear();
+
+
+        //when : 3번 게시글의 3번 댓글을 삭제한다.
+        Comment comment = commentRepository.findCommentByIdWithMemberAndPost(3L).get();
+
+        Member writer = comment.getMember();
+        CommunityPost communityPost = comment.getCommunityPost();
+
+        //연관관계 제거
+        writer.getComments().remove(comment);
+        communityPost.getComments().remove(comment);
+        commentRepository.deleteById(comment.getId());
+
+        em.flush();
+        em.clear();
+
+        log.info("===============================================================");
+
+        //then : 3번 게시물과 3번 댓글을 작성한 3번 유저를 가져와서 댓글 수를 비교해본다
+        Member fm = memberRepository.findById(3L).get();
+        CommunityPost fc = communityPostRepository.findDetailPost(3L).get();
+
+        assertThat(fm.getComments().size()).isEqualTo(0);
+        assertThat(fc.getComments().size()).isEqualTo(2);
+
     }
 
 }

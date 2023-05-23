@@ -1,7 +1,7 @@
 package NovelForm.NovelForm.domain.community.dto;
 
 
-import NovelForm.NovelForm.domain.community.domain.Comment;
+import NovelForm.NovelForm.domain.comment.Comment;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 

@@ -1,7 +1,6 @@
 package NovelForm.NovelForm.domain.community;
 
 
-import NovelForm.NovelForm.domain.community.domain.CommunityPost;
 import NovelForm.NovelForm.domain.community.dto.DetailPostDto;
 import NovelForm.NovelForm.domain.community.dto.PostDto;
 import NovelForm.NovelForm.domain.community.dto.WriteDto;

@@ -3,8 +3,6 @@ package NovelForm.NovelForm.domain.member;
 
 import NovelForm.NovelForm.domain.box.domain.Box;
 import NovelForm.NovelForm.domain.box.domain.BoxItem;
-import NovelForm.NovelForm.domain.comment.Comment;
-import NovelForm.NovelForm.domain.community.CommunityPost;
 import NovelForm.NovelForm.domain.community.dto.PostDto;
 import NovelForm.NovelForm.domain.favorite.domain.FavoriteAuthor;
 import NovelForm.NovelForm.domain.favorite.domain.FavoriteBox;
@@ -21,14 +19,9 @@ import NovelForm.NovelForm.domain.novel.Review;
 import NovelForm.NovelForm.repository.*;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
