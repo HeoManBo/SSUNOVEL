@@ -2,6 +2,7 @@ package NovelForm.NovelForm.domain.novel;
 
 
 import NovelForm.NovelForm.domain.novel.exception.NoSuchNovelListException;
+import NovelForm.NovelForm.domain.novel.exception.NotReviewOwner;
 import NovelForm.NovelForm.global.BaseResponse;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import jakarta.validation.ConstraintViolationException;
@@ -64,4 +65,13 @@ public class NovelSearchControllerAdvice {
         log.error("[novel exception handler] ex ", e);
         return new BaseResponse(HttpStatus.BAD_REQUEST, e.getMessage(), "잘못된 JSON 값 전달입니다.");
     }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(NotReviewOwner.class)
+    public BaseResponse notReviewOwner(NotReviewOwner e){
+        log.error("[novel exception handler] ex ", e);
+        return new BaseResponse(HttpStatus.BAD_REQUEST, "해당 리뷰 삭제권한이 없습니다.", "해당 리뷰 삭제권한이 없습니다.");
+    }
+
+
 }

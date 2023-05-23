@@ -8,6 +8,7 @@ import NovelForm.NovelForm.domain.novel.dto.CategoryDto;
 import NovelForm.NovelForm.domain.novel.dto.detailnoveldto.DetailNovelInfo;
 import NovelForm.NovelForm.domain.novel.dto.detailnoveldto.ReviewDto;
 import NovelForm.NovelForm.domain.novel.dto.searchdto.MidFormmat;
+import NovelForm.NovelForm.domain.novel.dto.searchdto.NovelDto;
 import NovelForm.NovelForm.domain.novel.dto.searchdto.SearchDto;
 import NovelForm.NovelForm.domain.novel.exception.NoSuchNovelListException;
 import NovelForm.NovelForm.global.BaseResponse;
@@ -29,6 +30,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static NovelForm.NovelForm.global.SessionConst.LOGIN_MEMBER_ID;
 
@@ -145,6 +147,13 @@ public class NovelSearchController {
         //소설 번호에 대응되는 리뷰를 가져온다.
         List<ReviewDto> reviewMatchingNovel = reviewService.findReviewMatchingNovel(novel);
         result.setReviewInfos(reviewMatchingNovel);
+
+        //해당 작가의 다른 소설을 가져온다.
+        List<Novel> authorNovels = novel.getAuthor().getNovels();
+        List<NovelDto> an = authorNovels.stream().filter(n -> !n.getTitle().equals(novel.getTitle())).map(n -> new NovelDto(n.getTitle(), novel.getAuthor().getName(), n.getCover_image()
+                , n.averageRating(), n.getDownload_cnt(), n.getCategory(), n.getId())).toList();
+        result.setAnotherNovels(an);
+
 
         //로그인 상태라면 좋아요를 눌렀는지 확인한다.
         if(memberId != null){
