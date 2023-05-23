@@ -137,7 +137,9 @@ public class NovelSearchController {
                 .is_naver(novel.getIs_naver())
                 .is_ridi(novel.getIs_ridi())
                 .review_cnt(novel.getReview_cnt())
-                .rating(novel.averageRating()).build();
+                .rating(novel.averageRating())
+                .price(novel.getPrice())
+                .total_episode(novel.getEpisode()).build();
 
 
         //소설 번호에 대응되는 리뷰를 가져온다.

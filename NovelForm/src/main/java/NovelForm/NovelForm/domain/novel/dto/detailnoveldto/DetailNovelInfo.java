@@ -47,6 +47,12 @@ public class DetailNovelInfo {
     @Schema(description = "해당 웹 소설 사이트 평점")
     private double rating;
 
+    @Schema(description = "접근 가능한 웹 소설 플랫폼 중 가장 저렴한 가격")
+    private int price;
+
+    @Schema(description = "전체 회차 수")
+    private int total_episode;
+
     //review repo를 통해 가져와야할 값
     //전체 리뷰 수, 전체 리뷰 평균,
     @Schema(description = "해당 웹 소설 리뷰 List")
@@ -65,7 +71,7 @@ public class DetailNovelInfo {
     @Builder
     public DetailNovelInfo(String image_url, String title, String content, String category,
                            String is_naver, String is_kakao, String is_munpia, String is_ridi, int review_cnt,
-                           double rating, String authorName) {
+                           double rating, String authorName, int total_episode, int price) {
         this.image_url = image_url;
         this.title = title;
         this.content = content;
@@ -77,6 +83,8 @@ public class DetailNovelInfo {
         this.review_cnt = review_cnt;
         this.rating = rating;
         this.authorName = authorName;
+        this.total_episode = total_episode;
+        this.price = price;
     }
 
     public DetailNovelInfo() {
