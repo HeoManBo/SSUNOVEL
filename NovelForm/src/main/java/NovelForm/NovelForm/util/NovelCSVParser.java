@@ -32,7 +32,7 @@ public class NovelCSVParser {
      */
     static public List<List<String>> read(String fileName){
         String path = System.getProperty("user.dir"); // Novel 프로젝트 디렉토리에 CSV 파일이 있다고 가정
-
+        System.out.println(fileName + "파싱 진행");
         List<List<String>> result = new ArrayList<>();
         String[] parsing;
 
@@ -90,7 +90,7 @@ public class NovelCSVParser {
                         .category(novel.get(2))
                         .summary(novel.get(4))
                         .price(deleteComma(novel.get(5)))
-                        .episode(deleteComma(novel.get(5)))
+                        .episode(deleteComma(novel.get(6)))
                         .download_cnt(Integer.parseInt(novel.get(7)))
                         .cover_image(novel.get(8))
                         .build();

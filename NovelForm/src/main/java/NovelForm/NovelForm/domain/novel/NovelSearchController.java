@@ -13,6 +13,7 @@ import NovelForm.NovelForm.domain.novel.dto.searchdto.SearchDto;
 import NovelForm.NovelForm.domain.novel.exception.NoSuchNovelListException;
 import NovelForm.NovelForm.global.BaseResponse;
 import NovelForm.NovelForm.repository.FavoriteNovelRepository;
+import NovelForm.NovelForm.util.NovelCSVParser;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -220,7 +221,7 @@ public class NovelSearchController {
      */
     @Operation(summary = "category 조회", description = "장르별, 플랫폼 별 카테고리 분류 조회 기능입니다.",
             responses = @ApiResponse(responseCode = "200", description = "카테고리별 상세 검색 성공", content = @Content(schema = @Schema(implementation = MidFormmat.class))))
-    @GetMapping(value = "/category", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/category", produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse<MidFormmat> novelCategoryList(@RequestBody CategoryDto categoryDto, BindingResult bindingResult) throws JsonMappingException {
         if(bindingResult.hasErrors()){
             throw new JsonMappingException("잘못된 JSON값입니다.");
@@ -229,6 +230,5 @@ public class NovelSearchController {
 
         return new BaseResponse<MidFormmat>(HttpStatus.OK, novelsWithCategory);
     }
-
 
 }
