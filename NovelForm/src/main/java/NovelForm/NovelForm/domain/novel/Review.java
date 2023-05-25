@@ -8,6 +8,7 @@ import lombok.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "review")
 public class Review extends BaseEntityTime {
     @Id
     @GeneratedValue(strategy =GenerationType.IDENTITY)

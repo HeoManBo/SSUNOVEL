@@ -49,6 +49,7 @@ public class ReviewService {
      * 리뷰를 DB상에 등록합니다.
      * 리턴 값은 String 으로 성공시 Success, 실패시 fail 문자열을 반환합니다.
      */
+    @Transactional
     public Long writeReview(ReviewBodyDto reviewBodyDto, Long memberId, Long novelId) throws Exception{
         Member member = memberRepository.findById(memberId).orElse(null); //멤버 찾기
         Novel novel = novelRepository.findById(novelId).orElse(null);
@@ -93,6 +94,7 @@ public class ReviewService {
      * 리뷰를 삭제하는 method
      *
      */
+    @Transactional
     public String deleteReview(Long memberId, Long novelId, Long review_idx) throws Exception {
         Member member = memberRepository.findByMemberIdWithReviews(memberId); //멤버 찾기 이때 리뷰까지 같이 가져온다.
         Novel novel = novelRepository.findByNovelIdWithReviews(novelId);
@@ -134,6 +136,7 @@ public class ReviewService {
     /**
      * 리뷰 수정 Method
      */
+    @Transactional
     public String modifyReview(ReviewBodyDto reviewBodyDto, Long memberId, Long novelId, Long reviewId) throws Exception {
         Member member = memberRepository.findById(memberId).orElse(null);
 
@@ -162,8 +165,9 @@ public class ReviewService {
             throw new NotReviewOwner();
         }
 
-        //deleteReview는 영속성 컨텍스트 내에 있으므로
-        //deleteReview를 수정하면 자연스럽게 update Query가 나가게 된다 --> 변경감지
+
+        //modifyReview는 영속성 컨텍스트 내에 있으므로
+        //modifyReview를 수정하면 자연스럽게 update Query가 나가게 된다 --> 변경감지
         modifyReview.modifyContent(reviewBodyDto.getContent());
         modifyReview.modifyRating(modifyReview.getRating(), reviewBodyDto.getRating(), novel); //리뷰 값 수정
 

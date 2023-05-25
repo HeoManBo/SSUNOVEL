@@ -43,7 +43,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     //리뷰 삭제
     @Modifying
-    @Query(value = "delete from Review where review_id = :review_id", nativeQuery = true)
+    @Query(value = "delete from review where review_idx = :review_id", nativeQuery = true)
     void deleteReviewById(@Param("review_id") Long review_id);
 
     //특정 리뷰 찾기
