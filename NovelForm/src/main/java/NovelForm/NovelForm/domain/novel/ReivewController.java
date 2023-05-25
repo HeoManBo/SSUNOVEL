@@ -39,6 +39,8 @@ public class ReivewController {
             throw new IllegalArgumentException("잘못된 인자 값입니다.");
         }
 
+        log.info("review add = member_id = {}, novel = {}", memberId, novel_id);
+
         Long result = reviewService.writeReview(reviewBodyDto, memberId, novel_id);
 
         return new BaseResponse<Long>(HttpStatus.OK, result);
@@ -70,4 +72,5 @@ public class ReivewController {
         return new BaseResponse(HttpStatus.OK, result);
 
     }
+
 }
