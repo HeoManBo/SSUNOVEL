@@ -4,19 +4,30 @@ package NovelForm.NovelForm.domain.novel;
 import NovelForm.NovelForm.domain.member.domain.Member;
 import NovelForm.NovelForm.domain.member.exception.WrongMemberException;
 import NovelForm.NovelForm.domain.novel.dto.detailnoveldto.ReviewDto;
+import NovelForm.NovelForm.domain.novel.dto.reivewdto.BestReviewDto;
 import NovelForm.NovelForm.domain.novel.dto.reivewdto.ReviewBodyDto;
+import NovelForm.NovelForm.domain.novel.exception.NoMatchingGenre;
 import NovelForm.NovelForm.domain.novel.exception.NotReviewOwner;
+import NovelForm.NovelForm.global.exception.NoSuchListElement;
+import NovelForm.NovelForm.repository.LikeRepository;
 import NovelForm.NovelForm.repository.MemberRepository;
 import NovelForm.NovelForm.repository.NovelRepository;
 import NovelForm.NovelForm.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static NovelForm.NovelForm.domain.novel.NovelService.PagingSize;
 
 @Service
 @Slf4j
@@ -25,17 +36,27 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final MemberRepository memberRepository;
     private final NovelRepository novelRepository;
+    private final LikeRepository likeRepository;
+
+    private final static String[] genre = {"로맨스", "로판", "판타지", "현판", "무협", "미스테리", "라이트노벨"};
+
+    //파라미터로 들어온 소설에 작성된 리뷰를 반환한다.
+//    @Transactional(readOnly = true)
+//    public List<ReviewDto> findReviewMatchingNovel(Novel novel){
+//        List<Review> reviews = reviewRepository.findByReview(novel);
+//        if(reviews.size() == 0){
+//            return null; //공 List를 반환함
+//        }
+//        return reviews.stream().map(r -> new ReviewDto(r.getMember().getNickname(), r.getContent(), r.getRating(),
+//                r.getCreate_at(), 0, r.getMember().getId(), r.getId())).collect(Collectors.toList());
+//    }
 
     //파라미터로 들어온 소설에 작성된 리뷰를 반환한다.
     @Transactional(readOnly = true)
     public List<ReviewDto> findReviewMatchingNovel(Novel novel){
-        List<Review> reviews = reviewRepository.findByReview(novel);
-        if(reviews.size() == 0){
-            return null; //공 List를 반환함
-        }
-        return reviews.stream().map(r -> new ReviewDto(r.getMember().getNickname(), r.getContent(), r.getRating(),
-                r.getCreate_at(), 0, r.getMember().getId(), r.getId())).collect(Collectors.toList());
+       return reviewRepository.findByReviewWithLike(novel);
     }
+
 
     @Transactional(readOnly = true)
     // novel에 리뷰를 작성한 member의 review 를 가져온다. 없다면 null로 반환.
@@ -172,5 +193,39 @@ public class ReviewService {
         modifyReview.modifyRating(modifyReview.getRating(), reviewBodyDto.getRating(), novel); //리뷰 값 수정
 
         return "success";
+    }
+
+    @Transactional(readOnly = true)
+    public List<BestReviewDto> findBestReview(int page, String input) throws Exception {
+        Page<BestReviewDto> result = null;
+        log.info("select genre = {}", input);
+        for(String s : genre){
+            Pageable pageable = PageRequest.of(page, PagingSize);
+            if(s.equals(input)) {
+                if (input.equals("로판")) {
+                    result = likeRepository.findNovelWithinGenreLikeReviewDesc2(input, "로맨스 판타지", pageable);
+                    break;
+                } else if (input.equals("현판")) {
+                    result = likeRepository.findNovelWithinGenreLikeReviewDesc3(input, "현대판타지", "현대 판타지", pageable);
+                    break;
+                } else {
+                    result = likeRepository.findNovelWithinGenreLikeReviewDesc(input, pageable);
+                    break;
+                }
+            }
+        }
+        //결과가 null 인 경우 -> 장르 소설이름이 일치하지 않은 경우
+        if(result == null){
+            throw new NoMatchingGenre("잘못된 장르 소설 이름입니다.");
+        }
+        if(result.getTotalPages() < page){
+            throw new NumberFormatException("잘못된 페이지 값입니다.");
+        }
+        //아직 해당 장르 베스트 리뷰가 없는 경우 --> DB상 inner join으로 좋아요가 없는 리뷰의 경우는 조회되지 않음..
+        if(result.getNumberOfElements() == 0){
+            throw new NoMatchingGenre("아직 베스트 리뷰가 없습니다.");
+        }
+
+        return result.getContent();
     }
 }

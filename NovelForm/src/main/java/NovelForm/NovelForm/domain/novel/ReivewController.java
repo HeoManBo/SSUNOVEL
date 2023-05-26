@@ -1,6 +1,8 @@
 package NovelForm.NovelForm.domain.novel;
 
+import NovelForm.NovelForm.domain.novel.dto.reivewdto.BestReviewDto;
 import NovelForm.NovelForm.domain.novel.dto.reivewdto.ReviewBodyDto;
+import NovelForm.NovelForm.domain.novel.exception.NoMatchingGenre;
 import NovelForm.NovelForm.domain.novel.exception.NotReviewOwner;
 import NovelForm.NovelForm.global.BaseResponse;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static NovelForm.NovelForm.global.SessionConst.LOGIN_MEMBER_ID;
 
@@ -71,6 +75,22 @@ public class ReivewController {
 
         return new BaseResponse(HttpStatus.OK, result);
 
+    }
+
+    /**
+     * 장르별 베스트 리뷰 조회
+     */
+    @GetMapping("")
+    public BaseResponse bestReview(    @Parameter(description = "장르 선택 파라미터입니다. 미선택시 default로 로맨스 베스트 리뷰를 조회합니다.")
+                                       @RequestParam(value = "genre", required = false, defaultValue = "로맨스") String genre,
+                                       @Parameter(description = "페이지 번호입니다 미선택시 0번으로 지정됩니다.")
+                                       @RequestParam(value = "page", required = false, defaultValue = "0") int page) throws Exception {
+
+
+        List<BestReviewDto> bestReview = reviewService.findBestReview(page, genre);
+
+
+        return new BaseResponse(HttpStatus.OK, bestReview);
     }
 
 }

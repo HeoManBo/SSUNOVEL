@@ -7,8 +7,10 @@ import NovelForm.NovelForm.domain.box.dto.AllBoxResponse;
 import NovelForm.NovelForm.domain.like.domain.Like;
 import NovelForm.NovelForm.domain.member.domain.Member;
 import NovelForm.NovelForm.domain.novel.Review;
+import NovelForm.NovelForm.domain.novel.dto.reivewdto.BestReviewDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -116,4 +118,104 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
      */
     @Modifying(clearAutomatically = true)
     void deleteAllByBox(Box box);
+
+
+    /**
+     * 장르별 베스트 리뷰 가져오기
+     */
+    @Query(value = "select new NovelForm.NovelForm.domain.novel.dto.reivewdto.BestReviewDto( " +
+            " n.id, " +
+            " n.title, " +
+            " a.name, " +
+            " case when n.review_cnt = 0 then 0.0 when n.review_cnt > 0 then (n.rating / n.review_cnt) end," +
+            "n.cover_image," +
+            " r.content, " +
+            " m.nickname, " +
+            " count(distinct l)) "+
+            " from Like l " +
+            " inner join l.review r " +
+            " inner join r.member m " +
+            " inner join r.novel n "  +
+            " inner join n.author a "+
+            " where n.category like :genre " +
+            " group by r " +
+            " order by count(l) desc ",
+
+            countQuery = " select count(distinct l) " +
+                    " from Like l" +
+                    " inner join l.review r " +
+                    " inner join r.member m " +
+                    " inner join r.novel n "  +
+                    " inner join n.author a "+
+                    " where n.category like :genre " +
+                    " group by r " +
+                    " order by count(l) desc "
+    )
+    Page<BestReviewDto> findNovelWithinGenreLikeReviewDesc(@Param("genre") String genre, Pageable pageable);
+
+    @Query(value = "select new NovelForm.NovelForm.domain.novel.dto.reivewdto.BestReviewDto( " +
+            " n.id, " +
+            " n.title, " +
+            " a.name, " +
+            " case when n.review_cnt = 0 then 0.0 when n.review_cnt > 0 then (n.rating / n.review_cnt) end," +
+            "n.cover_image," +
+            " r.content, " +
+            " m.nickname, " +
+            " count(distinct l)) "+
+            " from Like l " +
+            " inner join l.review r " +
+            " inner join r.member m " +
+            " inner join r.novel n "  +
+            " inner join n.author a "+
+            " where n.category like %:genre1% or n.category like %:genre2% " +
+            " group by r " +
+            " order by count(l) desc ",
+
+            countQuery = " select count(distinct l) " +
+                    " from Like l" +
+                    " inner join l.review r " +
+                    " inner join r.member m " +
+                    " inner join r.novel n "  +
+                    " inner join n.author a "+
+                    " where n.category like %:genre1% or n.category like %:genre2% " +
+                    " group by r " +
+                    " order by count(l) desc "
+    )
+    Page<BestReviewDto> findNovelWithinGenreLikeReviewDesc2(@Param("genre1") String genre1,
+                                                           @Param("genre2") String genre2,
+                                                           Pageable pageable);
+
+    @Query(value = "select new NovelForm.NovelForm.domain.novel.dto.reivewdto.BestReviewDto( " +
+            " n.id, " +
+            " n.title, " +
+            " a.name, " +
+            " case when n.review_cnt = 0 then 0.0 when n.review_cnt > 0 then (n.rating / n.review_cnt) end," +
+            "n.cover_image," +
+            " r.content, " +
+            " m.nickname, " +
+            " count(distinct l)) "+
+            " from Like l " +
+            " inner join l.review r " +
+            " inner join r.member m " +
+            " inner join r.novel n "  +
+            " inner join n.author a "+
+            " where n.category like %:genre1% or n.category like %:genre2% or n.category like %:genre3% " +
+            " group by r " +
+            " order by count(l) desc ",
+
+            countQuery = " select count(distinct l) " +
+                    " from Like l" +
+                    " inner join l.review r " +
+                    " inner join r.member m " +
+                    " inner join r.novel n "  +
+                    " inner join n.author a "+
+                    " where n.category like %:genre1% or n.category like %:genre2% or n.category like %:genre3% " +
+                    " group by r " +
+                    " order by count(l) desc "
+    )
+    Page<BestReviewDto> findNovelWithinGenreLikeReviewDesc3(@Param("genre1") String genre1,
+                                                            @Param("genre2") String genre2,
+                                                            @Param("genre3") String genre3,
+                                                            Pageable pageable);
 }
+
