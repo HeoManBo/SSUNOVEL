@@ -1,6 +1,7 @@
 package NovelForm.NovelForm.domain.community;
 
 
+import NovelForm.NovelForm.domain.alert.domain.Alert;
 import NovelForm.NovelForm.domain.box.exception.WrongMemberException;
 import NovelForm.NovelForm.domain.comment.Comment;
 import NovelForm.NovelForm.domain.community.dto.CommentDto;
@@ -8,9 +9,7 @@ import NovelForm.NovelForm.domain.community.dto.CreateCommentDto;
 import NovelForm.NovelForm.domain.community.exception.NoPostException;
 import NovelForm.NovelForm.domain.community.exception.WrongCommentException;
 import NovelForm.NovelForm.domain.member.domain.Member;
-import NovelForm.NovelForm.repository.CommentRepository;
-import NovelForm.NovelForm.repository.CommunityPostRepository;
-import NovelForm.NovelForm.repository.MemberRepository;
+import NovelForm.NovelForm.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,6 +26,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final CommunityPostRepository communityPostRepository;
     private final MemberRepository memberRepository;
+    private final AlertRepository alertRepository;
 
     // 댓글 등록 서비스 로직입니다.
     public Long createComment(CreateCommentDto createCommentDto, Long post_id, Long member_id) throws Exception{
@@ -54,6 +54,12 @@ public class CommentService {
 
         comment.addCommunityPost(cp);
         comment.addMember(m);
+
+
+        //게시글을 주인에게 알림 전달
+        Alert alert = new Alert(cp, cp.getMember());
+        alert.addMember(cp.getMember()); //연관관계 처리
+        alertRepository.save(alert); //알림 저장
 
         log.info("comment writer : {}, comment = {}, where comment is written = {}", m.getId(), comment.getContent(), cp.getId());
 
