@@ -118,7 +118,7 @@ public class NovelSearchController {
     /**
      * 상세 조회 메소드
      */
-    @Operation(summary = "소설 상세 정보", description = "소설 상세 정보를 보여줍니다. ",
+    @Operation(summary = "소설 상세 정보", description = "소설 상세 정보를 보여줍니다. 리뷰와 다른 소설이 없는 경우 공 리스트로 반환됩니다. ",
                responses = @ApiResponse(responseCode = "200", description = "소설 상세 정보 조회 성공", content = @Content(schema = @Schema(implementation = DetailNovelInfo.class))))
     @GetMapping("/{novel_id}")
     public BaseResponse<DetailNovelInfo> detailSearchNovel(@PathVariable("novel_id") @Min(0) Long id,
@@ -147,9 +147,14 @@ public class NovelSearchController {
 
         //소설 번호에 대응되는 리뷰를 가져온다.
         List<ReviewDto> reviewMatchingNovel = reviewService.findReviewMatchingNovel(novel);
-        result.setReviewInfos(reviewMatchingNovel);
+        if(reviewMatchingNovel == null){
+            result.setReviewInfos(null);
+        }
+        else{
+            result.setReviewInfos(reviewMatchingNovel);
+        }
 
-        //해당 작가의 다른 소설을 가져온다.
+        //해당 작가의 다른 소설을 가져온다. -> 현재 조회하고 있는 소설은 제외한다.
         List<Novel> authorNovels = novel.getAuthor().getNovels();
         List<NovelDto> an = authorNovels.stream().filter(n -> !n.getTitle().equals(novel.getTitle())).map(n -> new NovelDto(n.getTitle(), novel.getAuthor().getName(), n.getCover_image()
                 , n.averageRating(), n.getDownload_cnt(), n.getCategory(), n.getId())).toList();
@@ -175,16 +180,19 @@ public class NovelSearchController {
             if(myReview != null){
                 result.setMy_review(myReview.getContent());
                 result.setMy_rating(myReview.getRating());
+                result.setMy_review_id(myReview.getId());
             }
             else{
                 result.setMy_review(null);
                 result.setMy_rating(0.0);
+                result.setMy_review_id(0L);
             }
         }
         else{ //로그인 상태가 아니라면 0, 0.0, null 처리
             result.setAlreadyLike(0);
             result.setMy_review(null);
             result.setMy_rating(0.0);
+            result.setMy_review_id(0L);
         }
 
         return new BaseResponse<DetailNovelInfo>(HttpStatus.OK, result);

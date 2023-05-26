@@ -9,7 +9,6 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Data
-@AllArgsConstructor
 public class ReviewDto{
 
     @Schema(description = "작성한 사람의 nickname", defaultValue = "XXXX")
@@ -33,4 +32,13 @@ public class ReviewDto{
     @Schema(description = "해당 리뷰 번호")
     Long review_id;
 
+    public ReviewDto(String nickname, String content, double rating, LocalDateTime writeAt, Long like_cnt, Long member_id, Long review_id) {
+        this.nickname = nickname;
+        this.content = content;
+        this.rating = rating;
+        this.writeAt = writeAt;
+        this.like_cnt = (int)like_cnt.intValue();
+        this.member_id = member_id;
+        this.review_id = review_id;
+    }
 }

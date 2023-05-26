@@ -73,6 +73,8 @@ public class DetailNovelInfo {
     private double my_rating;
     @Schema(description = "내가 작성한 리뷰", defaultValue = "미 작성시 null 값으로 처리")
     private String my_review;
+    @Schema(description = "내가 작성한 리뷰 ID")
+    private Long my_review_id;
 
     @Builder
     public DetailNovelInfo(String image_url, String title, String content, String category,
