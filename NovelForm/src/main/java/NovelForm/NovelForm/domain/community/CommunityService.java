@@ -78,7 +78,7 @@ public class CommunityService {
 
         //현재 페이지에 해당하는 게시글 리스트 반환
         return postListWithPaging.stream().
-                map(c -> new PostDto(c.getId(), c.getTitle(), c.getMember().getNickname())).toList();
+                map(c -> new PostDto(c.getId(), c.getTitle(), c.getMember().getNickname(), c.getCreate_at())).toList();
 
     }
 
@@ -174,6 +174,6 @@ public class CommunityService {
         }
 
         return communityPostWithKeyword.stream().
-                map(c -> new PostDto(c.getId(), c.getTitle(), c.getMember().getNickname())).toList();
+                map(c -> new PostDto(c.getId(), c.getTitle(), c.getMember().getNickname(), c.getCreate_at())).toList();
     }
 }

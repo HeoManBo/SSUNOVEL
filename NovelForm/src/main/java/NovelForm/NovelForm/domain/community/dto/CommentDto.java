@@ -5,6 +5,8 @@ import NovelForm.NovelForm.domain.comment.Comment;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 /**
  * 상세 조회시 댓글 리스트에 담길 값 Dto
  */
@@ -18,6 +20,8 @@ public class CommentDto {
     private Long memberId;
     @Schema(description = "댓글 id")
     private Long commentId;
+    @Schema(description = "댓글 작성 시간")
+    private LocalDateTime writeAt;
 
 
     public CommentDto(Comment comment) {
@@ -25,5 +29,6 @@ public class CommentDto {
         this.content = comment.getContent();
         this.memberId = comment.getMember().getId();
         this.commentId = comment.getId();
+        this.writeAt = comment.getCreate_at();
     }
 }

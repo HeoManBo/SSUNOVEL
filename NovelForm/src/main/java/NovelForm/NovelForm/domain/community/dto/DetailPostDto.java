@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,8 +35,12 @@ public class DetailPostDto {
     @Schema(description = "댓글 리스트")
     List<CommentDto> commentLists;
 
+    @Schema(description = "게시글 작성 시간")
+    LocalDateTime writeAt;
+
     public DetailPostDto(CommunityPost communityPost) {
         this.nickname = communityPost.getMember().getNickname();
+        this.writeAt = communityPost.getCreate_at();
         this.title = communityPost.getTitle();
         this.content = communityPost.getContent();
         this.writerId = communityPost.getMember().getId();
