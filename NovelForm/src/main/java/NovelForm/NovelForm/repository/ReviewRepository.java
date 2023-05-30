@@ -39,6 +39,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<ReviewDto> findByReviewWithLike(@Param("novel") Novel novel);
 
 
+
+
     //파라미터로 넘어오는 소설의 멤버의 리뷰를 조회함
     @Query(value = "select r from Review r join fetch r.member where r.id = :review_id ")
     Optional<Review> reviewForDelete(@Param("review_id") Long review_id);
@@ -87,6 +89,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             " inner join n.author a" +
             " where r.member = :member")
     List<MemberReviewInfo> findMemberReviewByMember(@Param("member") Member member);
+
+    @Query("select r " +
+            "from Review r join fetch r.member m join fetch r.likeList where r.novel = :novel")
+    List<Review> reviewFetchLike(@Param("novel") Novel novel);
 
 
 

@@ -1,6 +1,7 @@
 package NovelForm.NovelForm.domain.novel;
 
 
+import NovelForm.NovelForm.domain.like.domain.Like;
 import NovelForm.NovelForm.domain.member.domain.Member;
 import NovelForm.NovelForm.domain.member.exception.WrongMemberException;
 import NovelForm.NovelForm.domain.novel.dto.detailnoveldto.ReviewDto;
@@ -23,6 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -51,10 +54,45 @@ public class ReviewService {
 //                r.getCreate_at(), 0, r.getMember().getId(), r.getId())).collect(Collectors.toList());
 //    }
 
+//    //파라미터로 들어온 소설에 작성된 리뷰를 반환한다.
+//    @Transactional(readOnly = true)
+//    public List<ReviewDto> findReviewMatchingNovel(Novel novel){
+//       return reviewRepository.findByReviewWithLike(novel);
+//    }
+
     //파라미터로 들어온 소설에 작성된 리뷰를 반환한다.
     @Transactional(readOnly = true)
-    public List<ReviewDto> findReviewMatchingNovel(Novel novel){
-       return reviewRepository.findByReviewWithLike(novel);
+    public List<ReviewDto> findReviewMatchingNovel(Novel novel, Long memberId){
+        List<Review> reviews = reviewRepository.reviewFetchLike(novel);
+        log.info("reviews size = {}", reviews.size());
+        for (Review review : reviews) {
+            log.info("review conent : {}, writer = {}", review.getContent(), review.getMember().getNickname());
+        }
+        List<ReviewDto> result = new ArrayList<>();
+        if(reviews.size() != 0){ //리뷰가 있으면 -> 해당 리뷰를 현재 로그인 한 아이디로 좋아요를 한 적이 있는지 추적한다.
+            for (Review r : reviews) {
+                ReviewDto dto = new ReviewDto(r.getMember().getNickname(), r.getContent(), r.getRating(),
+                        r.getCreate_at(), r.getLikeList().size(), r.getId(), r.getId());
+                if(memberId != null){  //로그인 상태라면 좋아요 누른 리뷰를 찾는다.
+                    List<Like> likeList = r.getLikeList();
+                    if(likeList.size() != 0) {
+                        for (Like like : likeList) { // sequential 하게 탐색
+                            if (like.getMember().getId().equals(memberId)) { //같으면 좋아요를 누른 적이 있음
+                                dto.setAlready_like(1);
+                            }
+                        }
+                    }
+                } else { // 로그인 상태가 아니면 0으로 처리
+                    dto.setAlready_like(0);
+                }
+                result.add(dto);
+            }
+        }
+        else{ //리뷰가 없다면 null로 처리
+            return null;
+        }
+        Collections.sort(result); // like_cnt를 기준으로 내림차순 정렬.
+        return result;
     }
 
 

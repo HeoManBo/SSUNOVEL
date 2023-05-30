@@ -146,8 +146,8 @@ public class NovelSearchController {
 
 
         //소설 번호에 대응되는 리뷰를 가져온다.
-        List<ReviewDto> reviewMatchingNovel = reviewService.findReviewMatchingNovel(novel);
-        if(reviewMatchingNovel == null){
+        List<ReviewDto> reviewMatchingNovel = reviewService.findReviewMatchingNovel(novel, memberId);
+        if(reviewMatchingNovel == null){ //매칭되는 리뷰가 없다면
             result.setReviewInfos(null);
         }
         else{
