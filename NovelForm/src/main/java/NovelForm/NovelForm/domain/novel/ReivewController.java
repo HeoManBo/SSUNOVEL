@@ -31,7 +31,7 @@ public class ReivewController {
 
     private final ReviewService reviewService;
 
-    //리뷰 등록 메소드입니다.
+    //리뷰 등록 메소드입니다.g
     @ApiResponse(description = "리뷰 등록 API 메소드입니다. 성공시 해당 리뷰 ID를 반환합니다.")
     @PostMapping("/{novel_id}")
     public BaseResponse writeReview(@RequestBody ReviewBodyDto reviewBodyDto, BindingResult bindingResult,
@@ -81,13 +81,16 @@ public class ReivewController {
      * 장르별 베스트 리뷰 조회
      */
     @GetMapping("")
-    public BaseResponse bestReview(    @Parameter(description = "장르 선택 파라미터입니다. 미선택시 default로 로맨스 베스트 리뷰를 조회합니다.")
-                                       @RequestParam(value = "genre", required = false, defaultValue = "로맨스") String genre,
-                                       @Parameter(description = "페이지 번호입니다 미선택시 0번으로 지정됩니다.")
-                                       @RequestParam(value = "page", required = false, defaultValue = "0") int page) throws Exception {
+    public BaseResponse bestReview(
+            @Parameter(description = "소설 검색어 파라미터입니다. 미선택시 해당 장르 전체 소설의 베스트 리뷰를 조회합니다.")
+            @RequestParam(value = "title", required = false, defaultValue = "") String title,
+            @Parameter(description = "장르 선택 파라미터입니다. 미선택시 default로 로맨스 베스트 리뷰를 조회합니다.")
+            @RequestParam(value = "genre", required = false, defaultValue = "로맨스") String genre,
+            @Parameter(description = "페이지 번호입니다 미선택시 0번으로 지정됩니다.")
+            @RequestParam(value = "page", required = false, defaultValue = "0") int page) throws Exception {
 
 
-        List<BestReviewDto> bestReview = reviewService.findBestReview(page, genre);
+        List<BestReviewDto> bestReview = reviewService.findBestReview(title, page, genre);
 
 
         return new BaseResponse(HttpStatus.OK, bestReview);

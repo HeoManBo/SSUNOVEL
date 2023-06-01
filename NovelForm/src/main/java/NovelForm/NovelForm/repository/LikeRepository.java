@@ -137,7 +137,7 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
             " inner join r.member m " +
             " inner join r.novel n "  +
             " inner join n.author a "+
-            " where n.category like :genre " +
+            " where n.title like %:title% and n.category like :genre " +
             " group by r " +
             " order by count(l) desc ",
 
@@ -147,11 +147,11 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
                     " inner join r.member m " +
                     " inner join r.novel n "  +
                     " inner join n.author a "+
-                    " where n.category like :genre " +
+                    " where n.title like %:title% and n.category like :genre " +
                     " group by r " +
                     " order by count(l) desc "
     )
-    Page<BestReviewDto> findNovelWithinGenreLikeReviewDesc(@Param("genre") String genre, Pageable pageable);
+    Page<BestReviewDto> findNovelWithinGenreLikeReviewDesc(@Param("title") String title, @Param("genre") String genre, Pageable pageable);
 
     @Query(value = "select new NovelForm.NovelForm.domain.novel.dto.reivewdto.BestReviewDto( " +
             " n.id, " +
@@ -161,13 +161,13 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
             "n.cover_image," +
             " r.content, " +
             " m.nickname, " +
-            " count(distinct l)) "+
+            " count(distinct l)) " +
             " from Like l " +
             " inner join l.review r " +
             " inner join r.member m " +
             " inner join r.novel n "  +
             " inner join n.author a "+
-            " where n.category like %:genre1% or n.category like %:genre2% " +
+            " where n.title like %:title% and (n.category like %:genre1% or n.category like %:genre2%) " +
             " group by r " +
             " order by count(l) desc ",
 
@@ -177,13 +177,14 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
                     " inner join r.member m " +
                     " inner join r.novel n "  +
                     " inner join n.author a "+
-                    " where n.category like %:genre1% or n.category like %:genre2% " +
+                    " where n.title like %:title% and (n.category like %:genre1% or n.category like %:genre2%) " +
                     " group by r " +
                     " order by count(l) desc "
     )
-    Page<BestReviewDto> findNovelWithinGenreLikeReviewDesc2(@Param("genre1") String genre1,
-                                                           @Param("genre2") String genre2,
-                                                           Pageable pageable);
+    Page<BestReviewDto> findNovelWithinGenreLikeReviewDesc2(@Param("title") String title,
+                                                            @Param("genre1") String genre1,
+                                                            @Param("genre2") String genre2,
+                                                            Pageable pageable);
 
     @Query(value = "select new NovelForm.NovelForm.domain.novel.dto.reivewdto.BestReviewDto( " +
             " n.id, " +
@@ -193,13 +194,13 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
             "n.cover_image," +
             " r.content, " +
             " m.nickname, " +
-            " count(distinct l)) "+
+            " count(distinct l))"+
             " from Like l " +
             " inner join l.review r " +
             " inner join r.member m " +
             " inner join r.novel n "  +
             " inner join n.author a "+
-            " where n.category like %:genre1% or n.category like %:genre2% or n.category like %:genre3% " +
+            " where n.title like %:title% and (n.category like %:genre1% or n.category like %:genre2% or n.category like %:genre3%) " +
             " group by r " +
             " order by count(l) desc ",
 
@@ -209,11 +210,12 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
                     " inner join r.member m " +
                     " inner join r.novel n "  +
                     " inner join n.author a "+
-                    " where n.category like %:genre1% or n.category like %:genre2% or n.category like %:genre3% " +
+                    " where n.title like %:title% and (n.category like %:genre1% or n.category like %:genre2% or n.category like %:genre3%) " +
                     " group by r " +
                     " order by count(l) desc "
     )
-    Page<BestReviewDto> findNovelWithinGenreLikeReviewDesc3(@Param("genre1") String genre1,
+    Page<BestReviewDto> findNovelWithinGenreLikeReviewDesc3(@Param("title") String title,
+                                                            @Param("genre1") String genre1,
                                                             @Param("genre2") String genre2,
                                                             @Param("genre3") String genre3,
                                                             Pageable pageable);

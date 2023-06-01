@@ -270,10 +270,11 @@ public class BestReviewTest {
     void 베스트리뷰테스트(){
         //장르 : 판타지
         String genre = "로맨스";
+        String title = "";
         //페이지 : 0페이지
         Pageable pageable = PageRequest.of(0, 10);
 
-        Page<BestReviewDto> result = likeRepository.findNovelWithinGenreLikeReviewDesc(genre, pageable);
+        Page<BestReviewDto> result = likeRepository.findNovelWithinGenreLikeReviewDesc(title, genre, pageable);
         List<BestReviewDto> r1 = result.getContent();
 
         for (BestReviewDto bestReviewDto : r1) {
@@ -290,7 +291,7 @@ public class BestReviewTest {
 
         String genre1 = "현판";
         String genre2 = "현대판타지";
-        Page<BestReviewDto> result2 = likeRepository.findNovelWithinGenreLikeReviewDesc2(genre1, genre2, pageable);
+        Page<BestReviewDto> result2 = likeRepository.findNovelWithinGenreLikeReviewDesc2(title, genre1, genre2, pageable);
         List<BestReviewDto> r2 = result2.getContent();
         log.info("total ele = {}", result2.getTotalElements());
         for (BestReviewDto bestReviewDto : r2) {
@@ -302,7 +303,7 @@ public class BestReviewTest {
                     bestReviewDto.getLike_count());
         }
 
-        Assertions.assertThat(result.getTotalElements()).isEqualTo(4);
+        Assertions.assertThat(result.getTotalElements()).isEqualTo(3);
         Assertions.assertThat(result2.getTotalElements()).isEqualTo(4);
     }
 

@@ -9,26 +9,22 @@ import NovelForm.NovelForm.domain.novel.dto.reivewdto.BestReviewDto;
 import NovelForm.NovelForm.domain.novel.dto.reivewdto.ReviewBodyDto;
 import NovelForm.NovelForm.domain.novel.exception.NoMatchingGenre;
 import NovelForm.NovelForm.domain.novel.exception.NotReviewOwner;
-import NovelForm.NovelForm.global.exception.NoSuchListElement;
 import NovelForm.NovelForm.repository.LikeRepository;
 import NovelForm.NovelForm.repository.MemberRepository;
 import NovelForm.NovelForm.repository.NovelRepository;
 import NovelForm.NovelForm.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static NovelForm.NovelForm.domain.novel.NovelService.PagingSize;
 
@@ -74,6 +70,7 @@ public class ReviewService {
                 ReviewDto dto = new ReviewDto(r.getMember().getNickname(), r.getContent(), r.getRating(),
                         r.getCreate_at(), r.getLikeList().size(), r.getId(), r.getId());
                 if(memberId != null){  //로그인 상태라면 좋아요 누른 리뷰를 찾는다.
+                    log.info("memberid = {}", memberId);
                     List<Like> likeList = r.getLikeList();
                     if(likeList.size() != 0) {
                         for (Like like : likeList) { // sequential 하게 탐색
@@ -234,20 +231,20 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public List<BestReviewDto> findBestReview(int page, String input) throws Exception {
+    public List<BestReviewDto> findBestReview(String title, int page, String input) throws Exception {
         Page<BestReviewDto> result = null;
         log.info("select genre = {}", input);
         for(String s : genre){
             Pageable pageable = PageRequest.of(page, PagingSize);
             if(s.equals(input)) {
                 if (input.equals("로판")) {
-                    result = likeRepository.findNovelWithinGenreLikeReviewDesc2(input, "로맨스 판타지", pageable);
+                    result = likeRepository.findNovelWithinGenreLikeReviewDesc2(title,input, "로맨스 판타지", pageable);
                     break;
                 } else if (input.equals("현판")) {
-                    result = likeRepository.findNovelWithinGenreLikeReviewDesc3(input, "현대판타지", "현대 판타지", pageable);
+                    result = likeRepository.findNovelWithinGenreLikeReviewDesc3(title, input, "현대판타지", "현대 판타지", pageable);
                     break;
                 } else {
-                    result = likeRepository.findNovelWithinGenreLikeReviewDesc(input, pageable);
+                    result = likeRepository.findNovelWithinGenreLikeReviewDesc(title, input, pageable);
                     break;
                 }
             }

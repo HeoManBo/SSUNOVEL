@@ -72,7 +72,7 @@ public class Alert extends BaseEntityTime {
         this.url = "https://www.novelforum.site/novel/" + novelId;
         this.status = "activated";
         this.readCheck = 0;
-        this.addMember(member);
+        //this.addMember(member);
     }
 
     public Alert(CommunityPost communityPost, Member member){
