@@ -112,7 +112,7 @@ public class BestReviewTest {
                 .download_cnt(0)
                 .rating(0.0)
                 .review_cnt(0)
-                .category("현판")
+                .category("로맨스판타지")
                 .summary("테스트 입력")
                 .build();
         novel2.addAuthor(author);
@@ -132,7 +132,7 @@ public class BestReviewTest {
                 .title("판타지판타지이이")
                 .cover_image("testtest")
                 .download_cnt(0)
-                .category("현대판타지")
+                .category("로맨스판타지")
                 .rating(0.0)
                 .review_cnt(0)
                 .summary("테스트 입력")
@@ -270,11 +270,11 @@ public class BestReviewTest {
     void 베스트리뷰테스트(){
         //장르 : 판타지
         String genre = "로맨스";
-        String title = "";
+        String title1 = "홍길";
         //페이지 : 0페이지
         Pageable pageable = PageRequest.of(0, 10);
 
-        Page<BestReviewDto> result = likeRepository.findNovelWithinGenreLikeReviewDesc(title, genre, pageable);
+        Page<BestReviewDto> result = likeRepository.findNovelWithinGenreLikeReviewDescForRomance(title1, genre, pageable);
         List<BestReviewDto> r1 = result.getContent();
 
         for (BestReviewDto bestReviewDto : r1) {
@@ -289,9 +289,9 @@ public class BestReviewTest {
         em.flush();
         em.clear();
 
-        String genre1 = "현판";
-        String genre2 = "현대판타지";
-        Page<BestReviewDto> result2 = likeRepository.findNovelWithinGenreLikeReviewDesc2(title, genre1, genre2, pageable);
+        String title2 = "";
+        String genre2 = "로맨스판타지";
+        Page<BestReviewDto> result2 = likeRepository.findNovelWithinGenreLikeReviewDesc(title2, genre2,  pageable);
         List<BestReviewDto> r2 = result2.getContent();
         log.info("total ele = {}", result2.getTotalElements());
         for (BestReviewDto bestReviewDto : r2) {
@@ -303,8 +303,14 @@ public class BestReviewTest {
                     bestReviewDto.getLike_count());
         }
 
+        /**
+         * 전 장르 베스트 리뷰를 가져옴
+         */
+        Page<BestReviewDto> result3 = likeRepository.findNovelWithinGenreLikeReviewDesc("", "", pageable);
+
         Assertions.assertThat(result.getTotalElements()).isEqualTo(3);
         Assertions.assertThat(result2.getTotalElements()).isEqualTo(4);
+        Assertions.assertThat(result3.getTotalElements()).isEqualTo(8);
     }
 
 

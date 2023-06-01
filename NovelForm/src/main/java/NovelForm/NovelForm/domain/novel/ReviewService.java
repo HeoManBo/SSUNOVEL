@@ -234,24 +234,26 @@ public class ReviewService {
     public List<BestReviewDto> findBestReview(String title, int page, String input) throws Exception {
         Page<BestReviewDto> result = null;
         log.info("select genre = {}", input);
-        for(String s : genre){
-            Pageable pageable = PageRequest.of(page, PagingSize);
-            if(s.equals(input)) {
-                if (input.equals("로판")) {
-                    result = likeRepository.findNovelWithinGenreLikeReviewDesc2(title,input, "로맨스 판타지", pageable);
-                    break;
-                } else if (input.equals("현판")) {
-                    result = likeRepository.findNovelWithinGenreLikeReviewDesc3(title, input, "현대판타지", "현대 판타지", pageable);
-                    break;
-                } else {
-                    result = likeRepository.findNovelWithinGenreLikeReviewDesc(title, input, pageable);
-                    break;
-                }
-            }
+        Pageable pageable = PageRequest.of(page, PagingSize);
+        if (input.equals("판타지")) { //현대판타지, 로맨스판타지 카테고리인 소설은 제외
+            result = likeRepository.findNovelWithinGenreLikeReviewDescForFantasy(title,input,pageable);
         }
-        //결과가 null 인 경우 -> 장르 소설이름이 일치하지 않은 경우
-        if(result == null){
-            throw new NoMatchingGenre("잘못된 장르 소설 이름입니다.");
+        else if(input.equals("로맨스")){ //로맨스판타지 카테고리인 소설은 제외
+            result = likeRepository.findNovelWithinGenreLikeReviewDescForRomance(title,input,pageable);
+        }
+        else if(input.equals("로판")){
+            result = likeRepository.findNovelWithinGenreLikeReviewDesc(title,"로맨스판타지",pageable);
+        }
+        else if(input.equals("현판")){
+            result = likeRepository.findNovelWithinGenreLikeReviewDesc(title,"현대판타지",pageable);
+        }
+        else {
+            result = likeRepository.findNovelWithinGenreLikeReviewDesc(title, input, pageable);
+        }
+
+        //리뷰가 없는 경우
+        if(result.getContent().size() == 0){
+            throw new NoMatchingGenre("해당 검색 조건에 맞느 베스트 리뷰를 찾을 수 없습니다!");
         }
         if(result.getTotalPages() < page){
             throw new NumberFormatException("잘못된 페이지 값입니다.");
