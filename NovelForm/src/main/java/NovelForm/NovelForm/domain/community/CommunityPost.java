@@ -1,8 +1,6 @@
 package NovelForm.NovelForm.domain.community;
 
 import NovelForm.NovelForm.domain.comment.Comment;
-import NovelForm.NovelForm.domain.community.dto.PostDto;
-import NovelForm.NovelForm.domain.community.dto.WriteDto;
 import NovelForm.NovelForm.domain.member.domain.Member;
 import NovelForm.NovelForm.global.BaseEntityTime;
 import jakarta.persistence.*;
@@ -53,6 +51,18 @@ public class CommunityPost extends BaseEntityTime {
         this.title = title;
         this.content = content;
         this.member = member;
+    }
+
+    //댓글 동등비교
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == this) return true; //같은 객체면 true
+        if(obj == null) return false; //null 값이면 false
+        if(getClass() != obj.getClass()) return false; //다른 클래스면 false;
+        CommunityPost compare = (CommunityPost) obj;
+        if(this.getId().equals(compare.getId())){ //Id가 같으면 삭제처리            return true;
+        }
+        return false;
     }
 
     // == 게시글 수정 메소드 === //

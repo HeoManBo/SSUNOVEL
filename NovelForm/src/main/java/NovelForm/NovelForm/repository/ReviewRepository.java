@@ -5,6 +5,7 @@ import NovelForm.NovelForm.domain.member.domain.Member;
 import NovelForm.NovelForm.domain.member.dto.MemberReviewInfo;
 import NovelForm.NovelForm.domain.novel.Review;
 import NovelForm.NovelForm.domain.novel.Novel;
+import NovelForm.NovelForm.domain.novel.dto.detailnoveldto.ReviewDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -29,6 +30,21 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query(value = "select r from Review r join fetch r.member where r.novel = :novel")
     List<Review> findByReview(@Param("novel") Novel novel);
 
+    //파라미터로 넘어오는 소설의 리뷰와 리뷰의 좋아요를 내림차순으로 가져온다.
+    @Query(value = "select new NovelForm.NovelForm.domain.novel.dto.detailnoveldto.ReviewDto(m.nickname, r.content, r.rating, r.create_at," +
+            "count(l), m.id, r.id)" +
+            " from Review r inner join r.member m left outer join Like l on r = l.review"
+            + " where r.novel = :novel group by r order by count(l) desc"
+    )
+    List<ReviewDto> findByReviewWithLike(@Param("novel") Novel novel);
+
+
+
+
+    //파라미터로 넘어오는 소설의 멤버의 리뷰를 조회함
+    @Query(value = "select r from Review r join fetch r.member where r.id = :review_id ")
+    Optional<Review> reviewForDelete(@Param("review_id") Long review_id);
+
     //파라미터로 넘어오는 소설의 멤버의 리뷰를 조회함
     @Query(value = "select r from Review r join fetch r.member where r.novel = :novel and r.member = :member ")
     Optional<Review> findSingleReivew(@Param("member")Member member, @Param("novel")Novel novel);
@@ -39,8 +55,14 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     //리뷰 삭제
     @Modifying
-    @Query(value = "delete from Review where review_id = :review_id", nativeQuery = true)
+    @Query(value = "delete from review where review_idx = :review_id", nativeQuery = true)
     void deleteReviewById(@Param("review_id") Long review_id);
+
+    //특정 리뷰 찾기
+    @Query("select r from Review r where r.id = :review_id")
+    Review findOneReview(@Param("review_id") Long review_id);
+
+
 
 
     // 멤버가 작성한 리뷰 찾기
@@ -67,5 +89,12 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             " inner join n.author a" +
             " where r.member = :member")
     List<MemberReviewInfo> findMemberReviewByMember(@Param("member") Member member);
+
+    @Query("select r " +
+            "from Review r join fetch r.member m left join fetch r.likeList where r.novel = :novel")
+    List<Review> reviewFetchLike(@Param("novel") Novel novel);
+
+
+
 
 }

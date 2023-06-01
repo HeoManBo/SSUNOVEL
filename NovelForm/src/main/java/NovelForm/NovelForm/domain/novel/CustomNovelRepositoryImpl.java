@@ -34,8 +34,8 @@ public class CustomNovelRepositoryImpl implements CustomNovelRepository{
             switch (categoryDto.getGenre()) {
                 case "현판" ->  whereCondition.add("(n.category like '%현판%' or n.category like '%현대판타지%')");
                 case "로판" -> whereCondition.add("(n.category like '%로판%' or n.category like '%로맨스판타지%')");
-                case "판타지" -> whereCondition.add("n.category like '판타지'");
-                case "로맨스" -> whereCondition.add("n.category like '로맨스'");
+                case "판타지" -> whereCondition.add("n.category like '판타지%'");
+                case "로맨스" -> whereCondition.add("n.category like '%로맨스'");
                 default -> whereCondition.add("n.category like '%" + categoryDto.getGenre() +"%'");
             }
         }
@@ -54,6 +54,7 @@ public class CustomNovelRepositoryImpl implements CustomNovelRepository{
         String query = "select count(n) from Novel n inner join n.author";
         String where = " where ";
         List<String> whereCondition = new ArrayList<>();
+        String orderBy = " order by " + "n." + categoryDto.getOrderBy() + " desc";
         if (categoryDto.getIsFinished() == 1) { //완결만 보고 싶다면
             whereCondition.add("n.is_finished like '완결'");
         }
@@ -73,6 +74,7 @@ public class CustomNovelRepositoryImpl implements CustomNovelRepository{
             query += where;
             query += String.join(" and ", whereCondition);
         }
+        query += orderBy; //기본적인 정렬 순서추가
         log.info("count query : {}", em.createQuery(query).getSingleResult().getClass().getCanonicalName());
         return Long.parseLong(em.createQuery(query).getSingleResult().toString()); // getClass를 찍어보면 java.lang.Long이 나옴.
     }

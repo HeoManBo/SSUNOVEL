@@ -1,16 +1,21 @@
 package NovelForm.NovelForm.domain.novel;
 
+import NovelForm.NovelForm.domain.like.domain.Like;
 import NovelForm.NovelForm.domain.member.domain.Member;
 import NovelForm.NovelForm.global.BaseEntityTime;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "review")
 public class Review extends BaseEntityTime {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy =GenerationType.IDENTITY)
     @Column(name = "review_idx")
     private Long id;
 
@@ -31,6 +36,9 @@ public class Review extends BaseEntityTime {
     @Column
     @Lob
     private String content;
+
+    @OneToMany(mappedBy = "review", fetch =  FetchType.LAZY)
+    private List<Like> likeList = new ArrayList<>();
 
 
     @Builder

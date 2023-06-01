@@ -1,6 +1,7 @@
 package NovelForm.NovelForm.domain.comment;
 
 import NovelForm.NovelForm.domain.community.CommunityPost;
+import NovelForm.NovelForm.domain.community.dto.CreateCommentDto;
 import NovelForm.NovelForm.domain.member.domain.Member;
 import NovelForm.NovelForm.global.BaseEntityTime;
 import jakarta.persistence.*;
@@ -66,5 +67,22 @@ public class Comment extends BaseEntityTime {
         this.member = member;
         this.communityPost = communityPost;
         this.parentComment = parentComment;
+    }
+
+    public void updateComment(CreateCommentDto commentDto){
+        this.content = commentDto.getContent();
+    }
+
+    //댓글 동등비교
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == this) return true; //같은 객체면 true
+        if(obj == null) return false; //null 값이면 false
+        if(getClass() != obj.getClass()) return false; //다른 클래스면 false;
+        Comment compare = (Comment) obj;
+        if(this.getId().equals(compare.getId())){ //Id가 같으면 삭제처리
+            return true;
+        }
+        return false;
     }
 }

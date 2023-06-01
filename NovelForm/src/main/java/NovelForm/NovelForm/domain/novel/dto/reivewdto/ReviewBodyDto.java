@@ -22,7 +22,7 @@ public class ReviewBodyDto {
     @DecimalMax(value = "5.0")
     private double rating;
 
-    @Schema(description = "리뷰 작성 내용")
+    @Schema(description = "리뷰 작성 내용 내용없이 평점만 부여했다면 null 값으로 전달")
     private String content;
 
 }

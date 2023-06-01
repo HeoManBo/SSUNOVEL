@@ -4,15 +4,13 @@ package NovelForm.NovelForm.domain.community;
 import NovelForm.NovelForm.domain.community.exception.NoPostException;
 import NovelForm.NovelForm.domain.community.exception.NotFoundSessionException;
 import NovelForm.NovelForm.domain.community.exception.NotPostOwner;
+import NovelForm.NovelForm.domain.community.exception.WrongCommentException;
 import NovelForm.NovelForm.domain.member.exception.WrongMemberException;
 import NovelForm.NovelForm.global.BaseResponse;
 import NovelForm.NovelForm.global.exception.NoSuchListElement;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
@@ -23,15 +21,6 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 @RestControllerAdvice("NovelForm.NovelForm.domain.community")
 @Slf4j
 public class CommunityControllerAdvice {
-    /**
-     * 존재하지 않는 멤버 에러처리
-     */
-    @ExceptionHandler(WrongMemberException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public BaseResponse wrongMemberException(WrongMemberException ex){
-        log.info("[Community Controller ex] ex ", ex);
-        return new BaseResponse(HttpStatus.BAD_REQUEST, "존재하지 않는 mebmerId입니다.", "에러");
-    }
 
     /**
      * 존재하지 않는 게시글 번호 조회
@@ -84,5 +73,11 @@ public class CommunityControllerAdvice {
     }
 
 
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(WrongCommentException.class)
+    public BaseResponse wrongCommentException(WrongCommentException e){
+        log.error("[Community Controller ex] ex", e);
+        return new BaseResponse(HttpStatus.BAD_REQUEST, e.getMessage(),   "에러");
+    }
 
 }

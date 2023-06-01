@@ -46,5 +46,8 @@ public interface FavoriteAuthorRepository extends JpaRepository<FavoriteAuthor, 
      */
     List<FavoriteAuthor> findFavoriteAuthorsByMemberId(Long memberId);
 
+    @Query("select fa from FavoriteAuthor fa join fetch fa.member m where fa.author = :author")
+    List<FavoriteAuthor> findByMemberWithLikeAuthor(@Param("author") Author author);
+
 
 }

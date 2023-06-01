@@ -8,10 +8,12 @@ import NovelForm.NovelForm.domain.novel.dto.CategoryDto;
 import NovelForm.NovelForm.domain.novel.dto.detailnoveldto.DetailNovelInfo;
 import NovelForm.NovelForm.domain.novel.dto.detailnoveldto.ReviewDto;
 import NovelForm.NovelForm.domain.novel.dto.searchdto.MidFormmat;
+import NovelForm.NovelForm.domain.novel.dto.searchdto.NovelDto;
 import NovelForm.NovelForm.domain.novel.dto.searchdto.SearchDto;
 import NovelForm.NovelForm.domain.novel.exception.NoSuchNovelListException;
 import NovelForm.NovelForm.global.BaseResponse;
 import NovelForm.NovelForm.repository.FavoriteNovelRepository;
+import NovelForm.NovelForm.util.NovelCSVParser;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -29,6 +31,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static NovelForm.NovelForm.global.SessionConst.LOGIN_MEMBER_ID;
 
@@ -115,7 +118,7 @@ public class NovelSearchController {
     /**
      * 상세 조회 메소드
      */
-    @Operation(summary = "소설 상세 정보", description = "소설 상세 정보를 보여줍니다. ",
+    @Operation(summary = "소설 상세 정보", description = "소설 상세 정보를 보여줍니다. 리뷰와 다른 소설이 없는 경우 공 리스트로 반환됩니다. ",
                responses = @ApiResponse(responseCode = "200", description = "소설 상세 정보 조회 성공", content = @Content(schema = @Schema(implementation = DetailNovelInfo.class))))
     @GetMapping("/{novel_id}")
     public BaseResponse<DetailNovelInfo> detailSearchNovel(@PathVariable("novel_id") @Min(0) Long id,
@@ -143,8 +146,20 @@ public class NovelSearchController {
 
 
         //소설 번호에 대응되는 리뷰를 가져온다.
-        List<ReviewDto> reviewMatchingNovel = reviewService.findReviewMatchingNovel(novel);
-        result.setReviewInfos(reviewMatchingNovel);
+        List<ReviewDto> reviewMatchingNovel = reviewService.findReviewMatchingNovel(novel, memberId);
+        if(reviewMatchingNovel == null){ //매칭되는 리뷰가 없다면
+            result.setReviewInfos(null);
+        }
+        else{
+            result.setReviewInfos(reviewMatchingNovel);
+        }
+
+        //해당 작가의 다른 소설을 가져온다. -> 현재 조회하고 있는 소설은 제외한다.
+        List<Novel> authorNovels = novel.getAuthor().getNovels();
+        List<NovelDto> an = authorNovels.stream().filter(n -> !n.getTitle().equals(novel.getTitle())).map(n -> new NovelDto(n.getTitle(), novel.getAuthor().getName(), n.getCover_image()
+                , n.averageRating(), n.getDownload_cnt(), n.getCategory(), n.getId())).toList();
+        result.setAnotherNovels(an);
+
 
         //로그인 상태라면 좋아요를 눌렀는지 확인한다.
         if(memberId != null){
@@ -165,16 +180,19 @@ public class NovelSearchController {
             if(myReview != null){
                 result.setMy_review(myReview.getContent());
                 result.setMy_rating(myReview.getRating());
+                result.setMy_review_id(myReview.getId());
             }
             else{
                 result.setMy_review(null);
                 result.setMy_rating(0.0);
+                result.setMy_review_id(0L);
             }
         }
         else{ //로그인 상태가 아니라면 0, 0.0, null 처리
             result.setAlreadyLike(0);
             result.setMy_review(null);
             result.setMy_rating(0.0);
+            result.setMy_review_id(0L);
         }
 
         return new BaseResponse<DetailNovelInfo>(HttpStatus.OK, result);
@@ -211,7 +229,7 @@ public class NovelSearchController {
      */
     @Operation(summary = "category 조회", description = "장르별, 플랫폼 별 카테고리 분류 조회 기능입니다.",
             responses = @ApiResponse(responseCode = "200", description = "카테고리별 상세 검색 성공", content = @Content(schema = @Schema(implementation = MidFormmat.class))))
-    @GetMapping(value = "/category", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/category", produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse<MidFormmat> novelCategoryList(@RequestBody CategoryDto categoryDto, BindingResult bindingResult) throws JsonMappingException {
         if(bindingResult.hasErrors()){
             throw new JsonMappingException("잘못된 JSON값입니다.");
@@ -220,6 +238,5 @@ public class NovelSearchController {
 
         return new BaseResponse<MidFormmat>(HttpStatus.OK, novelsWithCategory);
     }
-
 
 }

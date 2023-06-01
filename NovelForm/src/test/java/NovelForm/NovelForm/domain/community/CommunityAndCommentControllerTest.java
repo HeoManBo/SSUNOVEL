@@ -2,6 +2,7 @@ package NovelForm.NovelForm.domain.community;
 
 
 import NovelForm.NovelForm.domain.comment.Comment;
+import NovelForm.NovelForm.domain.community.dto.CreateCommentDto;
 import NovelForm.NovelForm.domain.community.dto.WriteDto;
 import NovelForm.NovelForm.domain.member.domain.Gender;
 import NovelForm.NovelForm.domain.member.domain.LoginType;
@@ -30,13 +31,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 /**
- * 커뮤니티 컨트롤러 테스트
+ * 커뮤니티/댓글 컨트롤러 테스트
  */
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
 @Slf4j
-public class CommunityControllerTest {
+public class CommunityAndCommentControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
@@ -257,11 +258,15 @@ public class CommunityControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andDo(print());
 
-        //when : 에러로직 2 : 없는 게시글을 지우려는 경우
+        //when : 에러로직 3 : 없는 게시글을 지우려는 경우
         mockMvc.perform(MockMvcRequestBuilders.delete("/community/{post_id}", "100")
                         .session(session))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andDo(print());
+
+        MockHttpSession abnormalSession = new MockHttpSession();
+        abnormalSession.setAttribute(LOGIN_MEMBER_ID, 3000L);
+
 
     }
 
@@ -315,4 +320,209 @@ public class CommunityControllerTest {
 
     }
 
+    @Test
+    void 댓글생성컨트롤러테스트() throws Exception {
+        CreateCommentDto dto = new CreateCommentDto();
+        dto.setContent("저 알거같아요");
+
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute(LOGIN_MEMBER_ID, 2L);
+
+        //when 정상 로직 1 : 2번유저가 3번 게시글에 댓글을 단다.
+        mockMvc.perform(MockMvcRequestBuilders.post("/community/comment/{post_id}", 3L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto))
+                        .session(session))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(print());
+
+        //when 비정상 로직 1 : 세션이 없는 유저가 댓글 작성
+        mockMvc.perform(MockMvcRequestBuilders.post("/community/comment/{post_id}", 3L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andDo(print());
+
+        MockHttpSession abnomalSession = new MockHttpSession();
+        abnomalSession.setAttribute(LOGIN_MEMBER_ID,3000L);
+
+        //when 비정상 로직 2 : 비정상적인 세션 값을 가진 유저가 댓글 작성
+        mockMvc.perform(MockMvcRequestBuilders.post("/community/comment/{post_id}", 3L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto))
+                        .session(abnomalSession))
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
+                .andDo(print());
+
+        //when 비정상 로직 2 : 존재하지 않는 postId에 유저가 댓글 작성
+        mockMvc.perform(MockMvcRequestBuilders.post("/community/comment/{post_id}", 3333L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto))
+                        .session(session))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
+    void 댓글수정테스트() throws Exception {
+        //given : 1,2,3번 유저가 주어졌을 때, 3번 게시글에 대한 각각 댓글을 하나 씩 작성한다.
+        Member member = memberRepository.findById(2L).get();
+        Member m1 = memberRepository.findById(1L).get();
+        Member m2 = memberRepository.findById(3L).get();
+
+        CommunityPost c = communityPostRepository.findDetailPost(3L).get();
+
+        Comment comment1 = Comment.builder().content("tttt").build();
+        comment1.addCommunityPost(c);
+        comment1.addMember(member);
+
+        Comment comment2 = Comment.builder().content("test").build();
+        comment2.addCommunityPost(c);
+        comment2.addMember(m1);
+
+        Comment comment3 = Comment.builder().content("1111").build();
+        comment3.addCommunityPost(c);
+        comment3.addMember(m2);
+
+        Comment comment4 = Comment.builder().content("2222").build();
+        comment4.addCommunityPost(c);
+        comment4.addMember(m2);
+
+        commentRepository.save(comment1);
+        commentRepository.save(comment2);
+        commentRepository.save(comment3);
+        commentRepository.save(comment4);
+
+        em.flush();
+        em.clear();
+
+        //when : 3번 유저가 1번 게시글의 자신의 댓글을 수정하려한다.
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute(LOGIN_MEMBER_ID, 3L);
+
+        CreateCommentDto dto = new CreateCommentDto();
+        dto.setContent("qqqqqq");
+
+        //when 정상로직 1: : 3번 댓글 수정
+        mockMvc.perform(MockMvcRequestBuilders.patch("/community/comment/{comment_id}", 3L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto))
+                        .session(session))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(print());
+
+        //정상로직 1-2 : 3번 게시글을 상세 조회해본다.
+        mockMvc.perform(MockMvcRequestBuilders.get("/community/{post_id}", 3L))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(print());
+
+        MockHttpSession session2 = new MockHttpSession();
+        session2.setAttribute(LOGIN_MEMBER_ID,1L);
+
+        //비정상로직 1 : 1번 유저가 2번 유저의 댓글을 수정하려는 경우
+        mockMvc.perform(MockMvcRequestBuilders.patch("/community/comment/{comment_id}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto))
+                        .session(session2))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result").value("해당 댓글 수정 권한이 없는 사용자의 요청입니다."))
+                .andDo(print());
+
+        MockHttpSession session3 = new MockHttpSession();
+        session3.setAttribute(LOGIN_MEMBER_ID, 3000L);
+
+        //비정상로직 2 : 세션 값이 이상한 경우
+        mockMvc.perform(MockMvcRequestBuilders.patch("/community/comment/{comment_id}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto))
+                        .session(session3))
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result").value("잘못된 유저 아이디입니다."))
+                .andDo(print());
+
+        //비정상로직 3 : 존재하지 않는 댓글을 수정하는 경우
+        mockMvc.perform(MockMvcRequestBuilders.patch("/community/comment/{comment_id}", 10000L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto))
+                        .session(session))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result").value("댓글을 찾을 수 없습니다."))
+                .andDo(print());
+    }
+
+    @Test
+    void 댓글삭제테스트() throws Exception {
+        //given : 1,2,3번 유저가 주어졌을 때, 3번 게시글에 대한 각각 댓글을 하나 씩 작성한다.
+        Member member = memberRepository.findById(2L).get();
+        Member m1 = memberRepository.findById(1L).get();
+        Member m2 = memberRepository.findById(3L).get();
+
+        CommunityPost c = communityPostRepository.findDetailPost(3L).get();
+
+        Comment comment1 = Comment.builder().content("tttt").build();
+        comment1.addCommunityPost(c);
+        comment1.addMember(member);
+
+        Comment comment2 = Comment.builder().content("test").build();
+        comment2.addCommunityPost(c);
+        comment2.addMember(m1);
+
+        Comment comment3 = Comment.builder().content("1111").build();
+        comment3.addCommunityPost(c);
+        comment3.addMember(m2);
+
+        Comment comment4 = Comment.builder().content("2222").build();
+        comment4.addCommunityPost(c);
+        comment4.addMember(m2);
+
+        commentRepository.save(comment1);
+        commentRepository.save(comment2);
+        commentRepository.save(comment3);
+        commentRepository.save(comment4);
+
+        em.flush();
+        em.clear();
+
+        //when : 3번 유저가 1번 게시글의 자신의 댓글을 수정하려한다.
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute(LOGIN_MEMBER_ID, 3L);
+
+        //when 정상로직 1: : 3번 유저가 1번 게시글의 3번 댓글 삭제
+        mockMvc.perform(MockMvcRequestBuilders.delete("/community/comment/{post_id}/{comment_id}",1L, 3L)
+                        .session(session))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(print());
+
+        //정상로직 1-2 : 3번 게시글에 3번 댓글이 삭제되었는지 상세 조회해본다.
+        mockMvc.perform(MockMvcRequestBuilders.get("/community/{post_id}", 3L))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(print());
+
+        MockHttpSession session2 = new MockHttpSession();
+        session2.setAttribute(LOGIN_MEMBER_ID,1L);
+
+        //비정상로직 1 : 1번 유저가 2번 유저의 댓글을 삭제하려는 경우
+        mockMvc.perform(MockMvcRequestBuilders.delete("/community/comment/{post_id}/{comment_id}",1L, 1L)
+                        .session(session2))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result").value("해당 댓글 삭제 권한이 없는 사용자의 요청입니다."))
+                .andDo(print());
+
+        MockHttpSession session3 = new MockHttpSession();
+        session3.setAttribute(LOGIN_MEMBER_ID, 3000L);
+
+        //비정상로직 2 : 세션 값이 이상한 경우
+        mockMvc.perform(MockMvcRequestBuilders.delete("/community/comment/{post_id}/{comment_id}", 1L, 3L)
+                        .session(session3))
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result").value("잘못된 유저 아이디입니다."))
+                .andDo(print());
+
+        //비정상로직 3 : 존재하지 않는 댓글을 수정하는 경우
+        mockMvc.perform(MockMvcRequestBuilders.delete("/community/comment/{post_id}/{comment_id}", 1L, 10000L)
+                        .session(session))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result").value("댓글을 찾을 수 없습니다."))
+                .andDo(print());
+    }
 }
