@@ -77,8 +77,9 @@ public class BoxService {
 
 
             BoxItem boxItem;
+            if (boxItemId.equals(createBoxRequest.getLeadItemId())){
 
-            if (boxItemId == createBoxRequest.getLeadItemId()){
+
                 boxItem = new BoxItem(1, novel);
             }
             else{
@@ -231,15 +232,15 @@ public class BoxService {
                 allBoxByPublic = boxRepository.findAllBoxByPublic(pageRequestBySort).getContent();
             }
             case LIKE_ASC -> {
-                allBoxByPublic = likeRepository.findAllBoxByPublicWithLike(pageRequest).getContent();
+                allBoxByPublic = boxRepository.findAllBoxByPublicWithLike(pageRequest).getContent();
             }
             case LIKE_DESC -> {
-                allBoxByPublic = likeRepository.findAllBoxByPublicWithLikeDesc(pageRequest).getContent();
+                allBoxByPublic = boxRepository.findAllBoxByPublicWithLikeDesc(pageRequest).getContent();
             }
 
         }
 
-
+        log.warn("all box :{}", allBoxByPublic);
 
 
         return allBoxByPublic;

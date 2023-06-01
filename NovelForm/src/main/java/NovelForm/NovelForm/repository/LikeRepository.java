@@ -74,7 +74,7 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
             " count(distinct bi), " +
             " count(distinct l)) " +
             " from Like l " +
-            " inner join l.box b " +
+            " inner join  l.box b " +
             " inner join b.member m " +
             " inner join b.boxItems bi " +
             " where b.is_private = 0 " +
@@ -82,7 +82,7 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
             " order by count(l) DESC ",
 
             countQuery = " select count(distinct l) " +
-                    " from Like l" +
+                    " from Like l " +
                     " inner join l.box b " +
                     " inner join b.member m " +
                     " inner join b.boxItems bi " +
