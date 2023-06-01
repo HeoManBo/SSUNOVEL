@@ -253,7 +253,7 @@ public class ReviewService {
 
         //리뷰가 없는 경우
         if(result.getContent().size() == 0){
-            throw new NoMatchingGenre("해당 검색 조건에 맞느 베스트 리뷰를 찾을 수 없습니다!");
+            throw new NoMatchingGenre("해당 검색 조건에 맞는 베스트 리뷰를 찾을 수 없습니다!");
         }
         if(result.getTotalPages() < page){
             throw new NumberFormatException("잘못된 페이지 값입니다.");
