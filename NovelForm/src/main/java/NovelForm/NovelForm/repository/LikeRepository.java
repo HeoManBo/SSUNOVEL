@@ -217,5 +217,8 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     )
     Page<BestReviewDto> findNovelWithinGenreLikeReviewDescForRomance(@Param("title") String title, @Param("genre") String genre, Pageable pageable);
 
+
+
+
 }
 

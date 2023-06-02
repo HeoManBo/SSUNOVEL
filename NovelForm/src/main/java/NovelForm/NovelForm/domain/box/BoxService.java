@@ -7,6 +7,8 @@ import NovelForm.NovelForm.domain.box.exception.NoSuchBoxItemException;
 import NovelForm.NovelForm.domain.box.exception.WrongAccessBoxException;
 import NovelForm.NovelForm.domain.box.exception.WrongBoxException;
 import NovelForm.NovelForm.domain.box.exception.WrongMemberException;
+import NovelForm.NovelForm.domain.favorite.domain.FavoriteBox;
+import NovelForm.NovelForm.domain.like.domain.Like;
 import NovelForm.NovelForm.domain.member.domain.Member;
 import NovelForm.NovelForm.domain.novel.Novel;
 import NovelForm.NovelForm.repository.*;
@@ -36,6 +38,7 @@ public class BoxService {
     
     private final LikeRepository likeRepository;
 
+    private final FavoriteBoxRepository favoriteBoxRepository;
 
     /**
      * 보관함 생성 로직
@@ -252,7 +255,7 @@ public class BoxService {
      * @param boxId
      * @return
      */
-    public BoxInfoResponse getBoxInfo(Long boxId, Integer page) {
+    public BoxInfoResponse getBoxInfo(Long boxId, Integer page, Long memberId) throws WrongMemberException {
 
         PageRequest pageRequest = PageRequest.of(page - 1, 10);
 
@@ -263,17 +266,53 @@ public class BoxService {
             throw new NoSuchBoxItemException("보관함: " + boxId);
         }
 
+        Boolean isLike;
+        Boolean isFavorite;
+
+        if(memberId == null){
+            isLike = false;
+            isFavorite = false;
+        }
+        else{
+            Member findMember = getMemberById(memberId);
+
+            List<Like> likesByMemberAndBox = likeRepository.findLikesByMemberAndBox(findMember, findBox);
+            FavoriteBox byMemberWithBox = favoriteBoxRepository.findByMemberWithBox(findMember, findBox);
+
+            if(likesByMemberAndBox.isEmpty()) {
+                isLike = false;
+            }
+            else{
+                isLike = true;
+            }
+
+            if(byMemberWithBox == null){
+                isFavorite = false;
+            }
+            else{
+                isFavorite = true;
+            }
+
+
+        }
+
 
         List<BoxItemInfo> boxItemInfos = new ArrayList<>();
 
         for (BoxItem boxItem : findBox.getBoxItems()) {
+
+            double averageRating;
+
+            if(boxItem.getNovel().getReview_cnt() == 0) averageRating = 0.0;
+            else averageRating = boxItem.getNovel().getRating() / boxItem.getNovel().getReview_cnt();
+
             boxItemInfos.add(new BoxItemInfo(
                     boxItem.getNovel().getId(),
                     boxItem.getNovel().getCover_image(),
                     boxItem.getNovel().getCategory(),
                     boxItem.getNovel().getAuthor().getName(),
                     boxItem.getNovel().getTitle(),
-                    boxItem.getNovel().getRating(),
+                    averageRating,
                     boxItem.getNovel().getReview_cnt(),
                     boxItem.getIs_lead_item()));
         }
@@ -283,10 +322,22 @@ public class BoxService {
                 findBox.getId(),
                 findBox.getTitle(),
                 findBox.getContent(),
+                isLike,
+                isFavorite,
                 boxItemInfos
         );
 
         return boxInfoResponse;
+    }
+
+    private Member getMemberById(Long memberId) throws WrongMemberException {
+        Optional<Member> byId = memberRepository.findById(memberId);
+
+        if(!byId.isPresent()){
+            throw new WrongMemberException("member id: " + memberId);
+        }
+
+        return byId.get();
     }
 
 

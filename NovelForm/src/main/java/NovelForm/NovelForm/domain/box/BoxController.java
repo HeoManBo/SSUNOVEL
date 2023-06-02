@@ -2,6 +2,7 @@ package NovelForm.NovelForm.domain.box;
 
 
 import NovelForm.NovelForm.domain.box.dto.*;
+import NovelForm.NovelForm.domain.box.exception.WrongMemberException;
 import NovelForm.NovelForm.global.BaseResponse;
 import NovelForm.NovelForm.global.ErrorResultCreater;
 import NovelForm.NovelForm.global.exception.CustomFieldException;
@@ -163,9 +164,13 @@ public class BoxController {
     public BaseResponse<BoxInfoResponse> getBoxInfo(
             @Parameter(name = "보관함 번호(id)", in = ParameterIn.PATH) @PathVariable Long boxId,
             @Parameter(description = "페이지 번호", in = ParameterIn.QUERY)
-            @Validated @RequestParam(value = "page", required = false, defaultValue = "1") Integer page){
+            @Validated @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+            @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId) throws WrongMemberException {
 
-        BoxInfoResponse boxInfo = boxService.getBoxInfo(boxId, page);
+
+
+
+        BoxInfoResponse boxInfo = boxService.getBoxInfo(boxId, page, memberId);
 
         return new BaseResponse<>(boxInfo);
     }
