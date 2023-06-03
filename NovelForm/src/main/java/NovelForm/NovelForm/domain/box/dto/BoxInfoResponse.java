@@ -20,6 +20,12 @@ public class BoxInfoResponse {
     @Schema(description = "보관함 설명", defaultValue = "test content")
     private String content;
 
+    @Schema(description = "보관함에 좋아요를 했는지", defaultValue = "false")
+    private Boolean isLike;
+
+    @Schema(description = "보관함에 즐겨찾기를 했는지", defaultValue = "false")
+    private Boolean isFavorite;
+
     @Schema(description = "보관함 내 작품들", defaultValue = "[]")
     private List<BoxItemInfo> boxItemInfo;
 

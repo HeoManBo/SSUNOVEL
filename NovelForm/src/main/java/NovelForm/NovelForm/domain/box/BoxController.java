@@ -2,6 +2,7 @@ package NovelForm.NovelForm.domain.box;
 
 
 import NovelForm.NovelForm.domain.box.dto.*;
+import NovelForm.NovelForm.domain.box.exception.WrongMemberException;
 import NovelForm.NovelForm.global.BaseResponse;
 import NovelForm.NovelForm.global.ErrorResultCreater;
 import NovelForm.NovelForm.global.exception.CustomFieldException;
@@ -161,11 +162,15 @@ public class BoxController {
     @Operation(summary = "보관함 상세 정보 가져오기", description = "보관함 내부의 작품 목록및 보관함에 대한 정보를 가져오는 메서드입니다.")
     @GetMapping("/info/{boxId}")
     public BaseResponse<BoxInfoResponse> getBoxInfo(
-            @Parameter(name = "보관함 번호(id)", in = ParameterIn.PATH) @PathVariable Long boxId,
+            @Parameter(description = "보관함 번호(id)", in = ParameterIn.PATH) @PathVariable Long boxId,
             @Parameter(description = "페이지 번호", in = ParameterIn.QUERY)
-            @Validated @RequestParam(value = "page", required = false, defaultValue = "1") Integer page){
+            @Validated @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+            @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId) throws WrongMemberException {
 
-        BoxInfoResponse boxInfo = boxService.getBoxInfo(boxId, page);
+
+
+
+        BoxInfoResponse boxInfo = boxService.getBoxInfo(boxId, page, memberId);
 
         return new BaseResponse<>(boxInfo);
     }
@@ -180,7 +185,7 @@ public class BoxController {
     @Operation(summary = "보관함 검색", description = "공유로 설정되어 있는 보관함들을 검색하는 메서드입니다.")
     @GetMapping("/search")
     public BaseResponse<BoxSearchResponse> getSearchBox(
-            @Parameter(name = "검색어", required = true, example = "test") @RequestParam String item,
+            @Parameter(description = "검색어", required = true, example = "test") @RequestParam String item,
             @Parameter(description = "페이지 번호", in = ParameterIn.QUERY)
             @Validated @RequestParam(value = "page", required = false, defaultValue = "1") Integer page){
 
@@ -198,7 +203,7 @@ public class BoxController {
     @Operation(summary = "보관함 이름 검색", description = "공유로 설정되어 있는 보관함들을 이름을 기반으로 검색하는 메서드입니다.")
     @GetMapping("/search/title")
     public BaseResponse<BoxSearchByTitleResponse> getSearchBoxByTitle(
-            @Parameter(name = "검색어", required = true, example = "title") @RequestParam String item,
+            @Parameter(description = "검색어", required = true, example = "title") @RequestParam String item,
             @Parameter(description = "페이지 번호", in = ParameterIn.QUERY)
             @Validated @RequestParam(value = "page", required = false, defaultValue = "1") Integer page){
 
@@ -217,7 +222,7 @@ public class BoxController {
     @Operation(summary = "보관함 생성자 검색", description = "공유로 설정되어 있는 보관함들을 생성자를 기반으로 검색하는 메서드입니다.")
     @GetMapping("/search/creator")
     public BaseResponse<BoxSearchByCreatorResponse> getSearchBoxByCreator(
-            @Parameter(name = "검색어", required = true, example = "creator") @RequestParam String item,
+            @Parameter(description = "검색어", required = true, example = "creator") @RequestParam String item,
             @Parameter(description = "페이지 번호", in = ParameterIn.QUERY)
             @Validated @RequestParam(value = "page", required = false, defaultValue = "1") Integer page){
 

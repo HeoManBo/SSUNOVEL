@@ -170,4 +170,70 @@ public interface BoxRepository extends JpaRepository<Box, Long> {
             " left join b.boxItems bi " +
             " where m = :member" )
     List<MemberBoxInfo> findMemberBoxByMember(@Param("member") Member member);
+
+
+    /**
+     * 좋아요가 없을 때도 동작할 좋아요 개수에 따른 보관함 가져오기
+     *  내림차순
+     * @param pageRequest
+     * @return
+     */
+    @Query(value = "select new NovelForm.NovelForm.domain.box.dto.AllBoxResponse( " +
+            " b.title, " +
+            " m.nickname, " +
+            " (select n.cover_image from BoxItem bi2 inner join bi2.novel n where bi2.box = b and bi2.is_lead_item = 1), " +
+            " b.id," +
+            " b.update_at, " +
+            " count(distinct bi), " +
+            " count(distinct l)) " +
+            " from Box b " +
+            " left join b.likes l " +
+            " inner join b.member m " +
+            " inner join b.boxItems bi " +
+            " where b.is_private = 0 " +
+            " group by b " +
+            " order by count(l) DESC ",
+
+            countQuery = " select count(distinct l) " +
+                    " from Box b " +
+                    " left join b.likes l " +
+                    " inner join b.member m " +
+                    " inner join b.boxItems bi " +
+                    " where b.is_private = 0 " +
+                    " group by b "
+    )
+    Page<AllBoxResponse> findAllBoxByPublicWithLikeDesc(PageRequest pageRequest);
+
+
+    /**
+     * 좋아요가 없을 때도 동작할 좋아요 개수에 따른 보관함 가져오기
+     *  내림차순
+     * @param pageRequest
+     * @return
+     */
+    @Query(value = "select new NovelForm.NovelForm.domain.box.dto.AllBoxResponse( " +
+            " b.title, " +
+            " m.nickname, " +
+            " (select n.cover_image from BoxItem bi2 inner join bi2.novel n where bi2.box = b and bi2.is_lead_item = 1), " +
+            " b.id," +
+            " b.update_at, " +
+            " count(distinct bi), " +
+            " count(distinct l)) " +
+            " from Box b " +
+            " left join b.likes l " +
+            " inner join b.member m " +
+            " inner join b.boxItems bi " +
+            " where b.is_private = 0 " +
+            " group by b " +
+            " order by count(l)",
+
+            countQuery = " select count(distinct l) " +
+                    " from Box b " +
+                    " left join b.likes l " +
+                    " inner join b.member m " +
+                    " inner join b.boxItems bi " +
+                    " where b.is_private = 0 " +
+                    " group by b "
+    )
+    Page<AllBoxResponse> findAllBoxByPublicWithLike(PageRequest pageRequest);
 }
