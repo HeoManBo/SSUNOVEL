@@ -12,6 +12,12 @@ import java.util.List;
 @AllArgsConstructor
 public class BoxSearchResponse {
 
+    @Schema(description = "보관함 수(이름 검색)")
+    private int boxCntByTitle;
+
+    @Schema(description = "보관함 수(생성자 검색)")
+    private int boxCntByMember;
+
     @Schema(description = "보관함 이름 기반 검색 목록")
     private List<BoxSearchInfo> searchByTitle = new ArrayList<>();
 

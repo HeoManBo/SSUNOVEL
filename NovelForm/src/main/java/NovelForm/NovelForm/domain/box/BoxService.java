@@ -353,7 +353,10 @@ public class BoxService {
         List<BoxSearchInfo> boxByTitle = boxRepository.findBoxByTitle(search, pageRequest);
         List<BoxSearchInfo> boxByMember = boxRepository.findBoxByMember(search, pageRequest);
 
-        return new BoxSearchResponse(boxByTitle, boxByMember);
+        int boxCntByTitle = boxByTitle.size();
+        int boxCntByMember = boxByMember.size();
+
+        return new BoxSearchResponse(boxCntByTitle, boxCntByMember, boxByTitle, boxByMember);
     }
 
 
@@ -367,7 +370,7 @@ public class BoxService {
         PageRequest pageRequest = PageRequest.of(page - 1, 10);
 
         List<BoxSearchInfo> boxByTitle = boxRepository.findBoxByTitle(search, pageRequest);
-        return new BoxSearchByTitleResponse(boxByTitle);
+        return new BoxSearchByTitleResponse(boxByTitle.size(), boxByTitle);
     }
 
 
@@ -380,6 +383,6 @@ public class BoxService {
         PageRequest pageRequest = PageRequest.of(page - 1, 10);
 
         List<BoxSearchInfo> boxByCreator = boxRepository.findBoxByMember(search, pageRequest);
-        return new BoxSearchByCreatorResponse(boxByCreator);
+        return new BoxSearchByCreatorResponse(boxByCreator.size(), boxByCreator);
     }
 }
