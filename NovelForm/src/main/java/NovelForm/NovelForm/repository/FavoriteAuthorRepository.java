@@ -12,6 +12,7 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository
@@ -46,8 +47,15 @@ public interface FavoriteAuthorRepository extends JpaRepository<FavoriteAuthor, 
      */
     List<FavoriteAuthor> findFavoriteAuthorsByMemberId(Long memberId);
 
+    /**
+     *  해당 작가를 좋아요를 누른 멤버의 리스트를 가져옴
+     */
     @Query("select fa from FavoriteAuthor fa join fetch fa.member m where fa.author = :author")
     List<FavoriteAuthor> findByMemberWithLikeAuthor(@Param("author") Author author);
 
-
+    /**
+     * 상세 조회 페이지에서 해당 작가 좋아요를 로그인한 유저가 좋아요를 눌렀는지 확인함
+     */
+    @Query("select fa from FavoriteAuthor fa where fa.member = :member and fa.author = :author")
+    FavoriteAuthor IsLikeAlreadyAuthor(@Param("member") Member member, @Param("author") Author author);
 }

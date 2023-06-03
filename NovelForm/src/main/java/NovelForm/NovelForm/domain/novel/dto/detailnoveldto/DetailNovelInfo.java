@@ -27,6 +27,9 @@ public class DetailNovelInfo {
     @Schema(description = "작가 명")
     private String authorName;
 
+    @Schema(description = "작가 번호")
+    private int authorId;
+
     @Schema(description = "소설 장르")
     private String category;
 
@@ -67,8 +70,10 @@ public class DetailNovelInfo {
     //favorite repo를 통해 가져와야할 값
     //상세 조회한 회원이 이미 좋아하는 소설인 경우 1
     //비로그인 회원이거나, 좋아요를 누르지 않은 회원인 경우 0
+    @Schema(description = "이미 좋아욜요를 한 작가인지 확인", defaultValue = "했으면 1, 안했으면 0")
+    private int alreadyAuthorLike;
     @Schema(description = "이미 즐겨찾기 한 소설인지 확인", defaultValue = "했으면 1, 안 했으면 0")
-    int alreadyLike;
+    private int alreadyLike;
     @Schema(description = "내가 부여한 평점", defaultValue = "평점 미 부여시 0점, 그 외엔 0.5~5.0 0.5단위")
     private double my_rating;
     @Schema(description = "내가 작성한 리뷰", defaultValue = "미 작성시 null 값으로 처리")

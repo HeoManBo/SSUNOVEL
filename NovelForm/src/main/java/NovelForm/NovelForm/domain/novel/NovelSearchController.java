@@ -1,6 +1,7 @@
 package NovelForm.NovelForm.domain.novel;
 
 
+import NovelForm.NovelForm.domain.favorite.domain.FavoriteAuthor;
 import NovelForm.NovelForm.domain.favorite.domain.FavoriteNovel;
 import NovelForm.NovelForm.domain.member.MemberService;
 import NovelForm.NovelForm.domain.member.domain.Member;
@@ -12,6 +13,7 @@ import NovelForm.NovelForm.domain.novel.dto.searchdto.NovelDto;
 import NovelForm.NovelForm.domain.novel.dto.searchdto.SearchDto;
 import NovelForm.NovelForm.domain.novel.exception.NoSuchNovelListException;
 import NovelForm.NovelForm.global.BaseResponse;
+import NovelForm.NovelForm.repository.FavoriteAuthorRepository;
 import NovelForm.NovelForm.repository.FavoriteNovelRepository;
 import NovelForm.NovelForm.util.NovelCSVParser;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -30,7 +32,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static NovelForm.NovelForm.global.SessionConst.LOGIN_MEMBER_ID;
@@ -46,7 +50,10 @@ public class NovelSearchController {
     private final ReviewService reviewService;
     private final FavoriteNovelRepository favoriteNovelRepository;
     private final MemberService memberService;
+    private final FavoriteAuthorRepository favoriteAuthorRepository;
 
+    private final String[] order = {"download_cnt", "review_cnt", "rating"};
+    private final String[] platform = {"is_munpia","is_kakao","is_naver","is_ridi"};
 
     /**
      *
@@ -63,15 +70,19 @@ public class NovelSearchController {
      * //별점순, 최신순, 리뷰 준 사람 숫자,
      */
 
-    @Operation(summary = "소설/작가 검색", description = "자세히 보기 클릭전, 기본적인 정보를 보여줍니다.",
+    @Operation(summary = "소설/작가 검색", description = "자세히 보기 클릭전, 기본적인 정보를 보여줍니다. orderBy 의 값은 deault -> download_cnt, review_cnt(리뷰 개수), rating(평균 평점)으로 구성됩니다.",
             responses = @ApiResponse(responseCode = "200", description = "상세 검색 성공", content = @Content(schema = @Schema(implementation = SearchDto.class))))
     @GetMapping(value = "/search" , produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse<SearchDto> searchNovelAndAuthor(@RequestParam String search,
-                                             @RequestParam(required = false, defaultValue = "None") String orderBy){
+                                             @RequestParam(required = false, defaultValue = "download_cnt") String orderBy){
 
         //검색어가 빈문자 or 공백으로만 차있는 경우 : bad request;
         if(!StringUtils.hasText(search)){
             throw new IllegalArgumentException("검색어의 입력 값이 없습니다.");
+        }
+
+        if(!Arrays.asList(order).contains(orderBy)){ //정렬 기준 값 확인
+            throw new IllegalArgumentException("잘못된 정렬 기준입니다.");
         }
 
         MidFormmat first = novelService.findNovels(search, 0, orderBy);
@@ -81,15 +92,19 @@ public class NovelSearchController {
         return new BaseResponse<SearchDto>(HttpStatus.OK, result);
     }
 
-    @Operation(summary = "소설만 상세 검색", description = "페이징이 가능한 소설 검색 결과를 보여줍니다.",
+    @Operation(summary = "소설만 상세 검색", description = "페이징이 가능한 소설 검색 결과를 보여줍니다. orderBy 의 값은 deault -> (None) download_cnt, review_cnt(리뷰 개수), rating(평균 평점)으로 구성됩니다.",
                responses = @ApiResponse(responseCode = "200", description = "소설 상세 검색 성공", content = @Content(schema = @Schema(implementation = MidFormmat.class))))
     @GetMapping(value = "/search/novel", produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse<MidFormmat> searchNovel(@RequestParam String search,
                                                 @RequestParam(required = false, defaultValue = "0") @Min(0) int pageNum,
-                                                @RequestParam(required = false, defaultValue = "None") String orderBy){
+                                                @RequestParam(required = false, defaultValue = "download_cnt") String orderBy){
         //검색어가 빈문자 or 공백으로만 차있는 경우 : bad request;
         if(!StringUtils.hasText(search)){
             throw new IllegalArgumentException("검색어의 입력 값이 없습니다.");
+        }
+
+        if(!Arrays.asList(order).contains(orderBy)){ //정렬 기준 값 확인
+            throw new IllegalArgumentException("잘못된 정렬 기준입니다.");
         }
 
         MidFormmat result = novelService.findNovels(search, pageNum, orderBy);
@@ -98,16 +113,21 @@ public class NovelSearchController {
         return new BaseResponse<MidFormmat>(HttpStatus.OK, result);
     }
 
-    @Operation(summary = "작가만 상세 검색", description = "페이징이 가능한 작가가 가지는 소설 검색 결과를 보여줍니다.",
+    @Operation(summary = "작가만 상세 검색", description = "페이징이 가능한 작가가 가지는 소설 검색 결과를 보여줍니다. orderBy 의 값은 deault -> (None) download_cnt, review_cnt(리뷰 개수), rating(평균 평점)으로 구성됩니다.",
                responses = @ApiResponse(responseCode = "200", description = "작가 상세 검색 성공", content = @Content(schema = @Schema(implementation = MidFormmat.class))))
     @GetMapping(value = "/search/author", produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse<MidFormmat> searchAuthor(@RequestParam String search,
                                                  @RequestParam(required = false, defaultValue = "0") @Min(0) int pageNum,
-                                                @RequestParam(required = false, defaultValue = "None") String orderBy){
+                                                @RequestParam(required = false, defaultValue = "download_cnt") String orderBy){
         //검색어가 빈문자 or 공백으로만 차있는 경우 : bad request;
         if(!StringUtils.hasText(search)){
             throw new IllegalArgumentException("검색어의 입력 값이 없습니다.");
         }
+
+        if(!Arrays.asList(order).contains(orderBy)){ //정렬 기준 값 확인
+            throw new IllegalArgumentException("잘못된 정렬 기준입니다.");
+        }
+
 
         MidFormmat result = novelService.findNovelWithAuthor(search, pageNum, orderBy);
 
@@ -118,11 +138,13 @@ public class NovelSearchController {
     /**
      * 상세 조회 메소드
      */
-    @Operation(summary = "소설 상세 정보", description = "소설 상세 정보를 보여줍니다. 리뷰와 다른 소설이 없는 경우 공 리스트로 반환됩니다. ",
+    @Operation(summary = "소설 상세 정보", description = "소설 상세 정보를 보여줍니다. 리뷰와 다른 소설이 없는 경우 공 리스트로 반환됩니다. " +
+            "orderby는 기본적으로 시간순(recently)으로 정렬하며 like_count 라는 값이 있으면 좋아요 수를 기준으로 리뷰를 정렬합니다. ",
                responses = @ApiResponse(responseCode = "200", description = "소설 상세 정보 조회 성공", content = @Content(schema = @Schema(implementation = DetailNovelInfo.class))))
     @GetMapping("/{novel_id}")
     public BaseResponse<DetailNovelInfo> detailSearchNovel(@PathVariable("novel_id") @Min(0) Long id,
-                                            @SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId) throws Exception{
+                                            @SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId,
+                                            @RequestParam(value = "orderBy", required = false, defaultValue = "recently") String reviewOrder) throws Exception{
         //소설 정보를 가져온다.
         Novel novel = novelService.findNovel(id);
         if(novel == null){ //novel_id 에 해당하는 id가 없다면
@@ -144,9 +166,11 @@ public class NovelSearchController {
                 .price(novel.getPrice())
                 .total_episode(novel.getEpisode()).build();
 
+        result.setAuthorId(novel.getAuthor().getId().intValue());
 
         //소설 번호에 대응되는 리뷰를 가져온다.
-        List<ReviewDto> reviewMatchingNovel = reviewService.findReviewMatchingNovel(novel, memberId);
+        List<ReviewDto> reviewMatchingNovel = reviewService.findReviewMatchingNovel(novel, memberId, reviewOrder);
+
         if(reviewMatchingNovel == null){ //매칭되는 리뷰가 없다면
             result.setReviewInfos(null);
         }
@@ -187,12 +211,22 @@ public class NovelSearchController {
                 result.setMy_rating(0.0);
                 result.setMy_review_id(0L);
             }
+
+            //해당 소설의 작가에 대한 좋아요를 눌렀는지 확인한다
+            FavoriteAuthor favoriteAuthor = favoriteAuthorRepository.IsLikeAlreadyAuthor(member, novel.getAuthor());
+            if(favoriteAuthor != null){ // 좋아요를 누른 기록이 있으면
+                result.setAlreadyAuthorLike(1);
+            }
+            else{
+                result.setAlreadyAuthorLike(0);
+            }
         }
-        else{ //로그인 상태가 아니라면 0, 0.0, null 처리
+        else{ //로그인 상태가 아니라면 0, 0.0, null, 0 처리
             result.setAlreadyLike(0);
             result.setMy_review(null);
             result.setMy_rating(0.0);
             result.setMy_review_id(0L);
+            result.setAlreadyAuthorLike(0);
         }
 
         return new BaseResponse<DetailNovelInfo>(HttpStatus.OK, result);
@@ -234,6 +268,17 @@ public class NovelSearchController {
         if(bindingResult.hasErrors()){
             throw new JsonMappingException("잘못된 JSON값입니다.");
         }
+        /**
+         * 각 json 값마다 유효성 검사
+         */
+        if(!Arrays.asList(order).contains(categoryDto.getOrderBy())){ //정렬 기준 값 확인
+            throw new IllegalArgumentException("잘못된 정렬 기준입니다.");
+        }
+
+        if(!Arrays.asList(platform).contains(categoryDto.getPlatform())){ //정렬 기준 값 확인
+            throw new IllegalArgumentException("잘못된 정렬 기준입니다.");
+        }
+
         MidFormmat novelsWithCategory = novelService.findNovelsWithCategory(categoryDto);
 
         return new BaseResponse<MidFormmat>(HttpStatus.OK, novelsWithCategory);

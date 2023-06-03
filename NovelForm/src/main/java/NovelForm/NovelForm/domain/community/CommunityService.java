@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,8 +69,17 @@ public class CommunityService {
      * 페이지 번호에 맞는 게시글 리스트 반환
      */
     @Transactional(readOnly = true)
-    public List<PostDto> totalPost(int pageNum) {
-        PageRequest page = PageRequest.of(pageNum, PagingSize);//최신순으로 내림차순 등록을 한다
+    public List<PostDto> totalPost(int pageNum, String date) throws IllegalArgumentException {
+        Pageable page;
+        if(date.equals("latest")){ //내림차순
+            page = PageRequest.of(pageNum, PagingSize, Sort.by("create_at").descending());
+        }
+        else if(date.equals("outDate")){ //오름 차순
+            page = PageRequest.of(pageNum, PagingSize, Sort.by("create_at").ascending());
+        }
+        else{
+            throw new IllegalArgumentException("잘못된 기준 정렬입니다");
+        }
 
         Page<CommunityPost> postListWithPaging = communityPostRepository.findPostListWithPaging(page);
 
@@ -166,8 +177,16 @@ public class CommunityService {
      * 검색어가 주어졌을 때 검색어에 해당되는 게시물을 찾아옵니다.
      */
     @Transactional(readOnly = true)
-    public List<PostDto> keywordPost(String keyword) {
-        List<CommunityPost> communityPostWithKeyword = communityPostRepository.findCommunityPostWithKeyword(keyword);
+    public List<PostDto> keywordPost(String keyword, String date) throws IllegalArgumentException {
+        List<CommunityPost> communityPostWithKeyword;
+        if(date.equals("latest")){ //내림차순
+            communityPostWithKeyword = communityPostRepository.findCommunityPostWithKeywordDESC(keyword);
+        }
+        else if(date.equals("outDate")) { //오름 차순
+            communityPostWithKeyword = communityPostRepository.findCommunityPostWithKeywordASC(keyword);
+        }else{
+            throw new IllegalArgumentException("잘못된 기준 정렬입니다");
+        }
 
         if(communityPostWithKeyword.size() == 0){ //검색 조건에 맞는 게시글이 없으면
             return null;
