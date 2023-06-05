@@ -194,7 +194,7 @@ public interface BoxRepository extends JpaRepository<Box, Long> {
             " inner join b.boxItems bi " +
             " where b.is_private = 0 " +
             " group by b " +
-            " order by count(l) DESC ",
+            " order by size(l) DESC ",
 
             countQuery = " select count(distinct l) " +
                     " from Box b " +
@@ -209,7 +209,7 @@ public interface BoxRepository extends JpaRepository<Box, Long> {
 
     /**
      * 좋아요가 없을 때도 동작할 좋아요 개수에 따른 보관함 가져오기
-     *  내림차순
+     * 오름차순
      * @param pageRequest
      * @return
      */
@@ -227,7 +227,7 @@ public interface BoxRepository extends JpaRepository<Box, Long> {
             " inner join b.boxItems bi " +
             " where b.is_private = 0 " +
             " group by b " +
-            " order by count(l)",
+            " order by size(l)",
 
             countQuery = " select count(distinct l) " +
                     " from Box b " +
