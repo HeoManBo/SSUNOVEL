@@ -91,8 +91,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<MemberReviewInfo> findMemberReviewByMember(@Param("member") Member member);
 
     @Query("select r " +
-            "from Review r join fetch r.member m left join fetch r.likeList where r.novel = :novel")
-    List<Review> reviewFetchLike(@Param("novel") Novel novel);
+            "from Review r join fetch r.member m left join fetch r.likeList where r.novel = :novel order by r.create_at desc")
+    List<Review> reviewFetchLikeOrderRecency(@Param("novel") Novel novel);
+
+
 
 
 

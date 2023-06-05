@@ -58,8 +58,10 @@ public class ReviewService {
 
     //파라미터로 들어온 소설에 작성된 리뷰를 반환한다.
     @Transactional(readOnly = true)
-    public List<ReviewDto> findReviewMatchingNovel(Novel novel, Long memberId){
-        List<Review> reviews = reviewRepository.reviewFetchLike(novel);
+    public List<ReviewDto> findReviewMatchingNovel(Novel novel, Long memberId, String order){
+
+        List<Review> reviews =  reviewRepository.reviewFetchLikeOrderRecency(novel); //일단 시간 순서대로 가져옴
+
         log.info("reviews size = {}", reviews.size());
         for (Review review : reviews) {
             log.info("review conent : {}, writer = {}", review.getContent(), review.getMember().getNickname());
@@ -88,7 +90,11 @@ public class ReviewService {
         else{ //리뷰가 없다면 null로 처리
             return null;
         }
-        Collections.sort(result); // like_cnt를 기준으로 내림차순 정렬.
+
+        if(order.equals("like_count")) { // like_cnt를 기준으로 내림차순 정렬.
+            Collections.sort(result);
+        }
+
         return result;
     }
 
@@ -182,6 +188,7 @@ public class ReviewService {
             throw new NotReviewOwner();
         }
 
+        likeRepository.deleteLikeReview(deleteReview); //삭제하려는 리뷰에 좋아요 한 DB 기록 삭제
         member.deleteMyReview(deleteReview); //일관성을 위해 현재 멤버 객체에서도 제거해줌
         novel.deleteReview(deleteReview); //일관성을 위해 현재 소설 객체에서도 제거해줌
         reviewRepository.deleteReviewById(deleteReview.getId()); //리뷰 삭제

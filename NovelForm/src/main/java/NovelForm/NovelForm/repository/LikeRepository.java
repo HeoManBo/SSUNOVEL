@@ -76,7 +76,7 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
             " count(distinct bi), " +
             " count(distinct l)) " +
             " from Like l " +
-            " inner join  l.box b " +
+            " inner join l.box b " +
             " inner join b.member m " +
             " inner join b.boxItems bi " +
             " where b.is_private = 0 " +
@@ -84,7 +84,7 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
             " order by count(l) DESC ",
 
             countQuery = " select count(distinct l) " +
-                    " from Like l " +
+                    " from Like l" +
                     " inner join l.box b " +
                     " inner join b.member m " +
                     " inner join b.boxItems bi " +
@@ -217,8 +217,9 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     )
     Page<BestReviewDto> findNovelWithinGenreLikeReviewDescForRomance(@Param("title") String title, @Param("genre") String genre, Pageable pageable);
 
-
-
-
+    // 해당 리뷰 삭제시 좋아요 한 기록들 또한 삭제
+    @Modifying
+    @Query("delete from Like l where l.review = :review")
+    void deleteLikeReview(@Param("review") Review review);
 }
 

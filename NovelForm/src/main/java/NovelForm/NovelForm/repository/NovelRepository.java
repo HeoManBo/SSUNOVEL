@@ -14,6 +14,7 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository
@@ -42,7 +43,12 @@ public interface NovelRepository extends JpaRepository<Novel, Long>, CustomNovel
     //countQuery에서는 개수만 새면 되므로 작가의 정보는 필요가 없어 fetch join 대신 inner join을 사용한다.
     @Query(value = "select n from Novel n join fetch n.author where n.title like %:search%",
            countQuery = "select count(n) from Novel n inner join n.author where n.title like %:search%")
-    Page<Novel> findByTitleWithPaging(@Param("search") String search, Pageable pageable);
+    Page<Novel> findByTitleWithPagingOrderByDownload_cntOrReview_cnt(@Param("search") String search, Pageable pageable);
+
+
+    @Query(value = "select n from Novel n join fetch n.author where n.title like %:search% order by n.rating / n.review_cnt desc",
+            countQuery = "select count(n) from Novel n inner join n.author where n.title like %:search% order by n.rating / n.review_cnt")
+    Page<Novel> findByTitleWithPagingOrderByRating(@Param("search") String search, Pageable pageable);
 
     //검색시 검색어가 포함되는 소설의 전체 개수를 검색하는 쿼리이다.
     @Query("select count(n) from Novel n where n.title like %:search%")
@@ -52,7 +58,11 @@ public interface NovelRepository extends JpaRepository<Novel, Long>, CustomNovel
     //해당 쿼리는 파라미터로 넘어오는 검색어와 일치하는 작가를 검색하는 쿼리이다.
     @Query(value = "select n from Novel n join fetch n.author au where au.name like %:search%",
             countQuery = "select count(n) from Novel n inner join n.author au where au.name like %:search%")
-    Page<Novel> findByAuthorWithPaging(@Param("search") String search, Pageable pageable);
+    Page<Novel> findByAuthorWithPagingOrderByDownload_cntOrReview_cnt(@Param("search") String search, Pageable pageable);
+
+    @Query(value = "select n from Novel n join fetch n.author au where au.name like %:search% order by n.rating / n.review_cnt desc",
+            countQuery = "select count(n) from Novel n inner join n.author au where au.name like %:search% order by  n.rating/ n.review_cnt")
+    Page<Novel> findByAuthorWithPagingOrderByRating(@Param("search") String search, Pageable pageable);
 
     //검색시 검색어가 포함되는 작가의 전체 소설 개수를 검색하는 쿼리이다.
     //개수만 가져오면 되므로 fetch join으로 작가의 정보까지 가져올 필요는 없으므로 inner join을 사용한다.
@@ -97,4 +107,7 @@ public interface NovelRepository extends JpaRepository<Novel, Long>, CustomNovel
             " group by n ")
     List<MemberFavoriteNovelInfo> findFavoriteNovelInfoByMember(@Param("member") Member member);
 
+
+    @Query("select n from Novel n join fetch Author a where n.id = :novel_id")
+    Optional<Novel> findNovelByIdWithAuthor(@Param("novel_id")Long novel_id);
 }

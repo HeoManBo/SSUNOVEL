@@ -79,16 +79,18 @@ public class CommunityController {
      * 파라미터로 넘어오는 페이지 번호에 맞는 게시글을 반환합니다.
      */
     @GetMapping()
-    @Operation(description = "전체 게시글 조회 메소드입니다", responses = @ApiResponse(responseCode = "200", description = "게사글 조회 목록 리스트 형태로 제공", content = @Content(schema = @Schema(implementation = PostDto.class))))
+    @Operation(description = "전체 게시글 조회 메소드입니다", responses = @ApiResponse(responseCode = "200", description = "게사글 조회 목록 리스트 형태로 제공하며", content = @Content(schema = @Schema(implementation = PostDto.class))))
     public BaseResponse totalPost(    @Parameter(description = "페이지 번호", in = ParameterIn.QUERY)
-                                      @RequestParam(value = "page", required = false, defaultValue = "0") int pageNum)
+                                      @RequestParam(value = "page", required = false, defaultValue = "0") int pageNum,
+                                      @Parameter(description = "게시글 정렬 기준으로 기본은 최신순(내림차순) : latest 부터 오래된 순서(오름차순)으로 조회하려면 outDate 전달", in = ParameterIn.QUERY)
+                                      @RequestParam(value = "orderByDate", required = false, defaultValue = "latest") String date)
             throws NoSuchListElement {
 
         if(pageNum < 0){
             throw new NumberFormatException("페이지 번호는 음수이거나 문자열일 수 없습니다.");
         }
 
-        List<PostDto> result = communityService.totalPost(pageNum);
+        List<PostDto> result = communityService.totalPost(pageNum, date);
 
         if(result == null){ //List를 받아오지 못하면 에러 호출
             throw new NoSuchListElement();
@@ -166,20 +168,23 @@ public class CommunityController {
 
     /**
      *
-     * @param 검색어
+     * @param
      * @return 검색어가 포함된 게시글 리스트를 반환합니다.
      */
     @GetMapping("/search")
     @Operation(description = "게시글 검색어 포함 조회 메소드입니다", responses = @ApiResponse(responseCode = "200", description = "게사글 검색어 포함 조회 성공, List 형태로 제공됩니다.", content = @Content(schema = @Schema(implementation = PostDto.class))))
     public BaseResponse<List<PostDto>> keywordPost(    @Parameter(description = "검색어", in = ParameterIn.QUERY)
-                                                       @RequestParam("keyword") String keyword) throws NoSuchListElement {
-        List<PostDto> result = communityService.keywordPost(keyword);
+                                                       @RequestParam("keyword") String keyword,
+                                                       @Parameter(description = "게시글 정렬 기준으로 기본은 최신순(내림차순) : latest 부터 오래된 순서(오름차순)으로 조회하려면 outDate 전달", in = ParameterIn.QUERY)
+                                                       @RequestParam(value = "orderByDate", required = false, defaultValue = "latest") String date) throws NoSuchListElement {
+        List<PostDto> result = communityService.keywordPost(keyword, date);
 
         log.info("keyword = {}", keyword);
 
         if(result == null){
             throw new NoSuchListElement();
         }
+
 
         return new BaseResponse(HttpStatus.OK, result);
     }

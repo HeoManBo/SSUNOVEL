@@ -72,8 +72,19 @@ public class NovelService {
     @Transactional(readOnly = true)
     public MidFormmat findNovels(String keyword, int novelPageNum, String orderBy){
         //소설 검색
-        Pageable novelPageable = PageRequest.of(novelPageNum, PagingSize);//페이징은 0번부터시작
-        Page<Novel> findNovels = novelRepository.findByTitleWithPaging(keyword, novelPageable);
+        Page<Novel> findNovels;
+
+        switch (orderBy) { //정렬 기준에 맞춰서 정렬
+            case "rating" -> { // 평균 평점으로 정렬
+                Pageable pageable = PageRequest.of(novelPageNum, PagingSize);
+                findNovels = novelRepository.findByTitleWithPagingOrderByRating(keyword, pageable);
+            }
+            default -> { //그외의 정렬 : (download_cnt) 웹 소설 플랫폼 사이트 전체 합 댓글 수, (review_cnt)novelforum 사이트 리뷰 수
+                Pageable novelPageable = PageRequest.of(novelPageNum, PagingSize, Sort.by(orderBy).descending());
+                findNovels = novelRepository.findByTitleWithPagingOrderByDownload_cntOrReview_cnt(keyword, novelPageable);
+            }
+        }
+
         //조건에 만족하는 소설이 없다면 반환
         if(findNovels.getTotalElements() == 0){
             return new MidFormmat(0, null);
@@ -88,8 +99,18 @@ public class NovelService {
     @Transactional(readOnly = true)
     public MidFormmat findNovelWithAuthor(String author_name, int authorPageNum, String orderBy){
         //소설 검색
-        Pageable authorPageable = PageRequest.of(authorPageNum, PagingSize); //페이징은 0번부터시작
-        Page<Novel> findNovels = novelRepository.findByAuthorWithPaging(author_name, authorPageable);
+        Page<Novel> findNovels;
+
+        switch (orderBy) { //정렬 기준에 맞춰서 정렬
+            case "rating" -> { // 평균 평점으로 정렬
+                Pageable pageable = PageRequest.of(authorPageNum, PagingSize);
+                findNovels = novelRepository.findByAuthorWithPagingOrderByRating(author_name, pageable);
+            }
+            default -> { //그외의 정렬 : (download_cnt) 웹 소설 플랫폼 사이트 전체 합 댓글 수, (review_cnt)novelforum 사이트 리뷰 수
+                Pageable novelPageable = PageRequest.of(authorPageNum, PagingSize, Sort.by(orderBy).descending());
+                findNovels = novelRepository.findByAuthorWithPagingOrderByDownload_cntOrReview_cnt(author_name, novelPageable);
+            }
+        }
         //조건에 만족하는 소설이 없다면 반환
         if(findNovels.getTotalElements() == 0){
             return new MidFormmat(0, null);
@@ -107,7 +128,7 @@ public class NovelService {
      */
     @Transactional(readOnly = true)
     public Novel findNovel(Long novel_id){
-        Optional<Novel> find = novelRepository.findById(novel_id);
+        Optional<Novel> find = novelRepository.findNovelByIdWithAuthor(novel_id);
         Novel novel;
         //없다면 null 처리
         if(find.isEmpty()){
@@ -162,4 +183,5 @@ public class NovelService {
         long size = novelRepository.totalCount(categoryDto);
         return new MidFormmat((int)size, dto);
     }
+
 }
