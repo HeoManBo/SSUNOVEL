@@ -32,6 +32,8 @@ import java.util.Optional;
 @Transactional
 public class BoxService {
 
+    private static final int pageCount = 10;
+
     private final BoxRepository boxRepository;
     private final MemberRepository memberRepository;
 
@@ -225,7 +227,8 @@ public class BoxService {
 
         List<AllBoxResponse> allBoxByPublic = null;
 
-        PageRequest pageRequest = PageRequest.of(page - 1, 10);
+        PageRequest pageRequest = PageRequest.of(page - 1, pageCount);
+
 
         // 필터링 조건에 따른 정렬 순서 조정
         switch (filtering) {
@@ -260,13 +263,19 @@ public class BoxService {
      */
     public BoxInfoResponse getBoxInfo(Long boxId, Integer page, Long memberId) throws WrongMemberException {
 
-        PageRequest pageRequest = PageRequest.of(page - 1, 10);
+        PageRequest pageRequest;
 
         Box findBox = boxRepository.findById(boxId).get();
 
 
         if(findBox == null){
             throw new NoSuchBoxItemException("보관함: " + boxId);
+        }
+
+        if(findBox.getBoxItems().size() < pageCount * page){
+            pageRequest = PageRequest.of(findBox.getBoxItems().size() / pageCount, pageCount);
+        }else{
+            pageRequest = PageRequest.of(page - 1, pageCount);
         }
 
         Page<BoxItem> findBoxItems = boxItemRepository.findBoxItemsWithBoxId(boxId, pageRequest);
