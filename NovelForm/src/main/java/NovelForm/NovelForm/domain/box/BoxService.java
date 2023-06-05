@@ -14,6 +14,7 @@ import NovelForm.NovelForm.domain.novel.Novel;
 import NovelForm.NovelForm.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,8 @@ public class BoxService {
     private final NovelRepository novelRepository;
     
     private final LikeRepository likeRepository;
+
+    private final BoxItemRepository boxItemRepository;
 
     private final FavoriteBoxRepository favoriteBoxRepository;
 
@@ -259,12 +262,18 @@ public class BoxService {
 
         PageRequest pageRequest = PageRequest.of(page - 1, 10);
 
-        Box findBox = boxRepository.findBoxWithBoxItems(boxId, pageRequest);
+        Box findBox = boxRepository.findById(boxId).get();
 
 
         if(findBox == null){
             throw new NoSuchBoxItemException("보관함: " + boxId);
         }
+
+        Page<BoxItem> findBoxItems = boxItemRepository.findBoxItemsWithBoxId(boxId, pageRequest);
+
+        List<BoxItem> findBoxItemList = findBoxItems.getContent().stream().toList();
+        log.info("boxitemList:{}", findBoxItemList);
+
 
         Boolean isLike;
         Boolean isFavorite;
@@ -299,7 +308,7 @@ public class BoxService {
 
         List<BoxItemInfo> boxItemInfos = new ArrayList<>();
 
-        for (BoxItem boxItem : findBox.getBoxItems()) {
+        for (BoxItem boxItem : findBoxItemList) {
 
             double averageRating;
 

@@ -1,6 +1,7 @@
 package NovelForm.NovelForm.repository;
 
 import NovelForm.NovelForm.domain.box.domain.Box;
+import NovelForm.NovelForm.domain.box.domain.BoxItem;
 import NovelForm.NovelForm.domain.box.dto.AllBoxResponse;
 import NovelForm.NovelForm.domain.box.dto.BoxSearchInfo;
 import NovelForm.NovelForm.domain.member.domain.Member;
@@ -58,6 +59,7 @@ public interface BoxRepository extends JpaRepository<Box, Long> {
             countQuery = "select count(b) from Box b inner join fetch b.boxItems bi where b.id = :boxId"
     )
     Box findBoxWithBoxItems(@Param("boxId") Long boxId, PageRequest pageRequest);
+
 
 
     /**
