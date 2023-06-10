@@ -207,6 +207,24 @@ public class MemberController {
         return new BaseResponse<>(result);
     }
 
+    /**
+     *  회원 정보 가져오기 메서드
+     *
+     *  닉네임, 이메일, 성별, 나이 정보를 가져온다.
+     */
+    @Operation(summary = "회원 정보 가져오기", description = "회원 정보 가져오기 기능. 이메일, 닉네임, 성별, 나이 정보")
+    @GetMapping("")
+    public BaseResponse<MemberInfoResponse> getMemberInfo(
+            @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId
+    ) throws WrongMemberException {
+
+        MemberInfoResponse memberInfoResponse = memberService.getMemberInfo(memberId);
+
+        return new BaseResponse<>(memberInfoResponse);
+
+    }
+
+
 
     /**
      * 마이페이지

@@ -377,4 +377,25 @@ public class MemberService {
 
         return memberFavoriteNovelResponse;
     }
+
+
+    /**
+     * 사용자 정보 가져오기
+     *
+     * @param memberId
+     * @return
+     */
+    public MemberInfoResponse getMemberInfo(Long memberId) throws WrongMemberException {
+
+        Member member = checkMember(memberId);
+
+        MemberInfoResponse memberInfoResponse = new MemberInfoResponse(
+                member.getEmail(),
+                member.getNickname(),
+                member.getGender(),
+                member.getAge()
+        );
+
+        return memberInfoResponse;
+    }
 }
