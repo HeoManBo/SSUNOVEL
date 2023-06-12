@@ -4,6 +4,7 @@ import NovelForm.NovelForm.domain.community.CommunityPost;
 import NovelForm.NovelForm.domain.community.dto.PostDto;
 import NovelForm.NovelForm.domain.member.domain.Member;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -67,11 +68,21 @@ public interface CommunityPostRepository extends JpaRepository<CommunityPost, Lo
     /**
      * 마이페이지 작성글 조회시 가져올 내 작성글
      */
-    @Query("select new NovelForm.NovelForm.domain.community.dto.PostDto( " +
+    @Query(value = "select new NovelForm.NovelForm.domain.community.dto.PostDto( " +
             " cp.id, " +
             " cp.title, " +
-            " cp.content " +
-            " ) from CommunityPost cp where cp.member = :member")
-    List<PostDto> findPostByMember(@Param("member") Member member);
+            " cp.content," +
+            " cp.create_at " +
+            " ) from CommunityPost cp where cp.member = :member",
 
+            countQuery = "select count(cp) from CommunityPost cp where cp.member = :member"
+    )
+    Page<PostDto> findPostByMember(@Param("member") Member member, PageRequest pageRequest);
+
+
+    /**
+     * 특정 회원이 작성한 작성 글 개수 가져오기
+     */
+    @Query("select count(cp) from CommunityPost cp where cp.member = :member")
+    Integer findPostCountByMember(@Param("member") Member member);
 }

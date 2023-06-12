@@ -1,7 +1,6 @@
 package NovelForm.NovelForm.repository;
 
 import NovelForm.NovelForm.domain.box.domain.Box;
-import NovelForm.NovelForm.domain.box.domain.BoxItem;
 import NovelForm.NovelForm.domain.box.dto.AllBoxResponse;
 import NovelForm.NovelForm.domain.box.dto.BoxSearchInfo;
 import NovelForm.NovelForm.domain.member.domain.Member;
@@ -158,7 +157,7 @@ public interface BoxRepository extends JpaRepository<Box, Long> {
      * 내가 작성한 보관함 가져오기
      * @return
      */
-    @Query("select new NovelForm.NovelForm.domain.member.dto.MemberBoxInfo(" +
+    @Query( value = "select new NovelForm.NovelForm.domain.member.dto.MemberBoxInfo(" +
             " b.id, " +
             " b.title, " +
             " m.nickname, " +
@@ -170,8 +169,17 @@ public interface BoxRepository extends JpaRepository<Box, Long> {
             " from Box b " +
             " inner join b.member m " +
             " left join b.boxItems bi " +
-            " where m = :member" )
-    List<MemberBoxInfo> findMemberBoxByMember(@Param("member") Member member);
+            " where m = :member " +
+            " group by b",
+
+            countQuery = "select count(b) " +
+                    "     from Box b" +
+                    "     inner join b.member m " +
+                    "     left join b.boxItems bi " +
+                    "     where m = :member" +
+                    "     group by b"
+    )
+    Page<MemberBoxInfo> findMemberBoxByMember(@Param("member") Member member, PageRequest pageRequest);
 
 
     /**
@@ -306,6 +314,8 @@ public interface BoxRepository extends JpaRepository<Box, Long> {
     Page<BoxSearchInfo> findBoxByTitleWithLikeDesc(@Param("search") String search, PageRequest pageRequest);
 
 
-
-
+    /**
+     * 본인이 생성한 보관함 개수 가져오기
+     */
+    Integer countBoxByMember(Member member);
 }

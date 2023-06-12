@@ -1,6 +1,7 @@
 package NovelForm.NovelForm.domain.member;
 
 
+import NovelForm.NovelForm.domain.box.FilteringType;
 import NovelForm.NovelForm.domain.member.dto.*;
 import NovelForm.NovelForm.domain.member.exception.WrongLoginException;
 import NovelForm.NovelForm.domain.member.exception.WrongMemberException;
@@ -242,12 +243,14 @@ public class MemberController {
     /**
      * 마이페이지 작성 글 가져오기
      */
-    @Operation(summary = "작성 글 가져오기", description = "마이페이지에서 가장 먼저 보여질 작성 글 가져오기")
+    @Operation(summary = "작성 글 가져오기", description = "마이페이지에서 가장 먼저 보여질 작성 글 가져오기 (최신 순으로 가져옵니다.)")
     @GetMapping("/mypage/post")
     public BaseResponse<MemberPostResponse> getMemberPost(
-        @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID) Long memberId) throws WrongMemberException {
+        @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID) Long memberId,
+        @Parameter(description = "페이지 번호", in = ParameterIn.QUERY)
+        @Validated @RequestParam(value = "page", required = false, defaultValue = "1") Integer page) throws WrongMemberException {
 
-        MemberPostResponse memberPost = memberService.getMemberPost(memberId);
+        MemberPostResponse memberPost = memberService.getMemberPost(memberId, page);
 
         return new BaseResponse<>(memberPost);
     }
@@ -258,10 +261,12 @@ public class MemberController {
     @Operation(summary = "작성 리뷰 가져오기", description = "본인이 작성한 리뷰 가져오기")
     @GetMapping("/mypage/review")
     public BaseResponse<MemberReviewResponse> getMemberReview(
-            @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID) Long memberId) throws WrongMemberException {
+            @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID) Long memberId,
+            @Parameter(description = "페이지 번호", in = ParameterIn.QUERY)
+            @Validated @RequestParam(value = "page", required = false, defaultValue = "1") Integer page) throws WrongMemberException {
 
 
-        MemberReviewResponse memberReviewResponse = memberService.getMemberReview(memberId);
+        MemberReviewResponse memberReviewResponse = memberService.getMemberReview(memberId, page);
 
         return new BaseResponse<>(memberReviewResponse);
     }
@@ -273,10 +278,12 @@ public class MemberController {
     @Operation(summary = "생성한 보관함 가져오기", description = "본인이 생성한 보관함 가져오기")
     @GetMapping("/mypage/box")
     public BaseResponse<MemberBoxResponse> getMemberBox(
-            @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID) Long memberId) throws WrongMemberException {
+            @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID) Long memberId,
+            @Parameter(description = "페이지 번호", in = ParameterIn.QUERY)
+            @Validated @RequestParam(value = "page", required = false, defaultValue = "1") Integer page) throws WrongMemberException {
 
 
-        MemberBoxResponse memberBoxResponse = memberService.getMemberBox(memberId);
+        MemberBoxResponse memberBoxResponse = memberService.getMemberBox(memberId, page);
 
         return new BaseResponse<>(memberBoxResponse);
     }
@@ -288,10 +295,12 @@ public class MemberController {
     @Operation(summary = "즐겨찾기 한 작가 목록 가져오기", description = "즐겨찾기로 등록한 작가 목록 가져오기")
     @GetMapping("/mypage/favorite/author")
     public BaseResponse<MemberFavoriteAuthorResponse> getMemberFavoriteAuthor(
-            @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID) Long memberId) throws WrongMemberException {
+            @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID) Long memberId,
+            @Parameter(description = "페이지 번호", in = ParameterIn.QUERY)
+            @Validated @RequestParam(value = "page", required = false, defaultValue = "1") Integer page) throws WrongMemberException {
 
 
-        MemberFavoriteAuthorResponse memberFavoriteAuthorResponse = memberService.getMemberFavoriteAuthor(memberId);
+        MemberFavoriteAuthorResponse memberFavoriteAuthorResponse = memberService.getMemberFavoriteAuthor(memberId, page);
 
         return new BaseResponse<>(memberFavoriteAuthorResponse);
     }
@@ -303,10 +312,12 @@ public class MemberController {
     @Operation(summary = "즐겨찾기 한 보관함 목록 가져오기", description = "즐겨찾기로 등록한 보관함 목록 가져오기")
     @GetMapping("/mypage/favorite/box")
     public BaseResponse<MemberFavoriteBoxResponse> getMemberFavoriteBox(
-            @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID) Long memberId) throws WrongMemberException {
+            @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID) Long memberId,
+            @Parameter(description = "페이지 번호", in = ParameterIn.QUERY)
+            @Validated @RequestParam(value = "page", required = false, defaultValue = "1") Integer page) throws WrongMemberException {
 
 
-        MemberFavoriteBoxResponse memberFavoriteBoxResponse = memberService.getMemberFavoriteBox(memberId);
+        MemberFavoriteBoxResponse memberFavoriteBoxResponse = memberService.getMemberFavoriteBox(memberId, page);
 
         return new BaseResponse<>(memberFavoriteBoxResponse);
     }
@@ -315,13 +326,15 @@ public class MemberController {
     /**
      * 마이페이지 즐겨찾기 한 소설 목록 가져오기
      */
-    @Operation(summary = "즐겨찾기 한 소설 목록 가져오기", description = "즐겨찾기로 등록한 즐겨찾기 목록 가져오기")
+    @Operation(summary = "즐겨찾기 한 소설 목록 가져오기", description = "즐겨찾기로 등록한 소설 목록 가져오기")
     @GetMapping("/mypage/favorite/novel")
     public BaseResponse<MemberFavoriteNovelResponse> getMemberFavoriteNovel(
-            @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID) Long memberId) throws WrongMemberException {
+            @Parameter(hidden = true) @SessionAttribute(name = LOGIN_MEMBER_ID) Long memberId,
+            @Parameter(description = "페이지 번호", in = ParameterIn.QUERY)
+            @Validated @RequestParam(value = "page", required = false, defaultValue = "1") Integer page) throws WrongMemberException {
 
 
-        MemberFavoriteNovelResponse memberFavoriteNovelResponse = memberService.getMemberFavoriteNovel(memberId);
+        MemberFavoriteNovelResponse memberFavoriteNovelResponse = memberService.getMemberFavoriteNovel(memberId, page);
 
         return new BaseResponse<>(memberFavoriteNovelResponse);
     }

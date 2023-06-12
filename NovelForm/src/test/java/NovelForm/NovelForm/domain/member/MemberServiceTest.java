@@ -23,6 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -415,14 +417,14 @@ public class MemberServiceTest {
         //given
         //setMember에서 설정한 내역을 바탕으로 작업
         List<Member> memberList = memberRepository.findAll();
-
+        PageRequest pageRequest = PageRequest.of(1, 10, Sort.by("update_at").descending());
 
 
 
         //when
         // 작성글 개수 확인
         for (Member member : memberList) {
-            List<PostDto> memberPostList = communityPostRepository.findPostByMember(member);
+            List<PostDto> memberPostList = communityPostRepository.findPostByMember(member, pageRequest).getContent();
 
             MemberPostResponse memberPostResponse = new MemberPostResponse(memberPostList.size(), memberPostList);
 
@@ -434,8 +436,9 @@ public class MemberServiceTest {
 
         //when
         // 작성 리뷰 확인
+
         for (Member member : memberList) {
-            List<MemberReviewInfo> memberReviewInfoList = reviewRepository.findMemberReviewByMember(member);
+            List<MemberReviewInfo> memberReviewInfoList = reviewRepository.findMemberReviewByMember(member, pageRequest).getContent();
 
             MemberReviewResponse memberReviewResponse = new MemberReviewResponse(memberReviewInfoList.size(), memberReviewInfoList);
 
@@ -448,7 +451,7 @@ public class MemberServiceTest {
         // when
         // 생성한 보관함 확인
         for (Member member : memberList) {
-            List<MemberBoxInfo> memberBoxInfoList = boxRepository.findMemberBoxByMember(member);
+            List<MemberBoxInfo> memberBoxInfoList = boxRepository.findMemberBoxByMember(member, pageRequest).getContent();
 
             MemberBoxResponse memberBoxResponse = new MemberBoxResponse(memberBoxInfoList.size(), memberBoxInfoList);
 
@@ -462,7 +465,7 @@ public class MemberServiceTest {
         // when
         // 즐겨찾기한 보관함 확인
         for (Member member : memberList) {
-            List<MemberBoxInfo> memberFavoriteBoxList = favoriteBoxRepository.findMemberFavoriteBoxByMember(member);
+            List<MemberBoxInfo> memberFavoriteBoxList = favoriteBoxRepository.findMemberFavoriteBoxByMember(member, pageRequest).getContent();
 
             MemberFavoriteBoxResponse memberFavoriteBoxResponse = new MemberFavoriteBoxResponse(memberFavoriteBoxList.size(), memberFavoriteBoxList);
 
@@ -479,7 +482,7 @@ public class MemberServiceTest {
         // 즐겨찾기한 작가 확인
         for(Member member : memberList){
 
-            List<Author> authorList = authorRepository.findAuthorsByMemberFavorite(member);
+            List<Author> authorList = authorRepository.findAuthorsByMemberFavorite(member, pageRequest).getContent();
             List<MemberFavoriteAuthorInfo> memberFavoriteAuthorInfoList = new ArrayList<>();
 
             for (Author author : authorList) {
@@ -518,7 +521,7 @@ public class MemberServiceTest {
         // 즐겨찾기한 소설 확인
         for (Member member : memberList) {
 
-            List<MemberFavoriteNovelInfo> novelInfoList = novelRepository.findFavoriteNovelInfoByMember(member);
+            List<MemberFavoriteNovelInfo> novelInfoList = favoriteNovelRepository.findFavoriteNovelInfoByMember(member, pageRequest).getContent();
             
             MemberFavoriteNovelResponse memberFavoriteNovelResponse = new MemberFavoriteNovelResponse(novelInfoList.size(), novelInfoList);
             

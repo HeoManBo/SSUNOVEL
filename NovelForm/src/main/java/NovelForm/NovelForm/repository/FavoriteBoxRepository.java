@@ -4,6 +4,7 @@ import NovelForm.NovelForm.domain.box.domain.Box;
 import NovelForm.NovelForm.domain.favorite.domain.FavoriteBox;
 import NovelForm.NovelForm.domain.member.domain.Member;
 import NovelForm.NovelForm.domain.member.dto.MemberBoxInfo;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -38,7 +39,7 @@ public interface FavoriteBoxRepository extends JpaRepository<FavoriteBox, Long> 
 
 
     // 즐겨찾기로 등록한 보관함 목록 가져오기
-    @Query("select new NovelForm.NovelForm.domain.member.dto.MemberBoxInfo(" +
+    @Query(value = "select new NovelForm.NovelForm.domain.member.dto.MemberBoxInfo(" +
             " b.id, " +
             " b.title, " +
             " m.nickname, " +
@@ -51,7 +52,22 @@ public interface FavoriteBoxRepository extends JpaRepository<FavoriteBox, Long> 
             " inner join fb.box b " +
             " inner join b.member m " +
             " left join b.boxItems bi " +
-            " where fb.member = :member" )
-    List<MemberBoxInfo> findMemberFavoriteBoxByMember(@Param("member") Member member);
+            " where fb.member = :member" +
+            " group by fb" ,
 
+            countQuery = "select count(fb) " +
+                    "       from FavoriteBox fb " +
+                    "       inner join fb.box b " +
+                    "       inner join b.member m " +
+                    "       left join b.boxItems bi " +
+                    "       where fb.member = :member" +
+                    "       group by fb"
+    )
+    Page<MemberBoxInfo> findMemberFavoriteBoxByMember(@Param("member") Member member, PageRequest pageRequest);
+
+
+    /**
+     * 본인이 등록한 즐겨찾기 보관함 개수 가져오기
+     */
+    Integer countFavoriteBoxByMember(Member member);
 }

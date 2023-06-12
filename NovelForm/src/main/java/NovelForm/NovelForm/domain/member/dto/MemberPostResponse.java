@@ -15,9 +15,9 @@ import java.util.List;
 @NoArgsConstructor
 public class MemberPostResponse {
 
-    @Schema(description = "작성글 갯수")
+    @Schema(description = "전체 작성글 갯수")
     int memberPostCnt;
 
-    @Schema(description = "작성글 목록")
+    @Schema(description = "이번 페이지의 작성글 목록")
     List<PostDto> memberPostList = new ArrayList<>();
 }

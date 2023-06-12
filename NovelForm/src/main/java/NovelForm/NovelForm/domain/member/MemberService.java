@@ -10,16 +10,15 @@ import NovelForm.NovelForm.domain.member.exception.WrongMemberException;
 import NovelForm.NovelForm.domain.novel.Author;
 import NovelForm.NovelForm.domain.novel.Novel;
 import NovelForm.NovelForm.repository.*;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
@@ -231,15 +230,23 @@ public class MemberService {
      * 해당 회원이 작성한 글 목록 가져오기
      *
      * @param memberId
+     * @param page
      */
-    public MemberPostResponse getMemberPost(Long memberId) throws WrongMemberException {
+    public MemberPostResponse getMemberPost(Long memberId, Integer page) throws WrongMemberException {
 
         // 사용자 확인
         Member member = checkMember(memberId);
 
         // 작성글 가져오기
-        List<PostDto> memberPostList = communityPostRepository.findPostByMember(member);
-        MemberPostResponse memberPostResponse = new MemberPostResponse(memberPostList.size(), memberPostList);
+        // 페이징은 10개 기준으로 하기
+        // 페이징을 하니까 전체 작성글 개수는 따로 가져와야 한다.
+        PageRequest pageRequest = PageRequest.of(page - 1, 10, Sort.by("update_at").descending());
+
+
+        List<PostDto> memberPostList = communityPostRepository.findPostByMember(member, pageRequest).getContent();
+
+        Integer postCnt = communityPostRepository.findPostCountByMember(member);
+        MemberPostResponse memberPostResponse = new MemberPostResponse(postCnt, memberPostList);
 
         return memberPostResponse;
     }
@@ -249,29 +256,23 @@ public class MemberService {
      * 사용자가 작성한 리뷰 가져오기
      *
      * @param memberId
+     * @param page
      * @return
      */
-    public MemberReviewResponse getMemberReview(Long memberId) throws WrongMemberException {
+    public MemberReviewResponse getMemberReview(Long memberId, Integer page) throws WrongMemberException {
 
         Member member = checkMember(memberId);
 
-        List<MemberReviewInfo> memberReviewInfoList = reviewRepository.findMemberReviewByMember(member);
+        // 작성 리뷰 가져오기
+        PageRequest pageRequest = PageRequest.of(page - 1, 10, Sort.by("update_at").descending());
+        List<MemberReviewInfo> memberReviewInfoList = reviewRepository.findMemberReviewByMember(member, pageRequest).getContent();
+        Integer reviewCnt = reviewRepository.countReviewByMember(member);
 
-        MemberReviewResponse memberReviewResponse = new MemberReviewResponse(memberReviewInfoList.size(), memberReviewInfoList);
+        MemberReviewResponse memberReviewResponse = new MemberReviewResponse(reviewCnt, memberReviewInfoList);
 
         return memberReviewResponse;
+
     }
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -292,14 +293,20 @@ public class MemberService {
      * 사용자가 생성한 모든 보관함을 가저오기
      *
      * @param memberId
+     * @param page
      * @return
      */
-    public MemberBoxResponse getMemberBox(Long memberId) throws WrongMemberException {
+    public MemberBoxResponse getMemberBox(Long memberId, Integer page) throws WrongMemberException {
         Member member = checkMember(memberId);
 
-        List<MemberBoxInfo> memberBoxInfoList = boxRepository.findMemberBoxByMember(member);
+        
+        
+        // 생성한 보관함 가져오기
+        PageRequest pageRequest = PageRequest.of(page - 1, 10, Sort.by("update_at").descending());
+        List<MemberBoxInfo> memberBoxInfoList = boxRepository.findMemberBoxByMember(member, pageRequest).getContent();
+        Integer boxCnt = boxRepository.countBoxByMember(member);
 
-        MemberBoxResponse memberBoxResponse = new MemberBoxResponse(memberBoxInfoList.size(), memberBoxInfoList);
+        MemberBoxResponse memberBoxResponse = new MemberBoxResponse(boxCnt, memberBoxInfoList);
 
         return memberBoxResponse;
     }
@@ -308,13 +315,16 @@ public class MemberService {
      * 사용자가 즐겨찾기로 등록한 작가 목록 가져오기
      *
      * @param memberId
+     * @param page
      * @return
      */
-    public MemberFavoriteAuthorResponse getMemberFavoriteAuthor(Long memberId) throws WrongMemberException {
+    public MemberFavoriteAuthorResponse getMemberFavoriteAuthor(Long memberId, Integer page) throws WrongMemberException {
 
         Member member = checkMember(memberId);
 
-        List<Author> authorList = authorRepository.findAuthorsByMemberFavorite(member);
+
+        PageRequest pageRequest = PageRequest.of(page - 1, 10, Sort.by("update_at").descending());
+        List<Author> authorList = authorRepository.findAuthorsByMemberFavorite(member, pageRequest).getContent();
         List<MemberFavoriteAuthorInfo> memberFavoriteAuthorInfoList = new ArrayList<>();
 
         for (Author author : authorList) {
@@ -338,8 +348,10 @@ public class MemberService {
             memberFavoriteAuthorInfoList.add(memberFavoriteAuthorInfo);
         }
 
+        Integer favoriteAuthorCnt = favoriteAuthorRepository.countFavoriteAuthorByMember(member);
+
         MemberFavoriteAuthorResponse memberFavoriteAuthorResponse =
-                new MemberFavoriteAuthorResponse(memberFavoriteAuthorInfoList.size(), memberFavoriteAuthorInfoList);
+                new MemberFavoriteAuthorResponse(favoriteAuthorCnt, memberFavoriteAuthorInfoList);
 
         return memberFavoriteAuthorResponse;
     }
@@ -348,15 +360,18 @@ public class MemberService {
      * 즐겨찾기로 등록한 보관함 목록 가져오기
      *
      * @param memberId
+     * @param page
      * @return
      */
-    public MemberFavoriteBoxResponse getMemberFavoriteBox(Long memberId) throws WrongMemberException {
+    public MemberFavoriteBoxResponse getMemberFavoriteBox(Long memberId, Integer page) throws WrongMemberException {
 
         Member member = checkMember(memberId);
 
-        List<MemberBoxInfo> memberFavoriteBoxList = favoriteBoxRepository.findMemberFavoriteBoxByMember(member);
+        PageRequest pageRequest = PageRequest.of(page - 1, 10, Sort.by("update_at").descending());
+        List<MemberBoxInfo> memberFavoriteBoxList = favoriteBoxRepository.findMemberFavoriteBoxByMember(member, pageRequest).getContent();
+        Integer boxCnt = favoriteBoxRepository.countFavoriteBoxByMember(member);
 
-        MemberFavoriteBoxResponse memberFavoriteBoxResponse = new MemberFavoriteBoxResponse(memberFavoriteBoxList.size(), memberFavoriteBoxList);
+        MemberFavoriteBoxResponse memberFavoriteBoxResponse = new MemberFavoriteBoxResponse(boxCnt, memberFavoriteBoxList);
 
         return memberFavoriteBoxResponse;
     }
@@ -365,15 +380,18 @@ public class MemberService {
      * 즐겨찾기로 등록한 소설 목록 가져오기
      *
      * @param memberId
+     * @param page
      * @return
      */
-    public MemberFavoriteNovelResponse getMemberFavoriteNovel(Long memberId) throws WrongMemberException {
+    public MemberFavoriteNovelResponse getMemberFavoriteNovel(Long memberId, Integer page) throws WrongMemberException {
 
         Member member = checkMember(memberId);
 
-        List<MemberFavoriteNovelInfo> novelInfoList = novelRepository.findFavoriteNovelInfoByMember(member);
+        PageRequest pageRequest = PageRequest.of(page - 1, 10, Sort.by("update_at").descending());
+        List<MemberFavoriteNovelInfo> novelInfoList = favoriteNovelRepository.findFavoriteNovelInfoByMember(member, pageRequest).getContent();
+        Integer novelCnt = favoriteNovelRepository.countFavoriteNovelByMember(member);
 
-        MemberFavoriteNovelResponse memberFavoriteNovelResponse = new MemberFavoriteNovelResponse(novelInfoList.size(), novelInfoList);
+        MemberFavoriteNovelResponse memberFavoriteNovelResponse = new MemberFavoriteNovelResponse(novelCnt, novelInfoList);
 
         return memberFavoriteNovelResponse;
     }
