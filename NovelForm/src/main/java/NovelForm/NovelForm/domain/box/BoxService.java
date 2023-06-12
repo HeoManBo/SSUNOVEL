@@ -364,12 +364,31 @@ public class BoxService {
      *
      *  둘 다 10개씩 검색하기
      */
-    public BoxSearchResponse searchBox(String search, Integer page) {
+    public BoxSearchResponse searchBox(String search, Integer page, FilteringType filtering) {
 
         PageRequest pageRequest = PageRequest.of(page - 1, 10);
 
-        List<BoxSearchInfo> boxByTitle = boxRepository.findBoxByTitle(search, pageRequest);
-        List<BoxSearchInfo> boxByMember = boxRepository.findBoxByMember(search, pageRequest);
+        List<BoxSearchInfo> boxByTitle = null;
+        List<BoxSearchInfo> boxByMember = null;
+
+        switch (filtering){
+            case TIME_DESC -> {
+                PageRequest pageRequestBySort = pageRequest.withSort(Sort.by(Sort.Order.desc("update_at")));
+                boxByTitle = boxRepository.findBoxByTitle(search, pageRequestBySort).getContent();
+                boxByMember = boxRepository.findBoxByMember(search, pageRequest).getContent();
+            }
+            case TIME_ASC -> {
+                PageRequest pageRequestBySort = pageRequest.withSort(Sort.by(Sort.Order.asc("update_at")));
+                boxByTitle = boxRepository.findBoxByTitle(search, pageRequestBySort).getContent();
+                boxByMember = boxRepository.findBoxByMember(search, pageRequestBySort).getContent();
+            }
+            case LIKE_DESC -> {
+                boxByTitle = boxRepository.findBoxByTitleWithLikeDesc(search, pageRequest).getContent();
+                boxByMember = boxRepository.findBoxByMemberWithLikeDesc(search, pageRequest).getContent();
+            }
+
+        }
+
 
         int boxCntByTitle = boxByTitle.size();
         int boxCntByMember = boxByMember.size();
@@ -383,11 +402,27 @@ public class BoxService {
      *
      *  10개씩 검색하기
      */
-    public BoxSearchByTitleResponse searchBoxByTitle(String search, Integer page) {
+    public BoxSearchByTitleResponse searchBoxByTitle(String search, Integer page, FilteringType filtering) {
 
         PageRequest pageRequest = PageRequest.of(page - 1, 10);
 
-        List<BoxSearchInfo> boxByTitle = boxRepository.findBoxByTitle(search, pageRequest);
+        List<BoxSearchInfo> boxByTitle = null;
+
+        switch (filtering){
+            case TIME_DESC -> {
+                PageRequest pageRequestBySort = pageRequest.withSort(Sort.by(Sort.Order.desc("update_at")));
+                boxByTitle = boxRepository.findBoxByTitle(search, pageRequestBySort).getContent();
+            }
+            case TIME_ASC -> {
+                PageRequest pageRequestBySort = pageRequest.withSort(Sort.by(Sort.Order.asc("update_at")));
+                boxByTitle = boxRepository.findBoxByTitle(search, pageRequestBySort).getContent();
+            }
+            case LIKE_DESC -> {
+                boxByTitle = boxRepository.findBoxByTitleWithLikeDesc(search, pageRequest).getContent();
+            }
+
+        }
+
         return new BoxSearchByTitleResponse(boxByTitle.size(), boxByTitle);
     }
 
@@ -397,10 +432,24 @@ public class BoxService {
      *
      *  10개씩 검색하기
      */
-    public BoxSearchByCreatorResponse searchBoxByCreator(String search, Integer page) {
+    public BoxSearchByCreatorResponse searchBoxByCreator(String search, Integer page, FilteringType filtering) {
         PageRequest pageRequest = PageRequest.of(page - 1, 10);
 
-        List<BoxSearchInfo> boxByCreator = boxRepository.findBoxByMember(search, pageRequest);
-        return new BoxSearchByCreatorResponse(boxByCreator.size(), boxByCreator);
+        List<BoxSearchInfo> boxByMember = null;
+
+        switch (filtering) {
+            case TIME_DESC -> {
+                PageRequest pageRequestBySort = pageRequest.withSort(Sort.by(Sort.Order.desc("update_at")));
+                boxByMember = boxRepository.findBoxByMember(search, pageRequest).getContent();
+            }
+            case TIME_ASC -> {
+                PageRequest pageRequestBySort = pageRequest.withSort(Sort.by(Sort.Order.asc("update_at")));
+                boxByMember = boxRepository.findBoxByMember(search, pageRequestBySort).getContent();
+            }
+            case LIKE_DESC -> {
+                boxByMember = boxRepository.findBoxByMemberWithLikeDesc(search, pageRequest).getContent();
+            }
+        }
+        return new BoxSearchByCreatorResponse(boxByMember.size(), boxByMember);
     }
 }

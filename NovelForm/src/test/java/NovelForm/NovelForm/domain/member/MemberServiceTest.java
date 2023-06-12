@@ -3,6 +3,7 @@ package NovelForm.NovelForm.domain.member;
 
 import NovelForm.NovelForm.domain.box.domain.Box;
 import NovelForm.NovelForm.domain.box.domain.BoxItem;
+import NovelForm.NovelForm.domain.community.CommunityPost;
 import NovelForm.NovelForm.domain.community.dto.PostDto;
 import NovelForm.NovelForm.domain.favorite.domain.FavoriteAuthor;
 import NovelForm.NovelForm.domain.favorite.domain.FavoriteBox;
@@ -130,13 +131,13 @@ public class MemberServiceTest {
         for(int i = 0; i < 10; i++){
             System.out.println(i);
 
-            Review review = new Review(
-                    "activated",
-                    novelList.get(i),
-                    memberList.get(i),
-                    3.5,
-                    "test review" + i
-            );
+            Review review = Review.builder()
+                    .rating(3.5)
+                    .content("test content")
+                    .build();
+
+            review.addNovel(novelList.get(i));
+            review.addMember(memberList.get(i));
             reviewList.add(review);
         }
 
