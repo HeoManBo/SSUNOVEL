@@ -30,7 +30,7 @@ public class ScheduledTask {
      * 서버가 시작될 때 실행된다...
      * 우선은 메소드가 종료되고 3일 후에 다시 호출하도록 설정
      */
-    @Scheduled()
+    //@Scheduled()
     public void callScrapingApi(){
 
         // 스크래핑 + CSV 파일 얻기
