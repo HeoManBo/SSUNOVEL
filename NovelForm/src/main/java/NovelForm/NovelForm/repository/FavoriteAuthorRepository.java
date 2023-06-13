@@ -58,4 +58,9 @@ public interface FavoriteAuthorRepository extends JpaRepository<FavoriteAuthor, 
      */
     @Query("select fa from FavoriteAuthor fa where fa.member = :member and fa.author = :author")
     FavoriteAuthor IsLikeAlreadyAuthor(@Param("member") Member member, @Param("author") Author author);
+
+    /**
+     * 본인이 즐겨찾기한 작가의 개수 구하기
+     */
+    Integer countFavoriteAuthorByMember(Member member);
 }

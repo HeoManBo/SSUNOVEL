@@ -81,6 +81,10 @@ public class DetailNovelInfo {
     @Schema(description = "내가 작성한 리뷰 ID")
     private Long my_review_id;
 
+
+    @Schema(description = "해당 소설에 대한 추천 소설 목록")
+    List<NovelDto> recommendNovels = new ArrayList<>();
+
     @Builder
     public DetailNovelInfo(String image_url, String title, String content, String category,
                            String is_naver, String is_kakao, String is_munpia, String is_ridi, int review_cnt,

@@ -69,6 +69,11 @@ public class Novel extends BaseEntityTime {
     @OneToMany(mappedBy = "novel",fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
 
+
+    // 추천 소설 목록...
+    @OneToMany(mappedBy = "recommendNovel")
+    private List<RecommendNovel> recommendNovels = new ArrayList<>();
+
     @Builder
     public Novel(String title, String summary, int episode, int price, int download_cnt, String is_finished,
                  String cover_image, double rating, int review_cnt, String category, Author author,

@@ -1,7 +1,6 @@
 package NovelForm.NovelForm.repository;
 
 import NovelForm.NovelForm.domain.box.domain.Box;
-import NovelForm.NovelForm.domain.box.domain.BoxItem;
 import NovelForm.NovelForm.domain.box.dto.AllBoxResponse;
 import NovelForm.NovelForm.domain.box.dto.BoxSearchInfo;
 import NovelForm.NovelForm.domain.member.domain.Member;
@@ -91,7 +90,7 @@ public interface BoxRepository extends JpaRepository<Box, Long> {
                          " where b.is_private = 0 and b.title like %:search% " +
                          " group by b "
     )
-    List<BoxSearchInfo> findBoxByTitle(@Param("search") String search, PageRequest pageRequest);
+    Page<BoxSearchInfo> findBoxByTitle(@Param("search") String search, PageRequest pageRequest);
 
 
     /**
@@ -125,7 +124,7 @@ public interface BoxRepository extends JpaRepository<Box, Long> {
                          " where b.is_private = 0 and m.nickname like %:search% " +
                          " group by b"
     )
-    List<BoxSearchInfo> findBoxByMember(@Param("search") String search, PageRequest pageRequest);
+    Page<BoxSearchInfo> findBoxByMember(@Param("search") String search, PageRequest pageRequest);
 
 
     /**
@@ -158,7 +157,7 @@ public interface BoxRepository extends JpaRepository<Box, Long> {
      * 내가 작성한 보관함 가져오기
      * @return
      */
-    @Query("select new NovelForm.NovelForm.domain.member.dto.MemberBoxInfo(" +
+    @Query( value = "select new NovelForm.NovelForm.domain.member.dto.MemberBoxInfo(" +
             " b.id, " +
             " b.title, " +
             " m.nickname, " +
@@ -170,8 +169,17 @@ public interface BoxRepository extends JpaRepository<Box, Long> {
             " from Box b " +
             " inner join b.member m " +
             " left join b.boxItems bi " +
-            " where m = :member" )
-    List<MemberBoxInfo> findMemberBoxByMember(@Param("member") Member member);
+            " where m = :member " +
+            " group by b",
+
+            countQuery = "select count(b) " +
+                    "     from Box b" +
+                    "     inner join b.member m " +
+                    "     left join b.boxItems bi " +
+                    "     where m = :member" +
+                    "     group by b"
+    )
+    Page<MemberBoxInfo> findMemberBoxByMember(@Param("member") Member member, PageRequest pageRequest);
 
 
     /**
@@ -196,7 +204,7 @@ public interface BoxRepository extends JpaRepository<Box, Long> {
             " group by b " +
             " order by size(l) DESC ",
 
-            countQuery = " select count(distinct l) " +
+            countQuery = " select count(distinct b) " +
                     " from Box b " +
                     " left join b.likes l " +
                     " inner join b.member m " +
@@ -229,7 +237,7 @@ public interface BoxRepository extends JpaRepository<Box, Long> {
             " group by b " +
             " order by size(l)",
 
-            countQuery = " select count(distinct l) " +
+            countQuery = " select count(distinct b) " +
                     " from Box b " +
                     " left join b.likes l " +
                     " inner join b.member m " +
@@ -238,4 +246,76 @@ public interface BoxRepository extends JpaRepository<Box, Long> {
                     " group by b "
     )
     Page<AllBoxResponse> findAllBoxByPublicWithLike(PageRequest pageRequest);
+
+
+
+    /**
+     *  검색에서 사용할 좋아요에 따른 보관함 정렬 <생성자 검색>
+     *  내림차순
+     * @param pageRequest
+     * @return
+     */
+    @Query(value = "select new NovelForm.NovelForm.domain.box.dto.BoxSearchInfo(" +
+            " b.id, " +
+            " b.title, " +
+            " m.nickname, " +
+            " (select n.cover_image from BoxItem bi2 inner join bi2.novel n where bi2.box = b and bi2.is_lead_item = 1), " +
+            " count(distinct bi), " +
+            " count(distinct l) ) " +
+            " from Box b " +
+            " left join b.likes l " +
+            " inner join b.member m " +
+            " inner join b.boxItems bi " +
+            " where b.is_private = 0 and m.nickname like %:search% " +
+            " group by b " +
+            " order by size(l) DESC ",
+
+            countQuery = " select count(distinct b) " +
+                    " from Box b " +
+                    " left join b.likes l " +
+                    " inner join b.member m " +
+                    " inner join b.boxItems bi " +
+                    " where b.is_private = 0 and b.title like %:search% " +
+                    " group by b "
+    )
+    Page<BoxSearchInfo> findBoxByMemberWithLikeDesc(@Param("search") String search, PageRequest pageRequest);
+
+
+
+    /**
+     *  검색에서 사용할 좋아요에 따른 보관함 정렬 <제목 검색>
+     *  내림차순
+     * @param pageRequest
+     * @return
+     */
+    @Query(value = "select new NovelForm.NovelForm.domain.box.dto.BoxSearchInfo(" +
+            " b.id, " +
+            " b.title, " +
+            " m.nickname, " +
+            " (select n.cover_image from BoxItem bi2 inner join bi2.novel n where bi2.box = b and bi2.is_lead_item = 1), " +
+            " count(distinct bi), " +
+            " count(distinct l) ) " +
+            " from Box b " +
+            " left join b.likes l " +
+            " inner join b.member m " +
+            " inner join b.boxItems bi " +
+            " where b.is_private = 0 and b.title like %:search% " +
+            " group by b " +
+            " order by size(l) DESC ",
+
+            countQuery = " select count(distinct b) " +
+                    " from Box b " +
+                    " left join b.likes l " +
+                    " inner join b.member m " +
+                    " inner join b.boxItems bi " +
+                    " where b.is_private = 0 and b.title like %:search% " +
+                    " group by b "
+    )
+    Page<BoxSearchInfo> findBoxByTitleWithLikeDesc(@Param("search") String search, PageRequest pageRequest);
+
+
+    /**
+     * 본인이 생성한 보관함 개수 가져오기
+     */
+    Integer countBoxByMember(Member member);
 }

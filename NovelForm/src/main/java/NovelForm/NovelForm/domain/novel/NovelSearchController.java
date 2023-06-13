@@ -151,6 +151,8 @@ public class NovelSearchController {
             throw new IllegalArgumentException("해당하는 소설이 존재하지 않습니다.");
         }
 
+
+
         DetailNovelInfo result = DetailNovelInfo.builder()
                 .image_url(novel.getCover_image())
                 .title(novel.getTitle())
@@ -183,6 +185,14 @@ public class NovelSearchController {
         List<NovelDto> an = authorNovels.stream().filter(n -> !n.getTitle().equals(novel.getTitle())).map(n -> new NovelDto(n.getTitle(), novel.getAuthor().getName(), n.getCover_image()
                 , n.averageRating(), n.getDownload_cnt(), n.getCategory(), n.getId())).toList();
         result.setAnotherNovels(an);
+
+
+        //해당 소설에 대한 추천 소설들을 가져온다.
+        List<RecommendNovel> recommendNovelList = novelService.findRecommendNovel(novel);
+        List<Novel> recommendNovels = recommendNovelList.stream().map(rn -> rn.getRecommendNovel()).toList();
+        List<NovelDto> rn = recommendNovels.stream().map(n -> new NovelDto(n.getTitle(), n.getAuthor().getName(), n.getCover_image(),
+                n.averageRating(), n.getDownload_cnt(), n.getCategory(), n.getId())).toList();
+        result.setRecommendNovels(rn);
 
 
         //로그인 상태라면 좋아요를 눌렀는지 확인한다.

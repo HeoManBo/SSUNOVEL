@@ -185,11 +185,14 @@ public class BoxController {
     @Operation(summary = "보관함 검색", description = "공유로 설정되어 있는 보관함들을 검색하는 메서드입니다.")
     @GetMapping("/search")
     public BaseResponse<BoxSearchResponse> getSearchBox(
-            @Parameter(description = "검색어", required = true, example = "test") @RequestParam String item,
+            @Parameter(description = "검색어", required = true, example = "test")
+            @RequestParam(value = "item") String item,
             @Parameter(description = "페이지 번호", in = ParameterIn.QUERY)
-            @Validated @RequestParam(value = "page", required = false, defaultValue = "1") Integer page){
+            @Validated @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+            @Parameter(description = "정렬 조건", in = ParameterIn.QUERY)
+            @Validated @RequestParam(value = "filtering", required = false, defaultValue = "TIME_DESC") FilteringType filtering){
 
-        BoxSearchResponse boxSearchResponse = boxService.searchBox(item, page);
+        BoxSearchResponse boxSearchResponse = boxService.searchBox(item, page, filtering);
 
         return new BaseResponse<>(boxSearchResponse);
     }
@@ -203,11 +206,14 @@ public class BoxController {
     @Operation(summary = "보관함 이름 검색", description = "공유로 설정되어 있는 보관함들을 이름을 기반으로 검색하는 메서드입니다.")
     @GetMapping("/search/title")
     public BaseResponse<BoxSearchByTitleResponse> getSearchBoxByTitle(
-            @Parameter(description = "검색어", required = true, example = "title") @RequestParam String item,
+            @Parameter(description = "검색어", required = true, example = "test")
+            @RequestParam(value = "item") String item,
             @Parameter(description = "페이지 번호", in = ParameterIn.QUERY)
-            @Validated @RequestParam(value = "page", required = false, defaultValue = "1") Integer page){
+            @Validated @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+            @Parameter(description = "정렬 조건", in = ParameterIn.QUERY)
+            @Validated @RequestParam(value = "filtering", required = false, defaultValue = "TIME_DESC") FilteringType filtering){
 
-        BoxSearchByTitleResponse boxSearchResponse = boxService.searchBoxByTitle(item, page);
+        BoxSearchByTitleResponse boxSearchResponse = boxService.searchBoxByTitle(item, page, filtering);
 
         return new BaseResponse<>(boxSearchResponse);
     }
@@ -222,11 +228,14 @@ public class BoxController {
     @Operation(summary = "보관함 생성자 검색", description = "공유로 설정되어 있는 보관함들을 생성자를 기반으로 검색하는 메서드입니다.")
     @GetMapping("/search/creator")
     public BaseResponse<BoxSearchByCreatorResponse> getSearchBoxByCreator(
-            @Parameter(description = "검색어", required = true, example = "creator") @RequestParam String item,
+            @Parameter(description = "검색어", required = true, example = "test")
+            @RequestParam(value = "item") String item,
             @Parameter(description = "페이지 번호", in = ParameterIn.QUERY)
-            @Validated @RequestParam(value = "page", required = false, defaultValue = "1") Integer page){
+            @Validated @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+            @Parameter(description = "정렬 조건", in = ParameterIn.QUERY)
+            @Validated @RequestParam(value = "filtering", required = false, defaultValue = "TIME_DESC") FilteringType filtering){
 
-        BoxSearchByCreatorResponse boxSearchResponse = boxService.searchBoxByCreator(item, page);
+        BoxSearchByCreatorResponse boxSearchResponse = boxService.searchBoxByCreator(item, page, filtering);
 
         return new BaseResponse<>(boxSearchResponse);
     }

@@ -6,17 +6,22 @@ import NovelForm.NovelForm.domain.box.dto.CreateBoxRequest;
 import NovelForm.NovelForm.domain.box.exception.NoSuchBoxItemException;
 import NovelForm.NovelForm.domain.box.exception.WrongBoxException;
 import NovelForm.NovelForm.domain.box.exception.WrongMemberException;
+import NovelForm.NovelForm.domain.community.CommunityPost;
+import NovelForm.NovelForm.domain.favorite.domain.FavoriteAuthor;
+import NovelForm.NovelForm.domain.favorite.domain.FavoriteBox;
+import NovelForm.NovelForm.domain.favorite.domain.FavoriteNovel;
+import NovelForm.NovelForm.domain.like.domain.Like;
 import NovelForm.NovelForm.domain.member.domain.Gender;
 import NovelForm.NovelForm.domain.member.domain.LoginType;
 import NovelForm.NovelForm.domain.member.domain.Member;
 import NovelForm.NovelForm.domain.novel.Author;
 import NovelForm.NovelForm.domain.novel.Novel;
-import NovelForm.NovelForm.repository.AuthorRepository;
-import NovelForm.NovelForm.repository.BoxRepository;
-import NovelForm.NovelForm.repository.MemberRepository;
-import NovelForm.NovelForm.repository.NovelRepository;
+import NovelForm.NovelForm.domain.novel.Review;
+import NovelForm.NovelForm.repository.*;
 import jakarta.persistence.EntityManager;
+import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @SpringBootTest
 @Transactional
 public class BoxServiceTest {
@@ -45,7 +51,150 @@ public class BoxServiceTest {
     MemberRepository memberRepository;
 
     @Autowired
+    ReviewRepository reviewRepository;
+
+    @Autowired
+    LikeRepository likeRepository;
+
+    @Autowired
+    FavoriteBoxRepository favoriteBoxRepository;
+
+    @Autowired
     EntityManager em;
+
+
+    @BeforeEach
+    void setBox(){
+        List<Member> memberList = new ArrayList<>();
+
+        // 회원 10명 생성
+        for(int i = 0; i < 10; i++){
+            Member member = new Member(
+                    "test" + i + "@test.com",
+                    "sdsdsdsdsd",
+                    "testnick_" + i,
+                    Gender.MALE,
+                    LoginType.USER,
+                    38
+            );
+            memberList.add(member);
+        }
+        memberRepository.saveAll(memberList);
+
+
+        // 작가 10명 및 각 작가당 소설 1개씩 생성
+        List<Author> authorList = new ArrayList<>();
+        List<Novel> novelList = new ArrayList<>();
+
+        for(int i = 0; i < 10; i++){
+            Author testAuthor = new Author("test Author" + i);
+            authorList.add(testAuthor);
+
+            Novel testNovel = new Novel(
+                    "test title" + i,
+                    "test summary" + i,
+                    121,
+                    100,
+                    390,
+                    "연재중",
+                    "https://img/src/" + i,
+                    3.8,
+                    198,
+                    "판타지",
+                    testAuthor,
+                    "navernaver",
+                    "kakaokakao",
+                    "ridiridi",
+                    "munpiamunpia"
+            );
+
+            novelList.add(testNovel);
+        }
+        authorRepository.saveAll(authorList);
+        novelRepository.saveAll(novelList);
+
+
+        log.info("size = {}", novelList.size());
+
+        // 모든 회원이(10명) 하나씩은 리뷰를 작성
+        List<Review> reviewList = new ArrayList<>();
+        for(int i = 0; i < 10; i++){
+            System.out.println(i);
+
+            Review review = new Review(
+                    "activated",
+                    novelList.get(i),
+                    memberList.get(i),
+                    3.5,
+                    "test review" + i
+            );
+            reviewList.add(review);
+        }
+
+        reviewRepository.saveAll(reviewList);
+
+
+
+        // 보관함
+        // 각 보관함마다 보관함 아이템 5개씩 생성
+        // 모든 보관함은 비공개로 설정
+        List<Box> boxList = new ArrayList<>();
+
+        for(int i = 0; i < 10; i++){
+
+            List<BoxItem> boxItemList = new ArrayList<>();
+            for(int j = 0; j < 5; j++){
+                BoxItem boxItem = new BoxItem(novelList.get(j).getId().intValue(), novelList.get(j));
+                boxItemList.add(boxItem);
+            }
+
+            Box box = new Box(
+                    "test title",
+                    "test content",
+                    0,
+                    memberList.get(i)
+            );
+            for (BoxItem boxItem : boxItemList) {
+                box.addBoxItem(boxItem);
+            }
+            boxList.add(box);
+        }
+
+        boxRepository.saveAll(boxList);
+
+
+
+        // 좋아요 설정
+        // 모든 회윈이 각자의 보관함에는 좋아요를 등록
+        List<Like> likeList = new ArrayList<>();
+
+        for(int i = 0; i < 10; i++){
+            Like like = new Like(memberList.get(i), boxList.get(i));
+            likeList.add(like);
+        }
+        likeRepository.saveAll(likeList);
+
+
+
+
+
+        // 즐겨찾기 보관함 등록
+        // 역순으로 보관함 즐겨찾기
+        List<FavoriteBox> favoriteBoxList = new ArrayList<>();
+
+        for(int i = 0; i < 10; i++){
+            FavoriteBox favoriteBox = new FavoriteBox(boxList.get(9 - i));
+            favoriteBox.addMember(memberList.get(i));
+
+            favoriteBoxList.add(favoriteBox);
+        }
+
+        favoriteBoxRepository.saveAll(favoriteBoxList);
+
+        em.flush();
+        em.clear();
+    }
+
 
 
     @Test
@@ -199,5 +348,12 @@ public class BoxServiceTest {
 
     }
 
+
+
+    @Test
+    @DisplayName("보관함 검색 테스트")
+    void searchBox(){
+
+    }
 
 }

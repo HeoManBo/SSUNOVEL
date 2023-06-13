@@ -7,6 +7,7 @@ import NovelForm.NovelForm.domain.novel.Review;
 import NovelForm.NovelForm.domain.novel.Novel;
 import NovelForm.NovelForm.domain.novel.dto.detailnoveldto.ReviewDto;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -75,7 +76,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     void bulkDeleteReviewByMember(@Param("member") Member member);
 
 
-    @Query("select new NovelForm.NovelForm.domain.member.dto.MemberReviewInfo(" +
+    @Query(value = "select new NovelForm.NovelForm.domain.member.dto.MemberReviewInfo(" +
             " r.content, " +
             " r.rating," +
             " r.update_at," +
@@ -87,16 +88,25 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             " r.id ) from Review r " +
             " inner join r.novel n " +
             " inner join n.author a" +
-            " where r.member = :member")
-    List<MemberReviewInfo> findMemberReviewByMember(@Param("member") Member member);
+            " where r.member = :member",
+
+            countQuery = " select count(r) " +
+                    "      from Review r " +
+                    "       inner join r.novel n " +
+                    "       inner join n.author a " +
+                    "       where r.member = :member"
+    )
+    Page<MemberReviewInfo> findMemberReviewByMember(@Param("member") Member member, PageRequest pageRequest);
 
     @Query("select r " +
             "from Review r join fetch r.member m left join fetch r.likeList where r.novel = :novel order by r.create_at desc")
     List<Review> reviewFetchLikeOrderRecency(@Param("novel") Novel novel);
 
 
-
-
+    /**
+     * 특정 사용자가 작성한 리뷰 개수 가져오기
+     */
+    Integer countReviewByMember(@Param("member") Member member);
 
 
 }
