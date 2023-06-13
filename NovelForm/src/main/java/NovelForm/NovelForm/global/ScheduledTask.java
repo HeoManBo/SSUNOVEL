@@ -1,6 +1,8 @@
 package NovelForm.NovelForm.global;
 
 import NovelForm.NovelForm.global.s3.S3Service;
+import NovelForm.NovelForm.repository.*;
+import NovelForm.NovelForm.util.NovelCSVParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,18 +19,25 @@ public class ScheduledTask {
     private final S3Service s3Service;
     private final RestTemplate restTemplate;
 
+    private final NovelRepository novelRepository;
+
+    private final FavoriteAuthorRepository favoriteAuthorRepository;
+    private final AuthorRepository authorRepository;
+
+    private final AlertRepository alertRepository;
+
     /**
      * 서버가 시작될 때 실행된다...
-     * 우선은 메소드가 종료되고 1일 후에 다시 호출하도록 설정
+     * 우선은 메소드가 종료되고 3일 후에 다시 호출하도록 설정
      */
-    @Scheduled(fixedDelay = 1000 * 60 * 60 * 24)
+    @Scheduled()
     public void callScrapingApi(){
 
         // 스크래핑 + CSV 파일 얻기
         String result = restTemplate.getForObject("http://52.79.165.132/scraping", String.class);
 
 
-        if(result.equals("ok")){
+        if(result.equals("\"ok\"")){
             log.info("스크래핑 성공");
             csvDownload();
         }
@@ -38,10 +47,15 @@ public class ScheduledTask {
 
         log.info("다운 종료");
 
+
+        NovelCSVParser novelCSVParser = new NovelCSVParser();
+        novelCSVParser.mergeDB(authorRepository, novelRepository, alertRepository, favoriteAuthorRepository);
+
+
         // DB에 줄거리가 유사한 소설 넣기
         result = restTemplate.getForObject("http://52.79.165.132/summary-recommend", String.class);
 
-        if(result.equals("ok")){
+        if(result.equals("\"ok\"")){
             log.info("DB에 줄거리 기반 소설 추천 목록 넣기 성공");
         }
         else{
