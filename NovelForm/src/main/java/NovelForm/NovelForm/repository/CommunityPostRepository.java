@@ -29,8 +29,8 @@ public interface CommunityPostRepository extends JpaRepository<CommunityPost, Lo
     /**
      * 페이징 번호에 맞는 게시글 조회 최신순 내림차순으로 조회한다.
      */
-    @Query(value = "select c from CommunityPost c join fetch c.member join fetch c.comments",
-            countQuery = "select c from CommunityPost c inner join c.member inner join c.comments")
+    @Query(value = "select c from CommunityPost c join fetch c.member",
+            countQuery = "select c from CommunityPost c inner join c.member")
     Page<CommunityPost> findPostListWithPaging(Pageable pageable);
 
 
@@ -70,16 +70,10 @@ public interface CommunityPostRepository extends JpaRepository<CommunityPost, Lo
     /**
      * 마이페이지 작성글 조회시 가져올 내 작성글
      */
-    @Query(value = "select new NovelForm.NovelForm.domain.community.dto.PostDto( " +
-            " cp.id, " +
-            " cp.title, " +
-            " cp.content," +
-            " cp.create_at " +
-            " ) from CommunityPost cp where cp.member = :member",
-
+    @Query(value = "select cp from CommunityPost cp where cp.member = :member",
             countQuery = "select count(cp) from CommunityPost cp where cp.member = :member"
     )
-    Page<PostDto> findPostByMember(@Param("member") Member member, PageRequest pageRequest);
+    Page<CommunityPost> findPostByMember(@Param("member") Member member, PageRequest pageRequest);
 
 
     /**

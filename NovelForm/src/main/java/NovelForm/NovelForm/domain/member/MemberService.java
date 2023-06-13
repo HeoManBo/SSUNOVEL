@@ -1,5 +1,6 @@
 package NovelForm.NovelForm.domain.member;
 
+import NovelForm.NovelForm.domain.community.CommunityPost;
 import NovelForm.NovelForm.domain.community.dto.PostDto;
 import NovelForm.NovelForm.domain.member.domain.LoginType;
 import NovelForm.NovelForm.domain.member.domain.Member;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -242,10 +244,13 @@ public class MemberService {
         PageRequest pageRequest = PageRequest.of(page - 1, 10, Sort.by("update_at").descending());
 
 
-        List<PostDto> memberPostList = communityPostRepository.findPostByMember(member, pageRequest).getContent();
+        List<CommunityPost> memberPostList = communityPostRepository.findPostByMember(member, pageRequest).getContent();
+
+        List<PostDto> postDtoList = memberPostList.stream().map(cp ->
+                new PostDto(cp.getId(), cp.getTitle(), cp.getMember().getNickname(), cp.getCreate_at(), cp.getComments().size())).toList();
 
         Integer postCnt = communityPostRepository.findPostCountByMember(member);
-        MemberPostResponse memberPostResponse = new MemberPostResponse(postCnt, memberPostList);
+        MemberPostResponse memberPostResponse = new MemberPostResponse(postCnt, postDtoList);
 
         return memberPostResponse;
     }
