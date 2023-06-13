@@ -24,30 +24,43 @@ public class ScheduledTask {
     @Scheduled(fixedDelay = 1000 * 60 * 60 * 24)
     public void callScrapingApi(){
 
+        // 스크래핑 + CSV 파일 얻기
         String result = restTemplate.getForObject("http://52.79.165.132/scraping", String.class);
 
 
-        if(result.equals("\"ok\"")){
+        if(result.equals("ok")){
             log.info("스크래핑 성공");
-
-            String[] keyList = {"naver.csv", "kakao.csv", "munpia0.csv", "munpia1.csv", "ridi0.csv", "ridi1.csv", "ridi2.csv"};
-            String localFilePath = "./NovelForm/";
-
-            for (String key : keyList) {
-                try{
-                    s3Service.download(localFilePath + key, key);
-                }
-                catch (Exception e){
-                    log.error("S3에서 {} 다운 실패!", key);
-                }
-
-            }
+            csvDownload();
         }
         else{
             log.info("스크래핑 실패");
         }
 
         log.info("다운 종료");
+
+        // DB에 줄거리가 유사한 소설 넣기
+        result = restTemplate.getForObject("http://52.79.165.132/summary-recommend", String.class);
+
+        if(result.equals("ok")){
+            log.info("DB에 줄거리 기반 소설 추천 목록 넣기 성공");
+        }
+        else{
+            log.info("DB 저장 실패");
+        }
+    }
+
+    private void csvDownload() {
+        String[] keyList = {"naver.csv", "kakao.csv", "munpia0.csv", "munpia1.csv", "ridi0.csv", "ridi1.csv", "ridi2.csv"};
+        String localFilePath = "./NovelForm/";
+
+        for (String key : keyList) {
+            try{
+                s3Service.download(localFilePath + key, key);
+            }
+            catch (Exception e){
+                log.error("S3에서 {} 다운 실패!", key);
+            }
+        }
     }
 
 
