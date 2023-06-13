@@ -29,8 +29,8 @@ public interface CommunityPostRepository extends JpaRepository<CommunityPost, Lo
     /**
      * 페이징 번호에 맞는 게시글 조회 최신순 내림차순으로 조회한다.
      */
-    @Query(value = "select c from CommunityPost c join fetch c.member ",
-            countQuery = "select c from CommunityPost c inner join c.member")
+    @Query(value = "select c from CommunityPost c join fetch c.member join fetch c.comments",
+            countQuery = "select c from CommunityPost c inner join c.member inner join c.comments")
     Page<CommunityPost> findPostListWithPaging(Pageable pageable);
 
 
@@ -43,11 +43,13 @@ public interface CommunityPostRepository extends JpaRepository<CommunityPost, Lo
     /**
      * keyword가 포함되는 게시글 가져온다 -> 오래전 것부터 가져옴
      */
-    @Query("select c from CommunityPost c join fetch c.member where c.title like %:keyword% order by c.create_at ASC")
-    List<CommunityPost> findCommunityPostWithKeywordASC(@Param("keyword") String keyword);
+    @Query(value = "select c from CommunityPost c join fetch c.member where c.title like %:keyword% order by c.create_at ASC",
+    countQuery = "select count(c) from CommunityPost c inner join c.member where c.title like %:keyword% order by c.create_at ASC")
+    Page<CommunityPost> findCommunityPostWithKeywordASC(@Param("keyword") String keyword, Pageable pageable);
 
-    @Query("select c from CommunityPost c join fetch c.member where c.title like %:keyword% order by c.create_at DESC")
-    List<CommunityPost> findCommunityPostWithKeywordDESC(@Param("keyword") String keyword);
+    @Query(value = "select c from CommunityPost c join fetch c.member where c.title like %:keyword% order by c.create_at DESC",
+    countQuery = "select count(c) from CommunityPost c inner join c.member where c.title like %:keyword% order by c.create_at DESC")
+    Page<CommunityPost> findCommunityPostWithKeywordDESC(@Param("keyword") String keyword, Pageable pageable);
 
 
     /**

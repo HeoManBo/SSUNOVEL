@@ -176,8 +176,14 @@ public class CommunityController {
     public BaseResponse<List<PostDto>> keywordPost(    @Parameter(description = "검색어", in = ParameterIn.QUERY)
                                                        @RequestParam("keyword") String keyword,
                                                        @Parameter(description = "게시글 정렬 기준으로 기본은 최신순(내림차순) : latest 부터 오래된 순서(오름차순)으로 조회하려면 outDate 전달", in = ParameterIn.QUERY)
-                                                       @RequestParam(value = "orderByDate", required = false, defaultValue = "latest") String date) throws NoSuchListElement {
-        List<PostDto> result = communityService.keywordPost(keyword, date);
+                                                       @RequestParam(value = "orderByDate", required = false, defaultValue = "latest") String date,
+                                                       @Parameter(description = "페이지 번호")
+                                                       @RequestParam(value = "pageNum", required = false, defaultValue = "0") int page) throws NoSuchListElement {
+        if(page < 0){ //음수 페이지 번호시 error;
+            throw new NumberFormatException("페이지 번호는 음수가될 수 없습니다..");
+        }
+
+        List<PostDto> result = communityService.keywordPost(keyword, date, page);
 
         log.info("keyword = {}", keyword);
 
