@@ -8,6 +8,7 @@ import NovelForm.NovelForm.domain.novel.dto.searchdto.MidFormmat;
 import NovelForm.NovelForm.domain.novel.dto.searchdto.NovelDto;
 import NovelForm.NovelForm.repository.AuthorRepository;
 import NovelForm.NovelForm.repository.NovelRepository;
+import NovelForm.NovelForm.repository.RecommendNovelRepository;
 import NovelForm.NovelForm.util.NovelCSVParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ import java.util.Optional;
 public class NovelService {
     private final NovelRepository novelRepository;
     private final AuthorRepository authorRepository;
+    private final RecommendNovelRepository recommendNovelRepository;
     public static final int PagingSize = 10; //페이징할 때 크기 기본적으로 10개로 설정,
 
     /**
@@ -182,6 +184,17 @@ public class NovelService {
                         novel.averageRating(), novel.getReview_cnt(), novel.getCategory(), novel.getId())).toList();
         long size = novelRepository.totalCount(categoryDto);
         return new MidFormmat((int)size, dto);
+    }
+
+
+    /**
+     * 특정 소설에 대한 추천 소설들을 가져옵니다.
+     */
+    @Transactional(readOnly = true)
+    public List<RecommendNovel> findRecommendNovel(Novel findNovel){
+        List<RecommendNovel> recommendNovelList = recommendNovelRepository.findRecommendNovelByNovel(findNovel);
+
+        return recommendNovelList;
     }
 
 }
