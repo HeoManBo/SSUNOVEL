@@ -73,7 +73,7 @@ public class NovelCSVParser {
      */
     public void mergeDB(AuthorRepository authorRepository, NovelRepository novelRepository,
                         AlertRepository alertRepository, FavoriteAuthorRepository favoriteAuthorRepository){
-        String[] names = {"naver.csv", "kakao.csv", "munpia.csv", "ridibooks.csv"};
+        String[] names = {"naver.csv", "kakao.csv", "munpia0.csv", "munpia1.csv", "ridi0.csv","ridi1.csv","ridi2.csv"};
         //String[] names = {"ridis.csv"};
 
         //기존에 있는 author 정보 넣기

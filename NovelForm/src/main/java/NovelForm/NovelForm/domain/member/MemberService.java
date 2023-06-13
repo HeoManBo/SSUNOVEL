@@ -196,7 +196,6 @@ public class MemberService {
         // 보관함 삭제
         boxRepository.bulkDeleteBoxByMember(member);
 
-
         // 마지막으로 멤버 삭제
         memberRepository.delete(member);
 

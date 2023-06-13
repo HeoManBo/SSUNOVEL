@@ -19,11 +19,13 @@ public class PostDto {
     private String nickName; //작성한 사람 이름
     @Schema(description = "작성 시간")
     private LocalDateTime writeAt;
-
-    public PostDto(Long postId, String title, String nickName, LocalDateTime write_at) {
+    @Schema(description = "해당 게시글에 달린 댓글 수")
+    private int comment_cnt;
+    public PostDto(Long postId, String title, String nickName, LocalDateTime write_at, int comment_cnt) {
         this.postId = postId;
         this.title = title;
         this.nickName = nickName;
         this.writeAt = write_at;
+        this.comment_cnt = comment_cnt;
     }
 }

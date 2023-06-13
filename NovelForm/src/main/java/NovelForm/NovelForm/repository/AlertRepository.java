@@ -25,4 +25,6 @@ public interface AlertRepository extends JpaRepository<Alert, Long> {
     Alert findAlertByIdAndMemberId(Long alertId, Long memberId);
 
 
+
+
 }
