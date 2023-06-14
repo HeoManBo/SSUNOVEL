@@ -48,13 +48,13 @@ public interface FavoriteNovelRepository extends JpaRepository<FavoriteNovel, Lo
             " n.cover_image, " +
             " a.name, " +
             " cast(count(r) as int), " +
-            " avg(r.rating), " +
+            " coalesce(avg(r.rating), 0.0) , " +
             " n.category " +
             " ) " +
             " from FavoriteNovel fn " +
             " inner join fn.novel n " +
             " inner join n.author a " +
-            " inner join n.reviews r " +
+            " left join n.reviews r " +
             " where fn.member = :member" +
             " group by fn ",
 
@@ -62,7 +62,7 @@ public interface FavoriteNovelRepository extends JpaRepository<FavoriteNovel, Lo
                     "       from FavoriteNovel fn " +
                     "       inner join fn.novel n " +
                     "       inner join n.author a " +
-                    "       inner join n.reviews r " +
+                    "       left join n.reviews r " +
                     "       where fn.member = :member " +
                     "       group by fn"
     )
@@ -71,5 +71,6 @@ public interface FavoriteNovelRepository extends JpaRepository<FavoriteNovel, Lo
     /**
      * 즐겨찾기한 소설의 개수를 가져온다.
      */
+    @Query("select count(distinct fn) from FavoriteNovel fn where fn.member =:member")
     Integer countFavoriteNovelByMember(Member member);
 }
