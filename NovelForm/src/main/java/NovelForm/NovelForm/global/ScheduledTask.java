@@ -1,5 +1,7 @@
 package NovelForm.NovelForm.global;
 
+import NovelForm.NovelForm.domain.Ridi;
+import NovelForm.NovelForm.domain.novel.Novel;
 import NovelForm.NovelForm.global.s3.S3Service;
 import NovelForm.NovelForm.repository.*;
 import NovelForm.NovelForm.util.NovelCSVParser;
@@ -8,13 +10,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -31,6 +34,7 @@ public class ScheduledTask {
 
     private final AlertRepository alertRepository;
 
+    private final RidiRepository ridiRepository;
     private final WebClient webClient;
 
     /**
@@ -101,6 +105,54 @@ public class ScheduledTask {
 //            }
 //        }
 //    }
+
+
+    // 더미데이터 삽입 시에만 사용할 메소드
+    //@Scheduled(fixedDelay = 1000 * 60 * 60)
+    //@Transactional
+    public void ridiReviewParsing(){
+        NovelCSVParser novelCSVParser = new NovelCSVParser();
+        List<List<String>> review_info = NovelCSVParser.read("ridi.csv");
+
+        List<Novel> novelList = novelRepository.findAll();
+
+        Map<String, Long> novelMap = new HashMap<>();
+
+        for (Novel novel : novelList) {
+            novelMap.put(novel.getTitle(), novel.getId());
+        }
+
+        List<Ridi> ridiList = new ArrayList<>();
+
+
+        review_info.sort(Comparator.comparing(row -> row.get(1)));
+        String prev = review_info.get(0).get(1);
+
+        Long idx = 1l;
+
+        for (List<String> review : review_info) {
+
+            log.info("{}, {} ={}", review.get(1), prev, review.get(1).equals(prev));
+
+            if(!review.get(1).equals(prev)){
+                idx++;
+                prev = review.get(1);
+            }
+
+            Long novelIdx = novelMap.get(review.get(0));
+
+            if(novelIdx == null){
+                continue;
+            }
+
+            Ridi ridi = new Ridi(idx, novelIdx, Double.parseDouble(review.get(3)));
+            ridiList.add(ridi);
+            //log.info("{}, {}, {}", ridi.getNovel_idx(), ridi.getUser_idx(), ridi.getRating());
+        }
+
+        ridiRepository.saveAll(ridiList);
+
+    }
 
 
 }
