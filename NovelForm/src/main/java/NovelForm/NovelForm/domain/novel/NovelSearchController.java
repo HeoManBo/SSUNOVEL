@@ -141,7 +141,7 @@ public class NovelSearchController {
     @Operation(summary = "소설 상세 정보", description = "소설 상세 정보를 보여줍니다. 리뷰와 다른 소설이 없는 경우 공 리스트로 반환됩니다. " +
             "orderby는 기본적으로 시간순(recently)으로 정렬하며 like_count 라는 값이 있으면 좋아요 수를 기준으로 리뷰를 정렬합니다. ",
                responses = @ApiResponse(responseCode = "200", description = "소설 상세 정보 조회 성공", content = @Content(schema = @Schema(implementation = DetailNovelInfo.class))))
-    @GetMapping("/{novel_id}")
+    @GetMapping("/info/{novel_id}")
     public BaseResponse<DetailNovelInfo> detailSearchNovel(@PathVariable("novel_id") @Min(0) Long id,
                                             @SessionAttribute(name = LOGIN_MEMBER_ID, required = false) Long memberId,
                                             @RequestParam(value = "orderBy", required = false, defaultValue = "recently") String reviewOrder) throws Exception{
