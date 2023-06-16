@@ -318,4 +318,11 @@ public interface BoxRepository extends JpaRepository<Box, Long> {
      * 본인이 생성한 보관함 개수 가져오기
      */
     Integer countBoxByMember(Member member);
+
+
+    /**
+     * 전체 보관함 개수 가져오기 (공개로 설정한)
+     */
+    @Query("select count(b) from Box b where b.is_private = 0")
+    Integer countBoxesByIs_private();
 }

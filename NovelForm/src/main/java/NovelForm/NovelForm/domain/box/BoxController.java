@@ -140,7 +140,7 @@ public class BoxController {
      */
     @Operation(summary = "보관함 전체 목록 가져오기", description = "공유로 설정해 놓은 보관함들을 다 가져오는 메서드입니다.")
     @GetMapping("/all")
-    public BaseResponse<List<AllBoxResponse>> getAllBox(
+    public BaseResponse<AllBoxAndCntResponse> getAllBox(
             @Parameter(description = "페이지 번호", in = ParameterIn.QUERY)
             @Validated @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
             @Parameter(description = "정렬 조건", in = ParameterIn.QUERY)
@@ -148,7 +148,7 @@ public class BoxController {
 
 
 
-        List<AllBoxResponse> allBoxResponses = boxService.getAllBox(page, filtering);
+        AllBoxAndCntResponse allBoxResponses = boxService.getAllBox(page, filtering);
 
         return new BaseResponse<>(allBoxResponses);
     }

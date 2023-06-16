@@ -223,7 +223,7 @@ public class BoxService {
      *
      * @return
      */
-    public List<AllBoxResponse> getAllBox(Integer page, FilteringType filtering) {
+    public AllBoxAndCntResponse getAllBox(Integer page, FilteringType filtering) {
 
         List<AllBoxResponse> allBoxByPublic = null;
 
@@ -252,7 +252,11 @@ public class BoxService {
         log.warn("all box :{}", allBoxByPublic);
 
 
-        return allBoxByPublic;
+        Integer allBoxCnt = boxRepository.countBoxesByIs_private();
+
+        AllBoxAndCntResponse allBoxAndCntResponse = new AllBoxAndCntResponse(allBoxCnt, allBoxByPublic);
+
+        return allBoxAndCntResponse;
     }
 
 
