@@ -3,6 +3,7 @@ package NovelForm.NovelForm.domain.community;
 
 import NovelForm.NovelForm.domain.community.dto.DetailPostDto;
 import NovelForm.NovelForm.domain.community.dto.PostDto;
+import NovelForm.NovelForm.domain.community.dto.PostListDto;
 import NovelForm.NovelForm.domain.community.dto.WriteDto;
 import NovelForm.NovelForm.domain.community.exception.NoPostException;
 import NovelForm.NovelForm.domain.community.exception.NotFoundSessionException;
@@ -90,7 +91,7 @@ public class CommunityController {
             throw new NumberFormatException("페이지 번호는 음수이거나 문자열일 수 없습니다.");
         }
 
-        List<PostDto> result = communityService.totalPost(pageNum, date);
+        PostListDto result = communityService.totalPost(pageNum, date);
 
         if(result == null){ //List를 받아오지 못하면 에러 호출
             throw new NoSuchListElement();
@@ -183,7 +184,7 @@ public class CommunityController {
             throw new NumberFormatException("페이지 번호는 음수가될 수 없습니다..");
         }
 
-        List<PostDto> result = communityService.keywordPost(keyword, date, page);
+        PostListDto result = communityService.keywordPost(keyword, date, page);
 
         log.info("keyword = {}", keyword);
 

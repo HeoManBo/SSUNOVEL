@@ -3,6 +3,7 @@ package NovelForm.NovelForm.domain.community;
 
 import NovelForm.NovelForm.domain.community.dto.DetailPostDto;
 import NovelForm.NovelForm.domain.community.dto.PostDto;
+import NovelForm.NovelForm.domain.community.dto.PostListDto;
 import NovelForm.NovelForm.domain.community.dto.WriteDto;
 import NovelForm.NovelForm.domain.community.exception.NoPostException;
 import NovelForm.NovelForm.domain.community.exception.NotPostOwner;
@@ -69,7 +70,7 @@ public class CommunityService {
      * 페이지 번호에 맞는 게시글 리스트 반환
      */
     @Transactional(readOnly = true)
-    public List<PostDto> totalPost(int pageNum, String date) throws IllegalArgumentException {
+    public PostListDto totalPost(int pageNum, String date) throws IllegalArgumentException {
         Pageable page;
         if(date.equals("latest")){ //내림차순
             page = PageRequest.of(pageNum, PagingSize, Sort.by("create_at").descending());
@@ -87,9 +88,14 @@ public class CommunityService {
             return null;
         }
 
-        //현재 페이지에 해당하는 게시글 리스트 반환
-        return postListWithPaging.stream().
+        List<PostDto> list = postListWithPaging.stream().
                 map(c -> new PostDto(c.getId(), c.getTitle(), c.getMember().getNickname(), c.getCreate_at(), c.getComments().size())).toList();
+
+        PostListDto ret = new PostListDto((int)postListWithPaging.getTotalElements(), list);
+
+
+        //현재 페이지에 해당하는 게시글 리스트 반환
+        return ret;
 
     }
 
@@ -177,7 +183,7 @@ public class CommunityService {
      * 검색어가 주어졌을 때 검색어에 해당되는 게시물을 찾아옵니다.
      */
     @Transactional(readOnly = true)
-    public List<PostDto> keywordPost(String keyword, String date, int page) throws IllegalArgumentException {
+    public PostListDto keywordPost(String keyword, String date, int page) throws IllegalArgumentException {
         Pageable pageable = PageRequest.of(page,PagingSize);
         Page<CommunityPost> communityPostWithKeyword;
         if(date.equals("latest")){ //내림차순
@@ -198,7 +204,11 @@ public class CommunityService {
             return null;
         }
 
-        return communityPostWithKeyword.getContent().stream().
-                map(c -> new PostDto(c.getId(), c.getTitle(), c.getMember().getNickname(), c.getCreate_at(),c.getComments().size())).toList();
+        List<PostDto> list = communityPostWithKeyword.getContent().stream().
+                map(c -> new PostDto(c.getId(), c.getTitle(), c.getMember().getNickname(), c.getCreate_at(), c.getComments().size())).toList();
+
+        PostListDto ret = new PostListDto((int)communityPostWithKeyword.getTotalElements(), list);
+
+        return ret;
     }
 }
