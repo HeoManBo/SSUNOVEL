@@ -272,4 +272,22 @@ public class ReviewService {
 
         return result.getContent();
     }
+
+    /**
+     * 최소 리뷰가 5개 이상남긴 유저인지 확인한다.
+     */
+    @Transactional(readOnly = true)
+    public boolean canRecommend(Long memberId){
+        Member member = memberRepository.findById(memberId).get(); //멤버 정보 가져오기
+        Integer cnt = reviewRepository.countReviewByMember(member); //해당 멤버가 작성한 리뷰 수 가져오기
+        if(cnt == null) {
+            return false;
+        }
+        if(cnt < 10){ //리뷰를 10개 이하로 남겼으면 추천 XX
+            return false;
+        }
+        return true;
+    }
+
+
 }

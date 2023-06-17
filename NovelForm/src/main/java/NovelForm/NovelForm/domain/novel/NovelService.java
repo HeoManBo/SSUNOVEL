@@ -197,4 +197,11 @@ public class NovelService {
         return recommendNovelList;
     }
 
+    public MidFormmat findRecommendNovelList(List<Long> recoList) {
+        List<Novel> findNovels = novelRepository.findRecommendNovel(recoList);
+        List<NovelDto> dto = findNovels.stream()
+                .map(novel -> new NovelDto(novel.getTitle(), novel.getAuthor().getName(), novel.getCover_image(),
+                        novel.averageRating(), novel.getReview_cnt(), novel.getCategory(), novel.getId())).toList();
+        return new MidFormmat(10, dto);
+    }
 }

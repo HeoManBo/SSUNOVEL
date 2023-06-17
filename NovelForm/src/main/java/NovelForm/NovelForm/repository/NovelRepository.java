@@ -91,4 +91,10 @@ public interface NovelRepository extends JpaRepository<Novel, Long>, CustomNovel
 
     @Query("select n from Novel n join fetch Author a where n.id = :novel_id")
     Optional<Novel> findNovelByIdWithAuthor(@Param("novel_id")Long novel_id);
+
+
+    @Query("select n from Novel n join fetch n.author au where n.id in (:recoList)")
+    List<Novel> findRecommendNovel(@Param("recoList") List<Long> recoList);
+
+
 }
